@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>Login - Mentis</title>
+
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+
+        body {
+
+            font-family: Arial, Helvetica, sans-serif;
+
+            background: white;
+
+            min-height: 100vh;
+
+            overflow-x: hidden;
+
+        }
+
+
+        /* =====================================
+           CABEÇALHO
+           ===================================== */
+
+        .header {
+
+            width: 100%;
+
+            height: 80px;
+
+            background: #d9d9d9;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            padding: 0 45px;
+
+        }
+
+
+        .logo img {
+
+            width: 95px;
+
+            height: auto;
+
+            display: block;
+
+        }
+
+
+        .menu {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 30px;
+
+        }
+
+
+        .menu a {
+
+            color: #111;
+
+            text-decoration: none;
+
+            font-size: 16px;
+
+            white-space: nowrap;
+
+        }
+
+
+        .menu a:hover {
+
+            color: #1a1a6e;
+
+        }
+
+
+        /* =====================================
+           ÁREA PRINCIPAL
+           ===================================== */
+
+        .container {
+
+            width: 100%;
+
+            min-height: calc(100vh - 80px);
+
+            display: flex;
+
+            position: relative;
+
+        }
+
+
+        /* =====================================
+           LADO ESQUERDO
+           ===================================== */
+
+        .left {
+
+            width: 50%;
+
+            min-height: calc(100vh - 80px);
+
+            position: relative;
+
+            overflow: hidden;
+
+            background-image:
+                url("{{ url_for('static', filename='imagens/cerebro.png') }}");
+
+            background-size: cover;
+
+            background-position: center;
+
+            background-repeat: no-repeat;
+
+        }
+
+
+        /* =====================================
+           CAMADA ESCURA
+           ===================================== */
+
+        .left::before {
+
+            content: "";
+
+            position: absolute;
+
+            inset: 0;
+
+            background: rgba(0, 0, 0, 0.42);
+
+            z-index: 1;
+
+        }
+
+
+        /* =====================================
+           CONTEÚDO ESQUERDO
+           ===================================== */
+
+        .left-content {
+
+            position: relative;
+
+            z-index: 2;
+
+            width: 100%;
+
+            min-height: calc(100vh - 80px);
+
+            display: flex;
+
+            flex-direction: column;
+
+            justify-content: center;
+
+            align-items: flex-start;
+
+            padding: 60px 10%;
+
+        }
+
+
+        /* =====================================
+           TEXTO
+           ===================================== */
+
+        .left-text {
+
+            max-width: 500px;
+
+        }
+
+
+        .left-text h2 {
+
+            color: white;
+
+            font-size: 42px;
+
+            line-height: 1.15;
+
+            margin-bottom: 18px;
+
+            text-shadow:
+                0 3px 7px
+                rgba(0, 0, 0, 0.85);
+
+        }
+
+
+        .left-text p {
+
+            color: white;
+
+            font-size: 19px;
+
+            line-height: 1.5;
+
+            margin-bottom: 30px;
+
+            text-shadow:
+                0 2px 5px
+                rgba(0, 0, 0, 0.85);
+
+        }
+
+
+        /* =====================================
+           BOTÃO ENTRAR EM UMA CONTA
+           ===================================== */
+
+        .account-button {
+
+            display: inline-flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            padding: 15px 25px;
+
+            border: none;
+
+            border-radius: 30px;
+
+            background: #1a1a6e;
+
+            color: white;
+
+            font-size: 16px;
+
+            font-weight: bold;
+
+            cursor: pointer;
+
+            transition: 0.25s;
+
+            box-shadow:
+                0 4px 12px
+                rgba(0, 0, 0, 0.35);
+
+        }
+
+
+        .account-button:hover {
+
+            background: #2d2da0;
+
+            transform: translateY(-2px);
+
+        }
+
+
+        /* =====================================
+           DIVISOR
+           ===================================== */
+
+        .toggle {
+
+            position: absolute;
+
+            z-index: 10;
+
+            left: 50%;
+
+            top: 50%;
+
+            transform:
+                translate(-50%, -50%);
+
+            width: 50px;
+
+            height: 50px;
+
+            border-radius: 50%;
+
+            background: white;
+
+            color: #1a1a6e;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            font-size: 22px;
+
+            font-weight: bold;
+
+            box-shadow:
+                0 3px 12px
+                rgba(0, 0, 0, 0.20);
+
+        }
+
+
+        /* =====================================
+           LADO DIREITO
+           ===================================== */
+
+        .right {
+
+            width: 50%;
+
+            min-height: calc(100vh - 80px);
+
+            background: white;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            padding: 50px;
+
+        }
+
+
+        /* =====================================
+           FORMULÁRIO
+           ===================================== */
+
+        .form-area {
+
+            width: 100%;
+
+            max-width: 430px;
+
+        }
+
+
+        .form-area h1 {
+
+            color: #111;
+
+            font-size: 36px;
+
+            margin-bottom: 10px;
+
+        }
+
+
+        .facalog {
+
+            margin-bottom: 28px;
+
+        }
+
+
+        .facalog p {
+
+            color: #555;
+
+            font-size: 16px;
+
+        }
+
+
+        /* =====================================
+           INPUTS
+           ===================================== */
+
+        .input {
+
+            width: 100%;
+
+            margin-bottom: 18px;
+
+        }
+
+
+        .input input {
+
+            width: 100%;
+
+            height: 52px;
+
+            padding: 0 16px;
+
+            border: 1px solid #cccccc;
+
+            border-radius: 8px;
+
+            background: white;
+
+            color: #111;
+
+            font-size: 16px;
+
+            outline: none;
+
+        }
+
+
+        .input input:focus {
+
+            border-color: #1a1a6e;
+
+            box-shadow:
+                0 0 0 3px
+                rgba(26, 26, 110, 0.10);
+
+        }
+
+
+        /* =====================================
+           ESQUECI MINHA SENHA
+           ===================================== */
+
+        .esqueci {
+
+            display: block;
+
+            width: 100%;
+
+            text-align: right;
+
+            margin-top: -8px;
+
+            margin-bottom: 20px;
+
+            color: #1a1a6e;
+
+            text-decoration: none;
+
+            font-size: 14px;
+
+            font-weight: bold;
+
+        }
+
+
+        .esqueci:hover {
+
+            text-decoration: underline;
+
+            color: #2d2da0;
+
+        }
+
+
+        /* =====================================
+           BOTÃO DO FORMULÁRIO
+           ===================================== */
+
+        .entrar {
+
+            width: 100%;
+
+            height: 52px;
+
+            border: none;
+
+            border-radius: 8px;
+
+            background: #1a1a6e;
+
+            color: white;
+
+            font-size: 17px;
+
+            font-weight: bold;
+
+            cursor: pointer;
+
+            transition: 0.2s;
+
+        }
+
+
+        .entrar:hover {
+
+            background: #2d2da0;
+
+        }
+
+
+        /* =====================================
+           ÍCONES
+           ===================================== */
+
+        .social {
+
+            display: flex;
+
+            justify-content: center;
+
+            align-items: center;
+
+            gap: 18px;
+
+            margin-top: 25px;
+
+        }
+
+
+        .social img {
+
+            width: 42px;
+
+            height: 42px;
+
+            object-fit: contain;
+
+        }
+
+
+        /* =====================================
+           ERRO
+           ===================================== */
+
+        .erro {
+
+            width: 100%;
+
+            padding: 12px;
+
+            margin-bottom: 18px;
+
+            background: #ffe6e6;
+
+            border: 1px solid #ffb5b5;
+
+            border-radius: 8px;
+
+            color: #a00000;
+
+            font-size: 14px;
+
+        }
+
+
+        /* =====================================
+           ESCONDER FORMULÁRIO
+           ===================================== */
+
+        .escondido {
+
+            display: none;
+
+        }
+
+
+        /* =====================================
+           RESPONSIVIDADE
+           ===================================== */
+
+        @media (max-width: 900px) {
+
+            .header {
+
+                height: auto;
+
+                min-height: 80px;
+
+                padding: 20px 25px;
+
+                flex-direction: column;
+
+                gap: 15px;
+
+            }
+
+
+            .menu {
+
+                gap: 18px;
+
+                flex-wrap: wrap;
+
+                justify-content: center;
+
+            }
+
+
+            .container {
+
+                flex-direction: column;
+
+            }
+
+
+            .left,
+            .right {
+
+                width: 100%;
+
+            }
+
+
+            .left {
+
+                min-height: 500px;
+
+            }
+
+
+            .left-content {
+
+                min-height: 500px;
+
+                padding: 50px 10%;
+
+            }
+
+
+            .right {
+
+                min-height: 500px;
+
+                padding: 50px 25px;
+
+            }
+
+
+            .toggle {
+
+                display: none;
+
+            }
+
+        }
+
+
+        @media (max-width: 600px) {
+
+            .menu a {
+
+                font-size: 14px;
+
+            }
+
+
+            .left-text h2 {
+
+                font-size: 30px;
+
+            }
+
+
+            .left-text p {
+
+                font-size: 16px;
+
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- =====================================
+     CABEÇALHO
+     ===================================== -->
+
+<header class="header">
+
+    <div class="logo">
+
+        <img
+            src="{{ url_for('static', filename='imagens/logo.png') }}"
+            alt="Logo Mentis">
+
+    </div>
+
+
+    <nav class="menu">
+
+        <a href="{{ url_for('home') }}#hero">
+            Home
+        </a>
+
+        <a href="{{ url_for('home') }}#sobre">
+            Sobre nós
+        </a>
+
+        <a href="{{ url_for('home') }}#demo">
+            Demo
+        </a>
+
+        <a href="{{ url_for('home') }}#faq">
+            FAQ
+        </a>
+
+        <a href="{{ url_for('home') }}#time">
+            Nosso time
+        </a>
+
+    </nav>
+
+</header>
+
+
+
+<!-- =====================================
+     CONTEÚDO
+     ===================================== -->
+
+<main class="container">
+
+
+    <!-- =================================
+         LADO ESQUERDO
+         ================================= -->
+
+    <section class="left">
+
+        <div class="left-content">
+
+            <div class="left-text">
+
+                <h2>
+                    Já possui uma conta?
+                </h2>
+
+
+                <p>
+                    Entre para continuar utilizando
+                    a Mentis.
+                </p>
+
+
+                <button
+                    type="button"
+                    class="account-button"
+                    onclick="mostrarLogin()">
+
+                    Entrar em uma conta
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =================================
+         DIVISOR
+         ================================= -->
+
+    <div class="toggle">
+
+        ↔
+
+    </div>
+
+
+
+    <!-- =================================
+         LADO DIREITO
+         ================================= -->
+
+    <section class="right">
+
+
+        <!-- =================================
+             CADASTRO
+             ================================= -->
+
+        <div
+            id="cadastro-area"
+            class="form-area">
+
+
+            <h1>
+                Criar conta
+            </h1>
+
+
+            <div class="facalog">
+
+                <p>
+                    Cadastre-se no Mentis
+                </p>
+
+            </div>
+
+
+            {% if erro %}
+
+                <div class="erro">
+                    {{ erro }}
+                </div>
+
+            {% endif %}
+
+
+            <form
+                action="{{ url_for('cadastro') }}"
+                method="POST">
+
+
+                <div class="input">
+
+                    <input
+                        name="email"
+                        type="email"
+                        placeholder="Digite seu e-mail"
+                        required>
+
+                </div>
+
+
+                <div class="input">
+
+                    <input
+                        name="senha"
+                        type="password"
+                        placeholder="Digite sua senha"
+                        required>
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="entrar">
+
+                    Cadastrar
+
+                </button>
+
+
+            </form>
+
+
+            <div class="social">
+
+                <img
+                    src="{{ url_for('static', filename='imagens/google.png') }}"
+                    alt="Google">
+
+
+                <img
+                    src="{{ url_for('static', filename='imagens/microsoft.png') }}"
+                    alt="Microsoft">
+
+            </div>
+
+
+        </div>
+
+
+
+        <!-- =================================
+             LOGIN
+             ================================= -->
+
+        <div
+            id="login-area"
+            class="form-area escondido">
+
+
+            <h1>
+                Entrar
+            </h1>
+
+
+            <div class="facalog">
+
+                <p>
+                    Entre na sua conta Mentis
+                </p>
+
+            </div>
+
+
+            {% if erro %}
+
+                <div class="erro">
+                    {{ erro }}
+                </div>
+
+            {% endif %}
+
+
+            <form
+                action="{{ url_for('entrar') }}"
+                method="POST">
+
+
+                <div class="input">
+
+                    <input
+                        name="email"
+                        type="email"
+                        placeholder="Digite seu e-mail"
+                        required>
+
+                </div>
+
+
+                <div class="input">
+
+                    <input
+                        name="senha"
+                        type="password"
+                        placeholder="Digite sua senha"
+                        required>
+
+                </div>
+
+
+                <!-- =========================
+                     NOVO BOTÃO
+                     ========================= -->
+
+                <a
+                    href="{{ url_for('esqueci_senha') }}"
+                    class="esqueci">
+
+                    Esqueci minha senha
+
+                </a>
+
+
+                <button
+                    type="submit"
+                    class="entrar">
+
+                    Entrar
+
+                </button>
+
+
+            </form>
+
+
+            <div class="social">
+
+                <img
+                    src="{{ url_for('static', filename='imagens/google.png') }}"
+                    alt="Google">
+
+
+                <img
+                    src="{{ url_for('static', filename='imagens/microsoft.png') }}"
+                    alt="Microsoft">
+
+            </div>
+
+
+        </div>
+
+
+    </section>
+
+</main>
+
+
+
+<script>
+
+    function mostrarLogin() {
+
+        const cadastro =
+            document.getElementById("cadastro-area");
+
+        const login =
+            document.getElementById("login-area");
+
+
+        cadastro.classList.add("escondido");
+
+        login.classList.remove("escondido");
+
+    }
+
+</script>
+
+
+</body>
+
+</html>
