@@ -41,10 +41,13 @@ load_dotenv()
 
 app = Flask(__name__)
 
-app.secret_key = os.getenv(
-    "SECRET_KEY",
-    "mentis-chave-secreta-dev"
-)
+app.secret_key = os.getenv("SECRET_KEY")
+
+if not app.secret_key:
+    raise RuntimeError(
+        "SECRET_KEY não configurada. "
+        "Adicione uma chave secreta ao arquivo .env."
+    )
 
 DATABASE_URL = os.getenv(
     "DATABASE_URL"
@@ -650,5 +653,5 @@ if __name__ == "__main__":
     app.run(
         host="0.0.0.0",
         port=5000,
-        debug=True
+        debug=False
     )
