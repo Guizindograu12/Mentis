@@ -174,25 +174,41 @@
             border-top: 1px solid var(--linha);
             margin: 0;
         }
-
+       
         .categorias {
-            padding: 22px 0;
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            column-gap: 32px;
+            row-gap: 0;
+            padding: 24px 0;
         }
 
         .categoria {
-            margin: 0 0 7px;
-            font-size: 13px;
-            line-height: 1.5;
-            color: #4b5e6e;
+            margin: 0;
+            padding: 13px 0;
+            border-bottom: 1px solid #e6eaee;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #526273;
         }
 
         .categoria strong {
-            color: #344a5d;
+            color: #092039;
+            font-size: 16px;
         }
 
         .categoria .valor {
-            font-weight: bold;
+            color: #315d88;
+            font-weight: 600;
         }
+
+        @media (max-width: 650px) {
+            .categorias {
+            grid-template-columns: 1fr;
+            column-gap: 0;
+        }
+        }
+
 
         .secao-analise {
             padding-top: 25px;
@@ -204,12 +220,22 @@
             margin: 0 0 18px;
         }
 
+        
         .analise-texto {
-            color: #303b45;
-            font-size: 14px;
-            line-height: 1.7;
-            text-align: justify;
-            white-space: pre-line;
+        color: #354657;
+        font-size: 15px;
+        line-height: 1.8;
+        text-align: left;
+        white-space: normal;
+        overflow-wrap: break-word;
+        }
+
+        .analise-texto p {
+        margin: 0 0 16px;
+        }
+
+        .analise-texto strong {
+        color: #092039;
         }
 
         .orientacoes {
@@ -338,7 +364,206 @@
             }
         }
 
-        @media print {
+        
+@page {
+    size: A4;
+    margin: 14mm;
+}
+
+@media print {
+    *,
+    *::before,
+    *::after {
+        box-sizing: border-box;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    html,
+    body {
+        width: 100%;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #ffffff !important;
+        color: #273747;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 10pt;
+    }
+
+    /* Preserva a marca Mentis no cabeçalho */
+    .topbar {
+        display: flex !important;
+        justify-content: center !important;
+        padding: 0 0 12px !important;
+        margin: 0 0 20px !important;
+        background: #ffffff !important;
+        box-shadow: none !important;
+        border-bottom: 1px solid #dce2e8;
+    }
+
+    .logo {
+        display: block !important;
+        color: #092039 !important;
+        font-size: 25pt !important;
+        font-weight: bold;
+        text-align: center;
+    }
+
+    .menu {
+        display: none !important;
+    }
+
+    /* Remove o cartão externo e aproveita a folha */
+    .container {
+        display: block !important;
+        width: 100% !important;
+        max-width: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #ffffff !important;
+        border: none !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+    }
+
+    .titulo {
+        margin: 0 0 6px !important;
+        text-align: center !important;
+        color: #092039 !important;
+        font-size: 20pt !important;
+        line-height: 1.3;
+    }
+
+    .subtitulo {
+        margin: 0 0 18px !important;
+        text-align: center !important;
+        font-size: 9pt !important;
+    }
+
+    .aviso {
+        margin-bottom: 20px !important;
+        padding: 10px 12px !important;
+        background: #f3f5f9 !important;
+        border-left: 3px solid #315d88;
+        font-size: 9pt !important;
+    }
+
+    /* Mantém o percentual e o círculo juntos */
+    .resumo {
+        display: flex !important;
+        flex-direction: row !important;
+        justify-content: center !important;
+        align-items: center !important;
+        gap: 24px !important;
+        padding: 10px 0 25px !important;
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+
+    .medidor {
+        display: grid !important;
+        flex: 0 0 135px !important;
+        width: 135px !important;
+        height: 135px !important;
+        min-width: 135px;
+        border-radius: 50% !important;
+        background: conic-gradient(
+            #092039 0 var(--percentual),
+            #d8dfe4 var(--percentual) 100%
+        ) !important;
+        print-color-adjust: exact !important;
+        -webkit-print-color-adjust: exact !important;
+    }
+
+    .medidor::before {
+        display: block !important;
+        inset: 6px !important;
+        background: #ffffff !important;
+    }
+
+    .medidor-valor {
+        z-index: 1;
+        color: #315d88 !important;
+        font-size: 30pt !important;
+    }
+
+    .resumo-texto h2 {
+        font-size: 21pt !important;
+        color: #092039 !important;
+    }
+
+    .resumo-texto p {
+        font-size: 12pt !important;
+    }
+
+    .categorias {
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        column-gap: 24px !important;
+        padding: 15px 0 !important;
+    }
+
+    .categoria {
+        margin: 0 !important;
+        padding: 8px 0 !important;
+        font-size: 9pt !important;
+        line-height: 1.5 !important;
+        border-bottom: 1px solid #e6eaee !important;
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+
+    .secao-analise {
+        padding-top: 20px !important;
+    }
+
+    .secao-analise h2 {
+        font-size: 16pt !important;
+        margin-bottom: 12px !important;
+    }
+
+    .analise-texto {
+        font-size: 10pt !important;
+        line-height: 1.65 !important;
+        white-space: normal !important;
+        text-align: left !important;
+        overflow-wrap: break-word;
+    }
+
+    .orientacoes {
+        margin-top: 18px !important;
+        padding: 15px !important;
+        background: #f6f8fa !important;
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+
+    .orientacoes h3 {
+        font-size: 12pt !important;
+    }
+
+    .orientacoes li {
+        font-size: 9.5pt !important;
+        line-height: 1.5 !important;
+        margin-bottom: 6px !important;
+    }
+
+    .rodape-aviso {
+        font-size: 9pt !important;
+        margin-top: 18px !important;
+    }
+
+    .acoes,
+    .voltar {
+        display: none !important;
+    }
+
+    a {
+        color: inherit !important;
+        text-decoration: none !important;
+    }
+}
+@media print {
             body {
                 background: white;
             }
