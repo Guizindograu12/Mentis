@@ -1,356 +1,565 @@
+
 <!DOCTYPE html>
 <html lang="pt-br">
 
 <head>
-
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0">
-
-    <title>Resultado - Mentis</title>
+    <title>Relatório - Mentis</title>
 
     <style>
-
         * {
             box-sizing: border-box;
         }
 
+        :root {
+            --azul: #092039;
+            --azul-claro: #315d88;
+            --cinza: #82909d;
+            --linha: #aebbc3;
+            --fundo: #f3f4f5;
+        }
+
         body {
             margin: 0;
-            padding: 0;
-            font-family: Arial, sans-serif;
-            background: #f5f5f5;
-            color: #222;
+            font-family: Arial, Helvetica, sans-serif;
+            background: var(--fundo);
+            color: #273747;
         }
 
         .topbar {
-            width: 100%;
+            min-height: 68px;
+            padding: 12px 28px;
             background: white;
-            padding: 18px 40px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            justify-content: space-between;
+            gap: 20px;
+            box-shadow: 0 2px 9px #00000012;
         }
 
         .logo {
-            font-size: 26px;
+            color: var(--azul);
+            font-size: 28px;
             font-weight: bold;
-            color: #1a1a6e;
+            letter-spacing: -1px;
         }
 
         .menu {
             display: flex;
             align-items: center;
-            gap: 15px;
+            justify-content: flex-end;
+            gap: 20px;
+            flex-wrap: wrap;
         }
 
         .menu a {
+            color: #202832;
             text-decoration: none;
-            color: #1a1a1a;
-            font-size: 15px;
-            font-weight: 500;
+            font-size: 14px;
         }
 
         .conta {
-            display: inline-flex;
-            align-items: center;
-            padding: 9px 14px;
-            background: #eeeeee;
-            border-radius: 20px;
-            color: #1a1a6e;
-            font-size: 14px;
-            font-weight: bold;
-            max-width: 250px;
+            max-width: 200px;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+            color: var(--azul);
+            font-size: 13px;
         }
 
         .sair {
-            padding: 9px 16px;
-            background: #1a1a6e;
+            background: #171568;
             color: white !important;
+            padding: 9px 20px;
             border-radius: 20px;
         }
 
         .container {
-            max-width: 950px;
-            margin: 40px auto;
-            padding: 35px;
+            width: calc(100% - 32px);
+            max-width: 1100px;
+            margin: 28px auto;
+            padding: 38px 42px;
             background: white;
-            border-radius: 15px;
-            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 12px #00000012;
         }
 
-        h1 {
-            margin-top: 0;
+        .titulo {
+            margin: 0 0 10px;
+            color: var(--azul);
+            font-size: 28px;
             text-align: center;
-            color: #1a1a6e;
+        }
+
+        .subtitulo {
+            margin: 0 0 25px;
+            text-align: center;
+            color: #657585;
+            font-size: 14px;
+            line-height: 1.6;
         }
 
         .aviso {
-            margin: 20px 0 30px;
-            padding: 15px;
-            border-radius: 10px;
-            background: #f1f1f8;
-            color: #555;
+            padding: 12px 15px;
+            margin-bottom: 35px;
+            background: #f3f5f9;
+            border-left: 3px solid var(--azul-claro);
+            color: #526273;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .resumo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 35px;
+            padding: 12px 0 42px;
+        }
+
+        .medidor {
+            --percentual: {{ relatorio.percentual_geral }}%;
+            flex: 0 0 170px;
+            width: 170px;
+            height: 170px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            background: conic-gradient(
+                var(--azul) 0 var(--percentual),
+                #d8dfe4 var(--percentual) 100%
+            );
+            position: relative;
+        }
+
+        .medidor::before {
+            content: "";
+            position: absolute;
+            inset: 7px;
+            border-radius: 50%;
+            background: white;
+        }
+
+        .medidor-valor {
+            position: relative;
+            z-index: 1;
+            color: var(--azul-claro);
+            font-size: 43px;
+            letter-spacing: -1px;
+        }
+
+        .resumo-texto {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .resumo-texto h2 {
+            margin: 0 0 9px;
+            color: var(--azul);
+            font-size: clamp(23px, 3vw, 36px);
+            line-height: 1.2;
+        }
+
+        .resumo-texto p {
+            margin: 0;
+            color: #8997a3;
+            font-size: 17px;
+            font-style: italic;
             line-height: 1.5;
         }
 
-        .geral {
-            text-align: center;
-            padding: 30px 20px;
-            border-radius: 15px;
-            background: #f8f8fc;
-            margin-bottom: 35px;
+        .linha {
+            border: 0;
+            border-top: 1px solid var(--linha);
+            margin: 0;
         }
 
-        .percentual {
-            font-size: 52px;
-            font-weight: bold;
-            color: #1a1a6e;
-            margin: 10px 0;
-        }
-
-        .classificacao {
-            font-size: 22px;
-            font-weight: bold;
-            color: #333;
-        }
-
-        h2 {
-            color: #1a1a6e;
-            margin-bottom: 20px;
+        .categorias {
+            padding: 22px 0;
         }
 
         .categoria {
-            border: 1px solid #ddd;
-            border-radius: 12px;
-            padding: 18px;
-            margin-bottom: 15px;
+            margin: 0 0 7px;
+            font-size: 13px;
+            line-height: 1.5;
+            color: #4b5e6e;
         }
 
-        .categoria-cabecalho {
-            display: flex;
-            justify-content: space-between;
-            gap: 20px;
-            margin-bottom: 10px;
+        .categoria strong {
+            color: #344a5d;
         }
 
-        .categoria-nome {
+        .categoria .valor {
             font-weight: bold;
-            color: #222;
         }
 
-        .categoria-valor {
-            font-weight: bold;
-            color: #1a1a6e;
+        .secao-analise {
+            padding-top: 25px;
         }
 
-        .barra {
-            width: 100%;
-            height: 12px;
-            background: #e3e3e3;
-            border-radius: 10px;
-            overflow: hidden;
+        .secao-analise h2 {
+            color: var(--azul);
+            font-size: 22px;
+            margin: 0 0 18px;
         }
 
-        .barra-preenchida {
-            height: 100%;
-            background: #1a1a6e;
-            border-radius: 10px;
-        }
-
-        .categoria-classificacao {
-            margin-top: 8px;
-            color: #666;
+        .analise-texto {
+            color: #303b45;
             font-size: 14px;
+            line-height: 1.7;
+            text-align: justify;
+            white-space: pre-line;
+        }
+
+        .orientacoes {
+            margin-top: 25px;
+        }
+
+        .orientacoes h3 {
+            color: var(--azul);
+            font-size: 16px;
+            margin-bottom: 12px;
+        }
+
+        .orientacoes ul {
+            padding-left: 22px;
+            margin: 0;
+        }
+
+        .orientacoes li {
+            margin-bottom: 9px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .rodape-aviso {
+            margin-top: 28px;
+            color: #354b5c;
+            font-size: 13px;
+            font-style: italic;
+            font-weight: bold;
+            line-height: 1.6;
         }
 
         .acoes {
             display: flex;
+            flex-wrap: wrap;
             justify-content: center;
-            gap: 15px;
-            margin-top: 35px;
+            gap: 12px;
+            margin-top: 30px;
         }
 
         .botao {
-            text-decoration: none;
-            padding: 12px 20px;
-            border-radius: 10px;
-            background: #1a1a6e;
+            display: inline-block;
+            padding: 12px 22px;
+            background: #171568;
+            border: 1px solid #171568;
+            border-radius: 24px;
             color: white;
+            text-decoration: none;
+            text-align: center;
+            font-size: 14px;
+            transition: background .2s;
         }
 
-        @media (max-width: 700px) {
+        .botao:hover {
+            background: #29268d;
+        }
 
+        .botao-secundario {
+            background: white;
+            color: #171568;
+        }
+
+        .botao-secundario:hover {
+            background: #f1f1f8;
+        }
+
+        .voltar {
+            display: block;
+            margin-top: 12px;
+            text-align: center;
+            color: #85919b;
+            font-size: 12px;
+        }
+
+        @media (max-width: 650px) {
             .topbar {
-                padding: 15px 20px;
+                padding: 15px;
                 flex-direction: column;
-                gap: 15px;
+            }
+
+            .menu {
+                gap: 14px;
             }
 
             .container {
-                margin: 20px 15px;
-                padding: 25px 20px;
+                width: calc(100% - 20px);
+                margin: 10px auto;
+                padding: 25px 18px;
             }
 
-            .categoria-cabecalho {
+            .titulo {
+                font-size: 23px;
+            }
+
+            .resumo {
                 flex-direction: column;
-                gap: 5px;
+                text-align: center;
+                gap: 22px;
+                padding-bottom: 30px;
             }
 
-            .percentual {
-                font-size: 42px;
+            .medidor {
+                flex-basis: 150px;
+                width: 150px;
+                height: 150px;
             }
 
+            .medidor-valor {
+                font-size: 37px;
+            }
+
+            .resumo-texto h2 {
+                font-size: 25px;
+            }
+
+            .resumo-texto p {
+                font-size: 15px;
+            }
+
+            .acoes {
+                flex-direction: column;
+            }
+
+            .botao {
+                width: 100%;
+            }
         }
 
-    </style>
+        @media print {
+            body {
+                background: white;
+            }
 
+            .topbar,
+            .acoes,
+            .voltar {
+                display: none;
+            }
+
+            .container {
+                width: 100%;
+                max-width: none;
+                margin: 0;
+                padding: 15px;
+                box-shadow: none;
+            }
+
+            .resumo {
+                break-inside: avoid;
+            }
+
+            .categoria,
+            .orientacoes li {
+                break-inside: avoid;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
 <header class="topbar">
-
-    <div class="logo">
-        Mentis
-    </div>
+    <div class="logo">Mentis</div>
 
     <nav class="menu">
-
-        <a href="{{ url_for('home') }}">
-            Home
-        </a>
+        <a href="{{ url_for('home') }}">Home</a>
 
         {% if usuario %}
-
-            <span class="conta">
-                {{ usuario }}
-            </span>
-
-            <a
-                href="{{ url_for('logout') }}"
-                class="sair">
-
-                Sair
-
-            </a>
-
+            <span class="conta">{{ usuario }}</span>
+            <a href="{{ url_for('logout') }}" class="sair">Sair</a>
         {% endif %}
-
     </nav>
-
 </header>
-
 
 <main class="container">
 
-    <h1>
-        Relatório do Questionário Mentis
-    </h1>
+    <h1 class="titulo">Relatório do Questionário Mentis</h1>
+
+    <p class="subtitulo">
+        Relatório individual de indicadores de bem-estar emocional
+    </p>
 
     <div class="aviso">
-
-        Este resultado é uma análise das respostas fornecidas
-        no questionário de bem-estar da Mentis. Ele não constitui
-        diagnóstico psicológico ou médico.
-
+        Este relatório apresenta uma análise das respostas fornecidas
+        no questionário de bem-estar da Mentis. Os resultados são
+        informativos e não constituem diagnóstico psicológico ou médico.
     </div>
 
+    <section class="resumo">
 
-    <section class="geral">
+        <div
+            class="medidor"
+            role="img"
+            aria-label="Resultado geral de {{ '%.2f'|format(relatorio.percentual_geral) }} por cento">
 
-        <div>
-            Resultado geral
+            <span class="medidor-valor">
+                {{ "%.0f"|format(relatorio.percentual_geral) }}%
+            </span>
+
         </div>
 
-        <div class="percentual">
-            {{ "%.2f"|format(relatorio.percentual_geral) }}%
-        </div>
+        <div class="resumo-texto">
 
-        <div class="classificacao">
-            {{ relatorio.classificacao_geral }}
+            <h2>
+                {% if relatorio.classificacao_geral == 'Muito Elevado' %}
+                    Indicadores muito elevados
+                {% elif relatorio.classificacao_geral == 'Elevado' %}
+                    Indicadores elevados
+                {% elif relatorio.classificacao_geral == 'Moderado' %}
+                    Indicadores moderados
+                {% else %}
+                    Indicadores de menor intensidade
+                {% endif %}
+            </h2>
+
+            <p>{{ relatorio.classificacao_geral }}</p>
+
         </div>
 
     </section>
 
+    <hr class="linha">
 
-    <section>
-
-        <h2>
-            Resultado por categoria
-        </h2>
-
+    <section class="categorias" aria-label="Resultados por categoria">
 
         {% for categoria in relatorio.categorias %}
 
             <div class="categoria">
-
-                <div class="categoria-cabecalho">
-
-                    <span class="categoria-nome">
-                        {{ categoria.categoria }}
-                    </span>
-
-                    <span class="categoria-valor">
-                        {{ "%.2f"|format(categoria.percentual) }}%
-                    </span>
-
-                </div>
-
-
-                <div class="barra">
-
-                    <div
-                        class="barra-preenchida"
-                        style="width: {{ categoria.percentual }}%;">
-
-                    </div>
-
-                </div>
-
-
-                <div class="categoria-classificacao">
-
-                    Classificação:
-                    {{ categoria.classificacao }}
-
-                </div>
-
+                <strong>{{ "%.2f"|format(categoria.percentual) }}%</strong>
+                de {{ categoria.categoria }} —
+                <span class="valor">{{ categoria.classificacao }}</span>
             </div>
 
         {% endfor %}
 
     </section>
 
+    <hr class="linha">
+
+    <section class="secao-analise">
+
+        <h2>Análise geral</h2>
+
+        {% if relatorio.analise_personalizada is defined
+              and relatorio.analise_personalizada %}
+
+            <div class="analise-texto">{{ relatorio.analise_personalizada }}</div>
+
+        {% else %}
+
+            <div class="analise-texto">
+                O resultado geral do questionário foi de
+                {{ "%.2f"|format(relatorio.percentual_geral) }}%,
+                com classificação "{{ relatorio.classificacao_geral }}".
+
+                Os percentuais por categoria apresentados acima ajudam
+                a identificar quais áreas merecem maior atenção.
+                A interpretação deve considerar o contexto individual,
+                as experiências recentes e o impacto desses indicadores
+                no cotidiano.
+
+                {% set destaques = relatorio.categorias
+                    | selectattr('percentual', 'ge', 70)
+                    | list %}
+
+                {% if destaques %}
+                    As categorias com resultados a partir de 70% foram:
+                    {% for categoria in destaques %}
+                        {{ categoria.categoria }}{% if not loop.last %},
+                        {% else %}.{% endif %}
+                    {% endfor %}
+                    Esses resultados podem ser considerados pontos de
+                    atenção dentro deste questionário.
+                {% else %}
+                    Nenhuma categoria atingiu 70% neste resultado.
+                    Ainda assim, os percentuais devem ser interpretados
+                    com cuidado e não descartam possíveis dificuldades.
+                {% endif %}
+            </div>
+
+        {% endif %}
+
+        <div class="orientacoes">
+
+            <h3>Orientações gerais para o bem-estar</h3>
+
+            <ul>
+                <li>
+                    <strong>Relaxamento:</strong>
+                    reserve momentos para pausas, respiração tranquila
+                    ou outras atividades que ajudem a aliviar a tensão.
+                </li>
+
+                <li>
+                    <strong>Rotina de sono:</strong>
+                    procure manter horários regulares para dormir e acordar.
+                </li>
+
+                <li>
+                    <strong>Organização das atividades:</strong>
+                    divida tarefas em etapas menores e estabeleça
+                    prioridades realistas.
+                </li>
+
+                <li>
+                    <strong>Conexões sociais:</strong>
+                    mantenha contato com pessoas de confiança e converse
+                    sobre dificuldades quando se sentir à vontade.
+                </li>
+
+                <li>
+                    <strong>Apoio profissional:</strong>
+                    se o sofrimento persistir ou prejudicar sua rotina,
+                    considere procurar um psicólogo ou outro profissional
+                    de saúde qualificado.
+                </li>
+            </ul>
+
+        </div>
+
+        <p class="rodape-aviso">
+            Este relatório é informativo. Os resultados não substituem
+            uma avaliação profissional, um diagnóstico ou um plano
+            de acompanhamento individualizado.
+        </p>
+
+    </section>
 
     <div class="acoes">
 
-        <a
-            class="botao"
-            href="{{ url_for('teste') }}">
-
+        <a class="botao" href="{{ url_for('teste') }}">
             Fazer novo teste
-
         </a>
 
-        <a
-            class="botao"
-            href="{{ url_for('home') }}">
-
+        <a class="botao botao-secundario"
+           href="{{ url_for('home') }}">
             Voltar para início
-
         </a>
+
+        <button class="botao" type="button" onclick="window.print()">
+            Imprimir relatório
+        </button>
 
     </div>
+
+    <a class="voltar" href="{{ url_for('home') }}">
+        Voltar à página inicial
+    </a>
 
 </main>
 
 </body>
-
 </html>
