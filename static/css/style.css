@@ -221,6 +221,8 @@ body{
 
 .oq{
 
+    text-align: justify;
+
     display:flex;
 
     justify-content:center;
@@ -306,6 +308,10 @@ body{
 }
 
 /* FAQ */
+
+.tituloFAQ {
+    color: #08085c;
+}
 
 .faq {
     padding: 100px 20px;
