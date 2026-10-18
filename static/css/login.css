@@ -1,656 +1,332 @@
-/* =========================================
-   CONFIGURAÇÕES GERAIS
-   ========================================= */
-
+/* CONFIGURAÇÕES GERAIS */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-
 body {
-
-    font-family: Arial, sans-serif;
-
-    background: #f5f5f5;
-
+    font-family: Arial, Helvetica, sans-serif;
+    background: white;
     min-height: 100vh;
-
+    overflow-x: hidden;
 }
 
-
-/* =========================================
-   CABEÇALHO
-   ========================================= */
-
+/* CABEÇALHO */
 .header {
-
+    width: 100%;
     height: 80px;
-
     background: #d9d9d9;
-
     display: flex;
-
     align-items: center;
-
     justify-content: space-between;
-
     padding: 0 45px;
-
 }
-
 
 .logo img {
-
     width: 95px;
-
+    height: auto;
     display: block;
-
 }
-
 
 .menu {
-
     display: flex;
-
     align-items: center;
-
-    gap: 35px;
-
+    gap: 30px;
 }
-
 
 .menu a {
-
-    text-decoration: none;
-
     color: #111;
-
+    text-decoration: none;
     font-size: 16px;
-
+    white-space: nowrap;
     transition: 0.2s;
-
 }
-
 
 .menu a:hover {
-
-    color: #202080;
-
+    color: #1a1a6e;
 }
 
-
-/* =========================================
-   CONTAINER PRINCIPAL
-   ========================================= */
-
+/* CONTAINER PRINCIPAL */
 .container {
-
     width: 100%;
-
     min-height: calc(100vh - 80px);
-
     display: flex;
-
     position: relative;
-
 }
 
-
-/* =========================================
-   LADO ESQUERDO
-   ========================================= */
-
+/* LADO ESQUERDO */
 .left {
-
     width: 50%;
-
     min-height: calc(100vh - 80px);
-
     position: relative;
-
     overflow: hidden;
-
-    background-image:
-        url("../imagens/fundo.png");
-
+    background-image: url("../imagens/cerebro.png");
     background-size: cover;
-
     background-position: center;
-
+    background-repeat: no-repeat;
 }
 
-
-/* =========================================
-   CAMADA ESCURA SOBRE A IMAGEM
-   ========================================= */
-
-.overlay {
-
+.left::before {
+    content: "";
     position: absolute;
-
     inset: 0;
-
-    background:
-
-        linear-gradient(
-            rgba(0, 0, 0, 0.48),
-            rgba(0, 0, 0, 0.48)
-        );
-
+    background: rgba(0, 0, 0, 0.42);
     z-index: 1;
-
 }
 
-
-/* =========================================
-   CONTEÚDO DO LADO ESQUERDO
-   ========================================= */
-
+/* CONTEÚDO ESQUERDO */
 .left-content {
-
     position: relative;
-
     z-index: 2;
-
+    width: 100%;
     min-height: calc(100vh - 80px);
-
     display: flex;
-
     flex-direction: column;
-
     justify-content: center;
-
     align-items: flex-start;
-
-    padding: 70px 12%;
-
+    padding: 60px 10%;
 }
-
-
-/* =========================================
-   CÉREBRO
-   ========================================= */
-
-.brain {
-
-    width: 150px;
-
-    max-width: 50%;
-
-    margin-bottom: 35px;
-
-    filter:
-        drop-shadow(
-            0 4px 10px
-            rgba(0, 0, 0, 0.35)
-        );
-
-}
-
-
-/* =========================================
-   TEXTO
-   ========================================= */
 
 .left-text {
-
-    color: white;
-
-    max-width: 480px;
-
+    max-width: 500px;
 }
-
 
 .left-text h2 {
-
-    font-size: 38px;
-
-    line-height: 1.15;
-
-    margin-bottom: 18px;
-
     color: white;
-
-    text-shadow:
-        0 2px 5px
-        rgba(0, 0, 0, 0.7);
-
+    font-size: 42px;
+    line-height: 1.15;
+    margin-bottom: 18px;
+    text-shadow: 0 3px 7px rgba(0, 0, 0, 0.85);
 }
-
 
 .left-text p {
-
-    font-size: 18px;
-
+    color: white;
+    font-size: 19px;
     line-height: 1.5;
-
-    margin-bottom: 28px;
-
-    color: white;
-
-    text-shadow:
-        0 2px 4px
-        rgba(0, 0, 0, 0.7);
-
+    margin-bottom: 30px;
+    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.85);
 }
 
-
-/* =========================================
-   BOTÃO "ENTRAR EM UMA CONTA"
-   ========================================= */
-
+/* BOTÃO ENTRAR EM UMA CONTA */
 .account-button {
-
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 15px 25px;
     border: none;
-
-    background: #1a1a6e;
-
-    color: white;
-
-    padding: 14px 24px;
-
     border-radius: 30px;
-
+    background: #1a1a6e;
+    color: white;
     font-size: 16px;
-
     font-weight: bold;
-
     cursor: pointer;
-
     transition: 0.25s;
-
-    box-shadow:
-        0 4px 12px
-        rgba(0, 0, 0, 0.3);
-
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
 }
-
 
 .account-button:hover {
-
     background: #2d2da0;
-
     transform: translateY(-2px);
-
 }
 
-
-/* =========================================
-   DIVISOR
-   ========================================= */
-
+/* DIVISOR */
 .toggle {
-
     position: absolute;
-
-    left: 50%;
-
-    top: 50%;
-
-    transform:
-        translate(-50%, -50%);
-
-    width: 48px;
-
-    height: 48px;
-
-    border-radius: 50%;
-
-    background: white;
-
-    color: #1a1a6e;
-
-    display: flex;
-
-    justify-content: center;
-
-    align-items: center;
-
-    font-size: 22px;
-
-    font-weight: bold;
-
     z-index: 10;
-
-    box-shadow:
-        0 3px 12px
-        rgba(0, 0, 0, 0.15);
-
-}
-
-
-/* =========================================
-   LADO DIREITO
-   ========================================= */
-
-.right {
-
-    width: 50%;
-
-    min-height: calc(100vh - 80px);
-
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
     background: white;
-
+    color: #1a1a6e;
     display: flex;
-
-    justify-content: center;
-
     align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    font-weight: bold;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.20);
+}
 
+/* LADO DIREITO */
+.right {
+    width: 50%;
+    min-height: calc(100vh - 80px);
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     padding: 50px;
-
 }
 
-
-/* =========================================
-   ÁREA DO FORMULÁRIO
-   ========================================= */
-
+/* FORMULÁRIO */
 .form-area {
-
     width: 100%;
-
     max-width: 430px;
-
 }
-
 
 .form-area h1 {
-
-    color: #1a1a6e;
-
+    color: #111;
     font-size: 36px;
-
     margin-bottom: 10px;
-
 }
-
 
 .facalog {
-
     margin-bottom: 28px;
-
 }
-
 
 .facalog p {
-
     color: #555;
-
     font-size: 16px;
-
 }
 
-
-/* =========================================
-   INPUTS
-   ========================================= */
-
+/* INPUTS */
 .input {
-
+    width: 100%;
     margin-bottom: 18px;
-
 }
-
 
 .input input {
-
     width: 100%;
-
     height: 52px;
-
-    padding: 0 18px;
-
-    border: 1px solid #d4d4d4;
-
+    padding: 0 16px;
+    border: 1px solid #cccccc;
     border-radius: 8px;
-
-    outline: none;
-
+    background: white;
+    color: #111;
     font-size: 16px;
-
-    background: #fafafa;
-
-    transition: 0.2s;
-
+    outline: none;
 }
-
 
 .input input:focus {
-
     border-color: #1a1a6e;
-
-    background: white;
-
-    box-shadow:
-        0 0 0 3px
-        rgba(26, 26, 110, 0.08);
-
+    box-shadow: 0 0 0 3px rgba(26, 26, 110, 0.10);
 }
 
-
-/* =========================================
-   BOTÃO DO FORMULÁRIO
-   ========================================= */
-
-.entrar {
-
+/* ESQUECI MINHA SENHA */
+.esqueci {
+    display: block;
     width: 100%;
-
-    height: 52px;
-
-    border: none;
-
-    border-radius: 8px;
-
-    background: #1a1a6e;
-
-    color: white;
-
-    font-size: 17px;
-
+    text-align: right;
+    margin-top: -8px;
+    margin-bottom: 20px;
+    color: #1a1a6e;
+    text-decoration: none;
+    font-size: 14px;
     font-weight: bold;
-
-    cursor: pointer;
-
-    transition: 0.25s;
-
 }
 
+.esqueci:hover {
+    text-decoration: underline;
+    color: #2d2da0;
+}
+
+/* BOTÃO DO FORMULÁRIO */
+.entrar {
+    width: 100%;
+    height: 52px;
+    border: none;
+    border-radius: 8px;
+    background: #1a1a6e;
+    color: white;
+    font-size: 17px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+}
 
 .entrar:hover {
-
     background: #2d2da0;
-
 }
 
-
-/* =========================================
-   REDES SOCIAIS
-   ========================================= */
-
+/* ÍCONES */
 .social {
-
     display: flex;
-
     justify-content: center;
-
+    align-items: center;
     gap: 18px;
-
-    margin-top: 28px;
-
+    margin-top: 25px;
 }
-
 
 .social img {
-
     width: 42px;
-
     height: 42px;
-
     object-fit: contain;
-
-    cursor: pointer;
-
-    transition: 0.2s;
-
 }
 
-
-.social img:hover {
-
-    transform: scale(1.08);
-
-}
-
-
-/* =========================================
-   ERRO
-   ========================================= */
-
+/* ERRO */
 .erro {
-
-    background: #ffe5e5;
-
-    color: #a00000;
-
-    border: 1px solid #ffb5b5;
-
-    padding: 12px 15px;
-
-    border-radius: 8px;
-
+    width: 100%;
+    padding: 12px;
     margin-bottom: 18px;
-
+    background: #ffe6e6;
+    border: 1px solid #ffb5b5;
+    border-radius: 8px;
+    color: #a00000;
     font-size: 14px;
-
 }
 
-
-/* =========================================
-   ESCONDER LOGIN/CADASTRO
-   ========================================= */
-
+/* ESCONDER FORMULÁRIO */
 .escondido {
-
     display: none;
-
 }
 
-
-/* =========================================
-   RESPONSIVIDADE
-   ========================================= */
-
+/* RESPONSIVIDADE */
 @media (max-width: 900px) {
-
     .header {
-
-        padding: 0 25px;
-
+        height: auto;
+        min-height: 80px;
+        padding: 20px 25px;
+        flex-direction: column;
+        gap: 15px;
     }
-
 
     .menu {
-
-        gap: 15px;
-
+        gap: 18px;
+        flex-wrap: wrap;
+        justify-content: center;
     }
-
-
-    .menu a {
-
-        font-size: 14px;
-
-    }
-
 
     .container {
-
         flex-direction: column;
-
     }
-
 
     .left,
     .right {
-
         width: 100%;
-
     }
-
 
     .left {
-
         min-height: 500px;
-
     }
-
 
     .left-content {
-
         min-height: 500px;
-
         padding: 50px 10%;
-
     }
-
 
     .right {
-
         min-height: 500px;
-
-        padding: 45px 25px;
-
+        padding: 50px 25px;
     }
-
 
     .toggle {
-
         display: none;
-
     }
-
 }
 
-
 @media (max-width: 600px) {
-
-    .header {
-
-        height: auto;
-
-        padding: 20px;
-
-        flex-direction: column;
-
-        gap: 15px;
-
+    .menu a {
+        font-size: 14px;
     }
-
-
-    .menu {
-
-        flex-wrap: wrap;
-
-        justify-content: center;
-
-    }
-
 
     .left-text h2 {
-
         font-size: 30px;
-
     }
-
 
     .left-text p {
-
         font-size: 16px;
-
     }
-
 }
