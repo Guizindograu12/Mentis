@@ -307,94 +307,63 @@ body{
 
 /* FAQ */
 
-.faq{
-
-    padding:100px 20px;
-
-    text-align:center;
-
+.faq {
+    padding: 100px 20px;
+    text-align: center;
+    min-height: 320px;
 }
 
-.carrossel{
-
-    max-width:900px;
-
-    margin:auto;
-
+.faq h2 {
+    margin-bottom: 35px;
 }
 
-.slide{
-
-    display:none;
-
+.carrossel {
+    max-width: 900px;
+    margin: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 25px;
 }
 
-.slide.active{
-
-    display:block;
-
+.carrossel button {
+    flex-shrink: 0;
+    cursor: pointer;
+    border: none;
+    background: #191970;
+    color: white;
+    border-radius: 50%;
+    width: 38px;
+    height: 38px;
+    font-size: 18px;
 }
 
-/* TIME */
-
-.time{
-
-    background:#f5f5f5;
-
-    padding:100px 50px;
-
-    text-align:center;
-
+.slide {
+    display: none;
+    flex: 1;
+    text-align: center;
 }
 
-.cards{
-
-    display:flex;
-
-    justify-content:center;
-
-    gap:30px;
-
-    flex-wrap:wrap;
-
-    margin-top:50px;
-
+.slide.active {
+    display: block;
 }
 
-.card{
-
-    width:260px;
-
-    background:#0f2a5a;
-
-    color:white;
-
-    padding:30px;
-
-    border-radius:15px;
-
+.slide h3 {
+    margin-bottom: 12px;
 }
 
-.foto{
-
-    width:120px;
-
-    height:120px;
-
-    background:#ddd;
-
-    border-radius:50%;
-
-    margin:auto auto 20px;
-
+.slide p {
+    line-height: 1.6;
 }
 
-.nome{
+@media (max-width: 600px) {
+    .carrossel {
+        gap: 10px;
+    }
 
-    margin-top:20px;
-
-    font-weight:bold;
-
+    .slide h3 {
+        font-size: 17px;
+    }
 }
 
 /* FOOTER */
@@ -526,5 +495,132 @@ width:100%;
 
     .conta {
         max-width: 180px;
+    }
+}
+
+
+/* NOSSO TIME */
+
+.time {
+    padding: 60px 30px 75px;
+    background: #fffafb;
+    text-align: center;
+}
+
+.time h2 {
+    color: #191970;
+    font-size: 28px;
+    font-weight: 500;
+    margin-bottom: 55px;
+}
+
+.cards {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    max-width: 1200px;
+    margin: 0 auto;
+    gap: 1px;
+}
+
+.card {
+    background: #08085c;
+    color: white;
+    padding: 18px 15px 12px;
+    text-align: left;
+    min-width: 0;
+}
+
+.card:nth-child(2),
+.card:nth-child(5) {
+    background: #194b96;
+}
+
+.card:nth-child(3) {
+    background: #101080;
+}
+
+.card:nth-child(4) {
+    background: #11104f;
+}
+
+.foto {
+    width: 100%;
+    max-width: 108px;
+    aspect-ratio: 1;
+    background: #d9d9d9;
+    border-radius: 50%;
+    margin: 0 auto 10px;
+}
+
+.card h3 {
+    font-size: 14px;
+    text-align: center;
+    text-transform: lowercase;
+    margin-bottom: 8px;
+}
+
+.card p {
+    font-size: 10px;
+    line-height: 1.55;
+}
+
+.nomes {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 1px;
+    max-width: 1200px;
+    margin: 5px auto 0;
+}
+
+.nomes div {
+    background: #08085c;
+    color: white;
+    padding: 20px 5px;
+    font-size: 14px;
+    overflow-wrap: anywhere;
+}
+
+.nomes div:nth-child(2),
+.nomes div:nth-child(5) {
+    background: #194b96;
+}
+
+.nomes div:nth-child(3) {
+    background: #101080;
+}
+
+.nomes div:nth-child(4) {
+    background: #11104f;
+}
+
+/* RESPONSIVIDADE */
+
+@media (max-width: 800px) {
+    .time {
+        padding: 40px 15px;
+    }
+
+    .cards,
+    .nomes {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .card p {
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 450px) {
+    .cards,
+    .nomes {
+        grid-template-columns: 1fr;
+    }
+
+    .card {
+        padding: 20px;
+    }
+
+    .card p {
+        text-align: center;
     }
 }
