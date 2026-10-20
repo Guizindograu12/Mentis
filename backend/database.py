@@ -703,3 +703,35 @@ def buscar_resultado(
 
 
     return resultado
+
+
+def buscar_ultimo_resultado_usuario(usuario_id):
+    consulta = (
+        select(Resultado.teste_id)
+        .join(
+            Teste,
+            Resultado.teste_id == Teste.id
+        )
+        .where(
+            Teste.usuario_id == usuario_id
+        )
+        .order_by(
+            Resultado.data_geracao.desc()
+        )
+        .limit(1)
+    )
+
+    return db.session.execute(
+        consulta
+    ).scalar_one_or_none()
+
+def buscar_ultimo_resultado_usuario(usuario_id):
+    consulta = (
+        select(Resultado.teste_id)
+        .join(Teste, Resultado.teste_id == Teste.id)
+        .where(Teste.usuario_id == usuario_id)
+        .order_by(Resultado.data_geracao.desc())
+        .limit(1)
+    )
+
+    return db.session.execute(consulta).scalar_one_or_none()

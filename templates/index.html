@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-br">
 
@@ -8,517 +9,337 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 
-
 <body>
 
-
-    <!-- =====================================
-         HEADER
-    ===================================== -->
-
+    <!-- HEADER -->
     <header class="header">
 
-
-        <!-- LOGO -->
-
         <div class="logo">
-
             <img
                 src="{{ url_for('static', filename='imagens/logo.png') }}"
                 alt="Logo Mentis">
-
         </div>
-
-
-        <!-- MENU -->
 
         <nav class="menu">
 
+            <a href="#hero">Home</a>
+            <a href="#sobre">Sobre nós</a>
+            <a href="#demo">Demo</a>
+            <a href="#faq">FAQ</a>
+            <a href="#time">Nosso time</a>
 
-            <a href="#hero">
-                Home
-            </a>
-
-
-            <a href="#sobre">
-                Sobre nós
-            </a>
-
-
-            <a href="#demo">
-                Demo
-            </a>
-
-
-            <a href="#faq">
-                FAQ
-            </a>
-
-
-            <a href="#time">
-                Nosso time
-            </a>
-
-
-            <!-- =================================
-                 LOGIN / USUÁRIO
-            ================================= -->
-
+            <!-- LOGIN / USUÁRIO -->
             <div class="login">
 
                 {% if usuario %}
 
-                    <!-- USUÁRIO LOGADO -->
-
-                    <span
-                        class="conta"
-                        title="{{ usuario }}">
-
+                    <span class="conta" title="{{ usuario }}">
                         {{ usuario }}
-
                     </span>
-
 
                     <a
                         href="{{ url_for('logout') }}"
                         class="btn-sair">
-
                         Sair
-
                     </a>
 
-
                 {% else %}
-
-                    <!-- USUÁRIO NÃO LOGADO -->
 
                     <a
                         href="{{ url_for('login') }}"
                         class="btn">
-
                         Login
-
                     </a>
 
                 {% endif %}
 
             </div>
 
-
         </nav>
-
 
     </header>
 
-
-
-    <!-- =====================================
-         HERO
-    ===================================== -->
-
-    <section
-        class="hero"
-        id="hero">
-
+    <!-- HERO -->
+    <section class="hero" id="hero">
 
         <img
             class="bg"
             src="{{ url_for('static', filename='imagens/fundo.png') }}"
             alt="Imagem principal">
 
-
         <div class="overlay">
 
-
-            <h1>
-
-                Tecnologia. Bem-Estar. Futuro.
-
-            </h1>
-
+            <h1>Tecnologia. Bem-Estar. Futuro.</h1>
 
             <p>
-
                 A IA que revolucionará a saúde mental
                 no mercado de trabalho.
-
             </p>
 
-
         </div>
-
 
         <div class="setinhas">
-
-
-            <a href="#sobre">
-
-                ↓ saiba mais ↓
-
-            </a>
-
-
+            <a href="#sobre">↓ saiba mais ↓</a>
         </div>
-
 
     </section>
 
-
-
-    <!-- =====================================
-         SOBRE NÓS
-    ===================================== -->
-
-    <section
-        id="sobre"
-        class="sobre">
-
+    <!-- SOBRE NÓS -->
+    <section id="sobre" class="sobre">
 
         <img
             src="{{ url_for('static', filename='imagens/work.png') }}"
             alt="Equipe trabalhando">
 
-
         <div class="texto">
 
-
-            <h2>
-
-                Sobre nós
-
-            </h2>
-
+            <h2>Sobre nós</h2>
 
             <p>
-
-                A Mentis acredita que saúde mental
-                no trabalho não é um luxo — é essencial.
+                A Mentis acredita que saúde mental no trabalho
+                não é um luxo — é essencial.
 
                 Criamos soluções inteligentes para
                 transformar cuidado em estratégia.
-
             </p>
 
-
         </div>
-
 
     </section>
 
-
-
-    <!-- =====================================
-         O QUE FAZEMOS
-    ===================================== -->
-
-    <section
-        id="oq"
-        class="oq">
-
+    <!-- O QUE FAZEMOS -->
+    <section id="oq" class="oq">
 
         <div>
 
-
-            <h2>
-
-                O que fazemos
-
-            </h2>
-
+            <h2>O que fazemos</h2>
 
             <p>
+                O propósito da Mentis é transformar a forma como
+                a saúde mental é retratada pelo mercado de trabalho,
+                reduzir o estigma e promover um mundo corporativo
+                mais aberto e preventivo em relação ao bem-estar
+                psicológico.
 
-                O propósito da Mentis é transformar a forma que a saúde mental é retratada pelo mercado de trabalho, reduzir o estigma e promover um mundo corporativo mais aberto e preventivo com o bem-estar psicológico.
-            <br>
-                Tornamos isso realidade através de um questionário trimestral via online: suas respostas são enviadas e processadas pela nossa IA, que identifica sintomas, pré-disposições, assim como problemas já existentes, e os resultados serão enviados para o RH e o EHS da sua empresa. Caso preciso, a Mentis possui seu próprio banco de profissionais da saúde mental, de modo que economize seu tempo e automatize a procura para você.
+                <br><br>
 
+                Tornamos isso realidade por meio de um questionário
+                online trimestral. As respostas são processadas pelo
+                nosso sistema de análise, que identifica indicadores
+                relacionados ao bem-estar emocional e à sobrecarga
+                mental.
 
+                Os resultados devem ser utilizados como indicadores
+                de bem-estar, e não como diagnóstico médico.
             </p>
 
-
         </div>
-
 
         <img
             src="{{ url_for('static', filename='imagens/trabalho2.png') }}"
             alt="Ambiente corporativo">
 
-
     </section>
 
+    <!-- DEMO -->
+    <section id="demo" class="demo">
 
+        <h2>Demo</h2>
 
-    <!-- =====================================
-         DEMO
-    ===================================== -->
-
-    <section
-        id="demo"
-        class="demo">
-
-
-        <h2>
-
-            Demo
-
-        </h2>
-
-
-        <p>
-
-            Experimente nossa versão beta.
-
-        </p>
-
+        <p>Experimente nossa versão beta.</p>
 
         <div class="botaodemo">
 
+            {% if usuario %}
 
-            <!--
-                IMPORTANTE:
+                {% if ultimo_resultado_id %}
 
-                Não usar url_for('teste') aqui.
+                    <!-- USUÁRIO JÁ CONCLUIU O QUESTIONÁRIO -->
+                    <a
+                        class="btn"
+                        href="{{ url_for(
+                            'resultado',
+                            teste_id=ultimo_resultado_id
+                        ) }}">
+                        Ver meus resultados
+                    </a>
 
-                O iniciar_teste verifica se o usuário
-                está logado antes de abrir o questionário.
-            -->
+                {% else %}
 
-            <a
-                class="btn"
-                href="{{ url_for('iniciar_teste') }}">
+                    <!-- USUÁRIO LOGADO, MAS AINDA NÃO CONCLUIU -->
+                    <a
+                        class="btn"
+                        href="{{ url_for('iniciar_teste') }}">
+                        Faça o teste!
+                    </a>
 
-                Faça o teste!
+                {% endif %}
 
-            </a>
+            {% else %}
 
+                <!-- USUÁRIO PRECISA ENTRAR NA CONTA -->
+                <a
+                    class="btn"
+                    href="{{ url_for('login') }}">
+                    Faça o teste!
+                </a>
+
+            {% endif %}
 
         </div>
 
-
     </section>
 
-
-
-    <!-- =====================================
-         FAQ
-    ===================================== -->
-
-    <section
-        id="faq"
-        class="faq">
+    <!-- FAQ -->
+    <section id="faq" class="faq">
 
         <div class="tituloFAQ">
-        <h2>
-
-            FAQ
-
-        </h2>
+            <h2>FAQ</h2>
         </div>
 
         <div class="carrossel">
 
-
             <button
                 type="button"
-                onclick="prevSlide()">
-
+                onclick="prevSlide()"
+                aria-label="Pergunta anterior">
                 ❮
-
             </button>
-
 
             <div class="slide active">
 
-
-                <h3>
-
-                    Como a Mentis te ajuda?
-
-                </h3>
-
+                <h3>Como a Mentis te ajuda?</h3>
 
                 <p>
-
-                A plataforma Mentis é uma ferramenta essencial para auxiliar sua empresa a manter um ambiente de trabalho saudável e humanizado. 
-                Ao garantir o bem-estar mental e emocional dos funcionários, não só promovemos uma equipe mais produtiva, mas também contribuímos 
-                para o aumento da rentabilidade e o cumprimento de metas organizacionais.
-                O cuidado com a saúde mental reflete diretamente em melhores resultados para a empresa.
-
+                    A plataforma Mentis é uma ferramenta para auxiliar
+                    empresas a promover um ambiente de trabalho saudável
+                    e humanizado. Ao incentivar o cuidado com o bem-estar
+                    mental e emocional dos funcionários, buscamos
+                    contribuir para uma equipe mais saudável e para
+                    melhores resultados organizacionais.
                 </p>
 
-
             </div>
-
 
             <div class="slide">
 
-
-                <h3>
-
-                    Qual é o papel da IA?
-
-                </h3>
-
+                <h3>Qual é o papel da IA?</h3>
 
                 <p>
-                   
-                As respostas fornecidas por meio do formulário serão diretamente encaminhadas para nossa inteligência artificial (IA). 
-                Essa IA é especialmente treinada para analisar os dados coletados nos questionários, com o objetivo de criar um banco de dados robusto que armazena respostas anteriores. 
-                Isso permite que a IA identifique padrões e detecte potenciais indícios de danos à saúde mental dos colaboradores, de forma proativa e contínua.
-
+                    As respostas fornecidas no questionário são
+                    processadas pelo sistema de análise da Mentis.
+                    O objetivo é identificar padrões e indicadores
+                    relacionados ao bem-estar emocional e à sobrecarga
+                    mental, ajudando a incentivar ações preventivas.
                 </p>
 
-
             </div>
-
 
             <div class="slide">
 
-
-                <h3>
-
-                    Quem acessa as respostas?
-
-                </h3>
-
+                <h3>Quem acessa as respostas?</h3>
 
                 <p>
-   
-                Somente a IA tem acesso às respostas completas. Esses dados são completamente anônimos, garantindo total privacidade aos respondentes. 
-                Após a análise detalhada realizada pela IA, apenas os resultados consolidados são compartilhados com os departamentos de Recursos Humanos (RH) e Saúde, Segurança e Meio Ambiente (EHS). 
-                Caso sejam identificados sinais de possíveis danos à saúde mental, o RH e/ou o EHS serão informados para que a empresa possa tomar as medidas adequadas, assegurando o cuidado com seus colaboradores.
-
+                    O acesso às respostas e aos resultados deve seguir
+                    as regras de privacidade e de proteção de dados
+                    implementadas pela plataforma. Os dados não devem
+                    ser apresentados como diagnóstico médico.
                 </p>
 
-
             </div>
-
 
             <div class="slide">
 
-
-                <h3>
-
-                    A Mentis vê respostas individuais?
-
-                </h3>
-
+                <h3>A Mentis fornece um diagnóstico?</h3>
 
                 <p>
-    
-                De forma alguma! Nós, da Mentis, não temos acesso às respostas individuais. Nosso compromisso é criar um ambiente onde os respondentes se sintam
-                completamente à vontade.
-
+                    Não. A Mentis oferece indicadores relacionados
+                    ao bem-estar emocional. Os resultados não substituem
+                    uma avaliação realizada por um profissional
+                    de saúde mental.
                 </p>
 
-
             </div>
-
 
             <button
                 type="button"
-                onclick="nextSlide()">
-
+                onclick="nextSlide()"
+                aria-label="Próxima pergunta">
                 ❯
-
             </button>
 
-
         </div>
-
 
     </section>
 
+    <!-- NOSSO TIME -->
+    <section id="time" class="time">
 
+        <h2>Nosso time</h2>
 
-    
-<!-- NOSSO TIME -->
-<section id="time" class="time">
+        <div class="cards">
 
-    <h2>Nosso time</h2>
+            <div class="card">
+                <div class="foto"></div>
+                <h3>Co-criador da Mentis, lead dev</h3>
+                <p>Principal desenvolvedor do Backend, spokesperson.</p>
+            </div>
 
-    <div class="cards">
+            <div class="card">
+                <div class="foto"></div>
+                <h3>Co-criadora da Mentis, lead dev</h3>
+                <p>Principal desenvolvedora do Frontend, lead designer, spokesperson.</p>
+            </div>
 
-        <div class="card">
-            <div class="foto"></div>
-            <h3>Co-criador da Mentis, lead dev</h3>
-            <p>Principal desenvolvedor do Backend, spokesperson.</p>
+            <div class="card">
+                <div class="foto"></div>
+                <h3>Sub-designer</h3>
+                <p>Responsável pelos slides e textos.</p>
+            </div>
+
+            <div class="card">
+                <div class="foto"></div>
+                <h3>Desenvolvimento</h3>
+                <p>Colaboração no desenvolvimento do sistema Mentis.</p>
+            </div>
+
+            <div class="card">
+                <div class="foto"></div>
+                <h3>Desenvolvimento</h3>
+                <p>Colaboração no desenvolvimento do sistema Mentis.</p>
+            </div>
+
         </div>
 
-        <div class="card">
-            <div class="foto"></div>
-            <h3>Co-criadora da Mentis, lead dev</h3>
-            <p>Principal desenvolvedora do Frontend, lead designer, spokesperson.</p>
+        <div class="nomes">
+            <div>Guilherme Agostinho</div>
+            <div>Luisa Feher</div>
+            <div>Evelyn Tochio</div>
+            <div>Yago Santana</div>
+            <div>Daniel Marques</div>
         </div>
 
-        <div class="card">
-            <div class="foto"></div>
-            <h3>Sub-designer</h3>
-            <p>Responsável pelos slides e textos.</p>
-        </div>
+    </section>
 
-        <div class="card">
-            <div class="foto"></div>
-            <h3>Função</h3>
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed sed euismod massa, ac tincidunt erat.</p>
-        </div>
-
-        <div class="card">
-            <div class="foto"></div>
-            <h3>Função</h3>
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed sed euismod massa, ac tincidunt erat.</p>
-        </div>
-
-    </div>
-
-    <div class="nomes">
-        <div>Guilherme Agostinho</div>
-        <div>Luisa Feher</div>
-        <div>Evelyn Tochio</div>
-        <div>Yago Santana</div>
-        <div>Daniel Marques</div>
-    </div>
-
-</section>
-
-
-    <!-- =====================================
-         FOOTER
-    ===================================== -->
-
+    <!-- FOOTER -->
     <footer class="footer">
 
-
-        <p>
-
-            Alguma sugestão?
-
-        </p>
-
+        <p>Alguma sugestão?</p>
 
         <a
             target="_blank"
+            rel="noopener noreferrer"
             href="https://docs.google.com/forms/d/e/1FAIpQLSdiIE0wrJNuVGTy-p5T9LtXMbHXtRA4h7XbXsh5T3tDMdDwOQ/viewform">
-
             Preencha nosso formulário!
-
         </a>
-
 
     </footer>
 
-
-
-    <!-- =====================================
-         JAVASCRIPT
-    ===================================== -->
-
+    <!-- JAVASCRIPT -->
     <script
         defer
         src="{{ url_for('static', filename='js/script.js') }}">
     </script>
 
-
 </body>
-
 </html>
