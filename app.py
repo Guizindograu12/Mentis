@@ -1,4 +1,3 @@
-
 from flask import (
     Flask,
     render_template,
@@ -401,51 +400,49 @@ def obrigado():
 
 
 # ==========================================
-# ESQUECI MINHA SENHA
+# RECUPERAÇÃO DEMONSTRATIVA DE SENHA
 # ==========================================
-
-@app.route("/esqueci-senha")
-def esqueci_senha():
-    return render_template("esqueci_senha.html")
-
 
 @app.route("/recuperar-senha", methods=["POST"])
 def recuperar_senha():
-    email = request.form.get(
-        "email", ""
-    ).strip().lower()
-
+    email = request.form.get("email", "").strip().lower()
     nova_senha = request.form.get("nova_senha", "")
     confirmar_senha = request.form.get("confirmar_senha", "")
 
-    if nova_senha != confirmar_senha:
+    def resposta_recuperacao(mensagem, sucesso=False):
         return render_template(
-            "esqueci_senha.html",
-            erro="As senhas não são iguais."
+            "login.html",
+            recovery_mode=True,
+            erro=None if sucesso else mensagem,
+            sucesso=mensagem if sucesso else None
         )
+
+    if not email or not nova_senha or not confirmar_senha:
+        return resposta_recuperacao("Preencha todos os campos.")
+
+    if len(nova_senha) < 8:
+        return resposta_recuperacao(
+            "A senha precisa ter pelo menos 8 caracteres."
+        )
+
+    if nova_senha != confirmar_senha:
+        return resposta_recuperacao("As senhas não são iguais.")
 
     usuario = buscar_usuario_por_email(email)
 
     if usuario is None:
-        return render_template(
-            "esqueci_senha.html",
-            erro="Nenhuma conta foi encontrada com esse e-mail."
+        return resposta_recuperacao(
+            "Não encontramos uma conta com esse e-mail."
         )
 
-    sucesso = alterar_senha(email, nova_senha)
-
-    if sucesso:
-        return render_template(
-            "esqueci_senha.html",
-            sucesso=(
-                "Senha alterada com sucesso! "
-                "Agora você pode entrar na sua conta."
-            )
+    if alterar_senha(email, nova_senha):
+        return resposta_recuperacao(
+            "Senha alterada! Agora você pode voltar ao login.",
+            sucesso=True
         )
 
-    return render_template(
-        "esqueci_senha.html",
-        erro="Não foi possível alterar a senha."
+    return resposta_recuperacao(
+        "Não foi possível alterar a senha. Tente novamente."
     )
 
 

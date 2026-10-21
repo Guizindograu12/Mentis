@@ -1,273 +1,204 @@
+
 <!DOCTYPE html>
 <html lang="pt-br">
-
 <head>
-
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Mentis</title>
+
     <link rel="stylesheet" href="{{ url_for('static', filename='css/header.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
-
 </head>
 
+<body data-recovery-mode="{{ 'true' if recovery_mode|default(false) else 'false' }}">
 
-<body>
+    {% include 'header.html' %}
 
+    <main class="container">
 
-<!-- =====================================
-CABEÇALHO
-==================================== -->
+        <!-- LADO ESQUERDO -->
+        <section class="left">
+            <div class="left-content">
+                <div class="left-text">
+                    <h2 id="titulo-alternativo">Já possui uma conta?</h2>
 
-  {% include 'header.html' %}
+                    <p id="texto-alternativo">
+                        Entre para continuar utilizando a Mentis.
+                    </p>
 
+                    <button
+                        type="button"
+                        class="account-button"
+                        onclick="mostrarLogin()">
+                        Entrar em uma conta
+                    </button>
+                </div>
+            </div>
+        </section>
 
+        <!-- LADO DIREITO -->
+        <section class="right">
 
-<!-- =====================================
-     CONTEÚDO
-     ===================================== -->
+            <!-- CADASTRO -->
+            <div id="cadastro-area" class="form-area">
 
-<main class="container">
+                <h1>Criar conta</h1>
 
+                <div class="facalog">
+                    <p>Cadastre-se no Mentis</p>
+                </div>
 
-    <!-- =================================
-         LADO ESQUERDO
-         ================================= -->
+                {% if erro and not recovery_mode|default(false) %}
+                    <div class="erro">{{ erro }}</div>
+                {% endif %}
 
-    <section class="left">
+                <form action="{{ url_for('cadastro') }}" method="POST">
+                    <div class="input">
+                        <input
+                            name="email"
+                            type="email"
+                            placeholder="Digite seu e-mail"
+                            autocomplete="email"
+                            required>
+                    </div>
 
-        <div class="left-content">
+                    <div class="input">
+                        <input
+                            name="senha"
+                            type="password"
+                            placeholder="Digite sua senha"
+                            autocomplete="new-password"
+                            required>
+                    </div>
 
-            <div class="left-text">
+                    <button type="submit" class="entrar">Cadastrar</button>
+                </form>
 
-                <h2 id="titulo-alternativo">
-                    Já possui uma conta?
-                </h2>
-
-                <p id="texto-alternativo">
-                     Entre para continuar utilizando a Mentis.
-                </p>
-
-
-                <button type="button" class="account-button" onclick="mostrarLogin()">
-
-                    Entrar em uma conta
-
-                </button>
-
+                <div class="social">
+                    <img src="{{ url_for('static', filename='imagens/google.png') }}" alt="Google">
+                    <img src="{{ url_for('static', filename='imagens/microsoft.png') }}" alt="Microsoft">
+                </div>
             </div>
 
-        </div>
+            <!-- LOGIN -->
+            <div id="login-area" class="form-area escondido">
 
-    </section>
+                <h1>Entrar</h1>
 
-    <!-- =================================
-         LADO DIREITO
-         ================================= -->
+                <div class="facalog">
+                    <p>Entre na sua conta Mentis</p>
+                </div>
 
-    <section class="right">
+                {% if erro and not recovery_mode|default(false) %}
+                    <div class="erro">{{ erro }}</div>
+                {% endif %}
 
+                <form action="{{ url_for('entrar') }}" method="POST">
+                    <div class="input">
+                        <input
+                            name="email"
+                            type="email"
+                            placeholder="Digite seu e-mail"
+                            autocomplete="email"
+                            required>
+                    </div>
 
-        <!-- =================================
-             CADASTRO
-             ================================= -->
+                    <div class="input">
+                        <input
+                            name="senha"
+                            type="password"
+                            placeholder="Digite sua senha"
+                            autocomplete="current-password"
+                            required>
+                    </div>
 
-        <div
-            id="cadastro-area"
-            class="form-area">
+                    <a href="#" class="esqueci" onclick="mostrarRecuperacao(event)">
+                        Esqueci minha senha
+                    </a>
 
+                    <button type="submit" class="entrar">Entrar</button>
+                </form>
 
-            <h1>
-                Criar conta
-            </h1>
-
-
-            <div class="facalog">
-
-                <p>
-                    Cadastre-se no Mentis
-                </p>
-
+                <div class="social">
+                    <img src="{{ url_for('static', filename='imagens/google.png') }}" alt="Google">
+                    <img src="{{ url_for('static', filename='imagens/microsoft.png') }}" alt="Microsoft">
+                </div>
             </div>
 
+            <!-- RECUPERAÇÃO DEMONSTRATIVA -->
+            <div id="recuperacao-area" class="form-area escondido">
 
-            {% if erro %}
+                <h1>Recuperar senha</h1>
 
-                <div class="erro">
-                    {{ erro }}
+                <div class="facalog">
+                    <p>Digite seu e-mail e escolha uma nova senha.</p>
+                    <p class="aviso-demo">
+                        Modo demonstrativo: não enviamos e-mail de verificação.
+                    </p>
                 </div>
 
-            {% endif %}
+                {% if recovery_mode|default(false) and erro %}
+                    <div class="erro">{{ erro }}</div>
+                {% endif %}
 
+                {% if recovery_mode|default(false) and sucesso %}
+                    <div class="mensagem-sucesso">{{ sucesso }}</div>
 
-            <form
-                action="{{ url_for('cadastro') }}"
-                method="POST">
+                    <button
+                        type="button"
+                        class="entrar"
+                        onclick="mostrarLogin()">
+                        Voltar ao login
+                    </button>
+                {% else %}
+                    <form action="{{ url_for('recuperar_senha') }}" method="POST">
 
+                        <div class="input">
+                            <input
+                                name="email"
+                                type="email"
+                                placeholder="E-mail cadastrado"
+                                autocomplete="email"
+                                required>
+                        </div>
 
-                <div class="input">
+                        <div class="input">
+                            <input
+                                name="nova_senha"
+                                type="password"
+                                placeholder="Nova senha (mínimo 8 caracteres)"
+                                minlength="8"
+                                autocomplete="new-password"
+                                required>
+                        </div>
 
-                    <input
-                        name="email"
-                        type="email"
-                        placeholder="Digite seu e-mail"
-                        required>
+                        <div class="input">
+                            <input
+                                name="confirmar_senha"
+                                type="password"
+                                placeholder="Confirme a nova senha"
+                                minlength="8"
+                                autocomplete="new-password"
+                                required>
+                        </div>
 
-                </div>
+                        <button type="submit" class="entrar">
+                            Alterar senha
+                        </button>
 
-
-                <div class="input">
-
-                    <input
-                        name="senha"
-                        type="password"
-                        placeholder="Digite sua senha"
-                        required>
-
-                </div>
-
-
-                <button
-                    type="submit"
-                    class="entrar">
-
-                    Cadastrar
-
-                </button>
-
-
-            </form>
-
-
-            <div class="social">
-
-                <img
-                    src="{{ url_for('static', filename='imagens/google.png') }}"
-                    alt="Google">
-
-
-                <img
-                    src="{{ url_for('static', filename='imagens/microsoft.png') }}"
-                    alt="Microsoft">
-
+                        <button
+                            type="button"
+                            class="voltar-login"
+                            onclick="mostrarLogin()">
+                            Voltar
+                        </button>
+                    </form>
+                {% endif %}
             </div>
 
+        </section>
+    </main>
 
-        </div>
-
-
-
-        <!-- =================================
-             LOGIN
-             ================================= -->
-
-        <div
-            id="login-area"
-            class="form-area escondido">
-
-
-            <h1>
-                Entrar
-            </h1>
-
-
-            <div class="facalog">
-
-                <p>
-                    Entre na sua conta Mentis
-                </p>
-
-            </div>
-
-
-            {% if erro %}
-
-                <div class="erro">
-                    {{ erro }}
-                </div>
-
-            {% endif %}
-
-
-            <form
-                action="{{ url_for('entrar') }}"
-                method="POST">
-
-
-                <div class="input">
-
-                    <input
-                        name="email"
-                        type="email"
-                        placeholder="Digite seu e-mail"
-                        required>
-
-                </div>
-
-
-                <div class="input">
-
-                    <input
-                        name="senha"
-                        type="password"
-                        placeholder="Digite sua senha"
-                        required>
-
-                </div>
-
-
-                <!-- =========================
-                     NOVO BOTÃO
-                     ========================= -->
-
-                <a
-                    href="{{ url_for('esqueci_senha') }}"
-                    class="esqueci">
-
-                    Esqueci minha senha
-
-                </a>
-
-
-                <button
-                    type="submit"
-                    class="entrar">
-
-                    Entrar
-
-                </button>
-
-
-            </form>
-
-
-            <div class="social">
-
-                <img
-                    src="{{ url_for('static', filename='imagens/google.png') }}"
-                    alt="Google">
-
-
-                <img
-                    src="{{ url_for('static', filename='imagens/microsoft.png') }}"
-                    alt="Microsoft">
-
-            </div>
-
-
-        </div>
-
-
-    </section>
-
-</main>
-
-<script src="{{ url_for('static', filename='js/login.js') }}"></script>
-
+    <script src="{{ url_for('static', filename='js/login.js') }}"></script>
 </body>
-
 </html>
