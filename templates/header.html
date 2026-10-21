@@ -1,0 +1,43 @@
+<header class="header">
+
+    <div class="logo">
+        <a href="{{ url_for('home') }}">
+            <img
+                src="{{ url_for('static', filename='imagens/logo.png') }}"
+                alt="Logo Mentis">
+        </a>
+    </div>
+
+    <nav class="menu">
+
+        <a href="{{ url_for('home') }}#hero">Home</a>
+        <a href="{{ url_for('home') }}#sobre">Sobre nós</a>
+        <a href="{{ url_for('home') }}#demo">Demo</a>
+        <a href="{{ url_for('home') }}#faq">FAQ</a>
+        <a href="{{ url_for('home') }}#time">Nosso time</a>
+
+        <div class="login">
+
+            {% if usuario %}
+
+                <span class="conta" title="{{ usuario }}">
+                    {{ usuario }}
+                </span>
+
+                <a href="{{ url_for('logout') }}" class="btn-sair">
+                    Sair
+                </a>
+
+            {% else %}
+
+                <a href="{{ url_for('login') }}" class="btn">
+                    Login
+                </a>
+
+            {% endif %}
+
+        </div>
+
+    </nav>
+
+</header>

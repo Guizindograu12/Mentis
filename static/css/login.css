@@ -12,53 +12,19 @@ body {
     overflow-x: hidden;
 }
 
-/* CABEÇALHO */
-.header {
-    width: 100%;
-    height: 80px;
-    background: #d9d9d9;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 45px;
-}
-
-.logo img {
-    width: 95px;
-    height: auto;
-    display: block;
-}
-
-.menu {
-    display: flex;
-    align-items: center;
-    gap: 30px;
-}
-
-.menu a {
-    color: #111;
-    text-decoration: none;
-    font-size: 16px;
-    white-space: nowrap;
-    transition: 0.2s;
-}
-
-.menu a:hover {
-    color: #1a1a6e;
-}
-
 /* CONTAINER PRINCIPAL */
 .container {
     width: 100%;
-    min-height: calc(100vh - 80px);
+    min-height: calc(100vh - 95px);
     display: flex;
     position: relative;
+    align-items: stretch;
 }
 
 /* LADO ESQUERDO */
 .left {
     width: 50%;
-    min-height: calc(100vh - 80px);
+    height: calc(100vh - 95px);
     position: relative;
     overflow: hidden;
     background-image: url("../imagens/cerebro.png");
@@ -80,7 +46,7 @@ body {
     position: relative;
     z-index: 2;
     width: 100%;
-    min-height: calc(100vh - 80px);
+    height: 100%;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -153,7 +119,7 @@ body {
 /* LADO DIREITO */
 .right {
     width: 50%;
-    min-height: calc(100vh - 80px);
+    min-height: calc(100vh - 95px);
     background: white;
     display: flex;
     align-items: center;
@@ -299,10 +265,12 @@ body {
     }
 
     .left {
-        min-height: 500px;
+    height: auto;
+    min-height: 500px;
     }
 
     .left-content {
+        height: auto;
         min-height: 500px;
         padding: 50px 10%;
     }
@@ -328,5 +296,46 @@ body {
 
     .left-text p {
         font-size: 16px;
+    }
+}
+
+/* CORREÇÃO DA ALTURA DA TELA DE LOGIN */
+
+body {
+    padding-top: 105px;
+}
+
+.container {
+    min-height: calc(100vh - 105px);
+    height: calc(100vh - 105px);
+}
+
+.left,
+.right {
+    height: 100%;
+    min-height: 0;
+}
+
+.left-content {
+    height: 100%;
+    min-height: 0;
+}
+
+/* Mantém o layout de celular funcionando */
+@media (max-width: 900px) {
+    .container {
+        height: auto;
+        min-height: calc(100vh - 105px);
+    }
+
+    .left,
+    .right {
+        height: auto;
+        min-height: 500px;
+    }
+
+    .left-content {
+        height: auto;
+        min-height: 500px;
     }
 }

@@ -10,7 +10,7 @@
         content="width=device-width, initial-scale=1.0">
 
     <title>Teste - Mentis</title>
-
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/header.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/teste.css') }}">
 
 </head>
@@ -19,56 +19,11 @@
 <body>
 
 
-<!-- =========================
-     BARRA SUPERIOR
-========================= -->
+<!-- =====================================
+CABEÇALHO
+==================================== -->
 
-<header class="topbar">
-
-    <div class="logo">
-
-        Mentis
-
-    </div>
-
-
-    <nav class="menu">
-
-        <!-- HOME -->
-
-        <a href="{{ url_for('home') }}">
-
-            Home
-
-        </a>
-
-
-        <!-- CONTA LOGADA -->
-
-        {% if session.get("usuario") %}
-
-            <span class="conta">
-
-                {{ session.get("usuario") }}
-
-            </span>
-
-
-            <!-- SAIR -->
-
-            <a
-                href="{{ url_for('logout') }}"
-                class="sair">
-
-                Sair
-
-            </a>
-
-        {% endif %}
-
-    </nav>
-
-</header>
+  {% include 'header.html' %}
 
 
 

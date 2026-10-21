@@ -5,24 +5,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Relatório - Mentis</title>
-
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/header.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/resultado.css') }}">
 </head>
 
 <body>
 
-<header class="topbar">
-    <div class="logo">Mentis</div>
+<!-- =====================================
+CABEÇALHO
+==================================== -->
 
-    <nav class="menu">
-        <a href="{{ url_for('home') }}">Home</a>
-
-        {% if usuario %}
-            <span class="conta">{{ usuario }}</span>
-            <a href="{{ url_for('logout') }}" class="sair">Sair</a>
-        {% endif %}
-    </nav>
-</header>
+  {% include 'header.html' %}
 
 <main class="container">
 
@@ -78,11 +71,15 @@
 
         {% for categoria in relatorio.categorias %}
 
-            <div class="categoria">
-                <strong>{{ "%.2f"|format(categoria.percentual) }}%</strong>
-                de {{ categoria.categoria }} —
-                <span class="valor">{{ categoria.classificacao }}</span>
-            </div>
+        <div class="categoria">
+            <strong
+                class="percentual-categoria"
+                data-percentual="{{ categoria.percentual }}"
+            >0,00%</strong>
+            de {{ categoria.categoria }} —
+            <span class="valor">{{ categoria.classificacao }}</span>
+        </div>
+</div>
 
         {% endfor %}
 
