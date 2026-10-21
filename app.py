@@ -1,3 +1,4 @@
+
 from flask import (
     Flask,
     render_template,
@@ -113,18 +114,7 @@ def iniciar_teste():
     if "usuario_id" not in session:
         return redirect(url_for("login"))
 
-    ultimo_resultado_id = buscar_ultimo_resultado_usuario(
-        session["usuario_id"]
-    )
-
-    if ultimo_resultado_id is not None:
-        return redirect(
-            url_for(
-                "resultado",
-                teste_id=ultimo_resultado_id
-            )
-        )
-
+    # Não redireciona para resultados anteriores.
     return redirect(url_for("teste"))
 
 
@@ -157,7 +147,7 @@ def entrar():
         session["usuario_id"] = usuario_id
         session["usuario"] = email
 
-        return redirect(url_for("iniciar_teste"))
+        return redirect(url_for("home"))
 
     return render_template(
         "login.html",
@@ -197,7 +187,7 @@ def cadastro():
         session["usuario_id"] = usuario_id
         session["usuario"] = email
 
-        return redirect(url_for("iniciar_teste"))
+        return redirect(url_for("home"))
 
     return render_template(
         "login.html",
@@ -214,18 +204,8 @@ def teste():
     if "usuario_id" not in session:
         return redirect(url_for("login"))
 
-    ultimo_resultado_id = buscar_ultimo_resultado_usuario(
-        session["usuario_id"]
-    )
-
-    if ultimo_resultado_id is not None:
-        return redirect(
-            url_for(
-                "resultado",
-                teste_id=ultimo_resultado_id
-            )
-        )
-
+    # Permite abrir o questionário mesmo que
+    # existam testes anteriores para esta conta.
     perguntas = listar_perguntas()
 
     return render_template(
@@ -247,23 +227,6 @@ def analisar():
         }), 401
 
     usuario_id = session.get("usuario_id")
-
-    # Impede o envio de um novo teste caso já exista
-    # um resultado concluído para esta conta.
-    ultimo_resultado_id = buscar_ultimo_resultado_usuario(
-        usuario_id
-    )
-
-    if ultimo_resultado_id is not None:
-        return jsonify({
-            "status": "ja_concluido",
-            "mensagem": "Você já concluiu o questionário.",
-            "resultado_url": url_for(
-                "resultado",
-                teste_id=ultimo_resultado_id
-            )
-        }), 409
-
     respostas = request.get_json(silent=True)
 
     if not respostas:
@@ -273,22 +236,13 @@ def analisar():
         }), 400
 
     try:
-        # ----------------------------------
-        # CRIA O TESTE
-        # ----------------------------------
-
+        # Cada envio cria um novo teste.
         teste = criar_teste(usuario_id)
 
-        # ----------------------------------
-        # SALVA RESPOSTAS
-        # ----------------------------------
-
+        # Salva as respostas deste teste.
         salvar_respostas(teste, respostas)
 
-        # ----------------------------------
-        # MONTA DADOS PARA ANÁLISE
-        # ----------------------------------
-
+        # Busca as respostas e as perguntas associadas.
         linhas = buscar_teste(
             teste.id,
             usuario_id
@@ -304,18 +258,12 @@ def analisar():
             for linha in linhas
         ]
 
-        # ----------------------------------
-        # CALCULA RESULTADO
-        # ----------------------------------
-
+        # Calcula os indicadores do questionário.
         analise = analisar_respostas(
             respostas_com_perguntas
         )
 
-        # ----------------------------------
-        # SALVA RESULTADO
-        # ----------------------------------
-
+        # Salva o resultado associado ao novo teste.
         resultado = salvar_resultado(
             teste,
             analise
@@ -326,11 +274,9 @@ def analisar():
         print()
         print("===================================")
         print("NOVO TESTE REALIZADO")
-        print("===================================")
         print("Teste ID:", teste.id)
         print("Usuário ID:", usuario_id)
         print("E-mail:", session.get("usuario"))
-        print("Resultado:", analise)
         print("===================================")
         print()
 
@@ -356,7 +302,9 @@ def analisar():
     except Exception as erro:
         db.session.rollback()
 
-        print("Erro ao processar teste:", erro)
+        app.logger.exception(
+            "Erro ao processar o questionário."
+        )
 
         return jsonify({
             "status": "erro",
@@ -400,12 +348,15 @@ def obrigado():
 
 
 # ==========================================
-# RECUPERAÇÃO DEMONSTRATIVA DE SENHA
+# RECUPERAÇÃO DE SENHA
 # ==========================================
 
 @app.route("/recuperar-senha", methods=["POST"])
 def recuperar_senha():
-    email = request.form.get("email", "").strip().lower()
+    email = request.form.get(
+        "email", ""
+    ).strip().lower()
+
     nova_senha = request.form.get("nova_senha", "")
     confirmar_senha = request.form.get("confirmar_senha", "")
 
@@ -418,7 +369,9 @@ def recuperar_senha():
         )
 
     if not email or not nova_senha or not confirmar_senha:
-        return resposta_recuperacao("Preencha todos os campos.")
+        return resposta_recuperacao(
+            "Preencha todos os campos."
+        )
 
     if len(nova_senha) < 8:
         return resposta_recuperacao(
@@ -426,7 +379,9 @@ def recuperar_senha():
         )
 
     if nova_senha != confirmar_senha:
-        return resposta_recuperacao("As senhas não são iguais.")
+        return resposta_recuperacao(
+            "As senhas não são iguais."
+        )
 
     usuario = buscar_usuario_por_email(email)
 
@@ -453,7 +408,6 @@ def recuperar_senha():
 @app.route("/logout")
 def logout():
     session.clear()
-
     return redirect(url_for("home"))
 
 

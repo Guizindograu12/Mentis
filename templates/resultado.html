@@ -1,211 +1,263 @@
+
 <!DOCTYPE html>
 <html lang="pt-br">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Relatório - Mentis</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/header.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/resultado.css') }}">
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/header.css') }}"
+    >
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/resultado.css') }}"
+    >
 </head>
 
 <body>
 
-<!-- =====================================
-CABEÇALHO
-==================================== -->
+    <!-- =====================================
+    CABEÇALHO
+    ===================================== -->
 
-  {% include 'header.html' %}
+    {% include 'header.html' %}
 
-<main class="container">
+    <main class="container">
 
-    <h1 class="titulo">Relatório do Questionário Mentis</h1>
+        <h1 class="titulo">
+            Relatório do Questionário Mentis
+        </h1>
 
-    <p class="subtitulo">
-        Relatório individual de indicadores de bem-estar emocional
-    </p>
+        <p class="subtitulo">
+            Relatório individual de indicadores de bem-estar emocional
+        </p>
 
-    <div class="aviso">
-        Este relatório apresenta uma análise das respostas fornecidas
-        no questionário de bem-estar da Mentis. Os resultados são
-        informativos e não constituem diagnóstico psicológico ou médico.
-    </div>
-
-    <section class="resumo">
-
-        <div
-            class="medidor"
-            style="--percentual: {{ relatorio.percentual_geral }}%;"
-            role="img"
-            aria-label="Resultado geral de {{ '%.2f'|format(relatorio.percentual_geral) }} por cento">
-
-            <span class="medidor-valor">
-                {{ "%.0f"|format(relatorio.percentual_geral) }}%
-            </span>
-
+        <div class="aviso">
+            Este relatório apresenta uma análise das respostas fornecidas
+            no questionário de bem-estar da Mentis. Os resultados são
+            informativos e não constituem diagnóstico psicológico ou médico.
         </div>
 
-        <div class="resumo-texto">
+        <section class="resumo">
 
-            <h2>
-                {% if relatorio.classificacao_geral == 'Muito Elevado' %}
-                    Indicadores muito elevados
-                {% elif relatorio.classificacao_geral == 'Elevado' %}
-                    Indicadores elevados
-                {% elif relatorio.classificacao_geral == 'Moderado' %}
-                    Indicadores moderados
-                {% else %}
-                    Indicadores de menor intensidade
-                {% endif %}
-            </h2>
+            <div
+                class="medidor"
+                style="--percentual: {{ relatorio.percentual_geral }}%;"
+                role="img"
+                aria-label="Resultado geral de {{ '%.2f'|format(relatorio.percentual_geral) }} por cento"
+            >
 
-            <p>{{ relatorio.classificacao_geral }}</p>
-
-        </div>
-
-    </section>
-
-    <hr class="linha">
-
-    <section class="categorias" aria-label="Resultados por categoria">
-
-        {% for categoria in relatorio.categorias %}
-
-        <div class="categoria">
-            <strong
-                class="percentual-categoria"
-                data-percentual="{{ categoria.percentual }}"
-            >0,00%</strong>
-            de {{ categoria.categoria }} —
-            <span class="valor">{{ categoria.classificacao }}</span>
-        </div>
-</div>
-
-        {% endfor %}
-
-    </section>
-
-    <hr class="linha">
-
-    <section class="secao-analise">
-
-        <h2>Análise geral</h2>
-
-        {% if relatorio.analise_personalizada is defined
-              and relatorio.analise_personalizada %}
-
-            <div class="analise-texto">{{ relatorio.analise_personalizada }}</div>
-
-        {% else %}
-
-            <div class="analise-texto">
-                <p>
-                    O resultado geral do questionário foi de
-                    {{ "%.2f"|format(relatorio.percentual_geral) }}%,
-                    com classificação "{{ relatorio.classificacao_geral }}".
-                </p>
-
-                <p>
-                    Os percentuais por categoria apresentados acima ajudam
-                    a identificar quais áreas merecem maior atenção.
-                    A interpretação deve considerar o contexto individual,
-                    as experiências recentes e o impacto desses indicadores
-                    no cotidiano.
-                </p>
-
-                {% set destaques = relatorio.categorias
-                    | selectattr('percentual', 'ge', 70)
-                    | list %}
-
-                {% if destaques %}
-                    <p>
-                        As categorias com resultados a partir de 70% foram:
-                        {% for categoria in destaques %}
-                            {{ categoria.categoria }}{% if not loop.last %}, {% else %}.{% endif %}
-                        {% endfor %}
-                        Esses resultados podem ser considerados pontos de
-                        atenção dentro deste questionário.
-                    </p>
-                {% else %}
-                    <p>
-                        Nenhuma categoria atingiu 70% neste resultado.
-                        Ainda assim, os percentuais devem ser interpretados
-                        com cuidado e não descartam possíveis dificuldades.
-                    </p>
-                {% endif %}
+                <span class="medidor-valor">
+                    {{ "%.0f"|format(relatorio.percentual_geral) }}%
+                </span>
 
             </div>
 
-        {% endif %}
+            <div class="resumo-texto">
 
-        <div class="orientacoes">
+                <h2>
+                    {% if relatorio.classificacao_geral == 'Muito Elevado' %}
+                        Indicadores muito elevados
+                    {% elif relatorio.classificacao_geral == 'Elevado' %}
+                        Indicadores elevados
+                    {% elif relatorio.classificacao_geral == 'Moderado' %}
+                        Indicadores moderados
+                    {% else %}
+                        Indicadores de menor intensidade
+                    {% endif %}
+                </h2>
 
-            <h3>Orientações gerais para o bem-estar</h3>
+                <p>
+                    {{ relatorio.classificacao_geral }}
+                </p>
 
-            <ul>
-                <li>
-                    <strong>Relaxamento:</strong>
-                    reserve momentos para pausas, respiração tranquila
-                    ou outras atividades que ajudem a aliviar a tensão.
-                </li>
+            </div>
 
-                <li>
-                    <strong>Rotina de sono:</strong>
-                    procure manter horários regulares para dormir e acordar.
-                </li>
+        </section>
 
-                <li>
-                    <strong>Organização das atividades:</strong>
-                    divida tarefas em etapas menores e estabeleça
-                    prioridades realistas.
-                </li>
+        <hr class="linha">
 
-                <li>
-                    <strong>Conexões sociais:</strong>
-                    mantenha contato com pessoas de confiança e converse
-                    sobre dificuldades quando se sentir à vontade.
-                </li>
+        <section
+            class="categorias"
+            aria-label="Resultados por categoria"
+        >
 
-                <li>
-                    <strong>Apoio profissional:</strong>
-                    se o sofrimento persistir ou prejudicar sua rotina,
-                    considere procurar um psicólogo ou outro profissional
-                    de saúde qualificado.
-                </li>
-            </ul>
+            {% for categoria in relatorio.categorias %}
+
+                <div class="categoria">
+
+                    <strong
+                        class="percentual-categoria"
+                        data-percentual="{{ categoria.percentual }}"
+                    >0,00%</strong>
+
+                    de {{ categoria.categoria }} —
+
+                    <span class="valor">
+                        {{ categoria.classificacao }}
+                    </span>
+
+                </div>
+
+            {% endfor %}
+
+        </section>
+
+        <hr class="linha">
+
+        <section class="secao-analise">
+
+            <h2>Análise geral</h2>
+
+            {% if relatorio.analise_personalizada is defined
+                  and relatorio.analise_personalizada %}
+
+                <div class="analise-texto">
+                    {{ relatorio.analise_personalizada }}
+                </div>
+
+            {% else %}
+
+                <div class="analise-texto">
+
+                    <p>
+                        O resultado geral do questionário foi de
+                        {{ "%.2f"|format(relatorio.percentual_geral) }}%,
+                        com classificação
+                        "{{ relatorio.classificacao_geral }}".
+                    </p>
+
+                    <p>
+                        Os percentuais por categoria apresentados acima
+                        ajudam a identificar quais áreas merecem maior
+                        atenção. A interpretação deve considerar o
+                        contexto individual, as experiências recentes
+                        e o impacto desses indicadores no cotidiano.
+                    </p>
+
+                    {% set destaques = relatorio.categorias
+                        | selectattr('percentual', 'ge', 70)
+                        | list %}
+
+                    {% if destaques %}
+
+                        <p>
+                            As categorias com resultados a partir de
+                            70% foram:
+
+                            {% for categoria in destaques %}
+                                {{ categoria.categoria }}{% if not loop.last %}, {% else %}.{% endif %}
+                            {% endfor %}
+
+                            Esses resultados podem ser considerados
+                            pontos de atenção dentro deste questionário.
+                        </p>
+
+                    {% else %}
+
+                        <p>
+                            Nenhuma categoria atingiu 70% neste resultado.
+                            Ainda assim, os percentuais devem ser
+                            interpretados com cuidado e não descartam
+                            possíveis dificuldades.
+                        </p>
+
+                    {% endif %}
+
+                </div>
+
+            {% endif %}
+
+            <div class="orientacoes">
+
+                <h3>Orientações gerais para o bem-estar</h3>
+
+                <ul>
+
+                    <li>
+                        <strong>Relaxamento:</strong>
+                        reserve momentos para pausas, respiração tranquila
+                        ou outras atividades que ajudem a aliviar a tensão.
+                    </li>
+
+                    <li>
+                        <strong>Rotina de sono:</strong>
+                        procure manter horários regulares para dormir
+                        e acordar.
+                    </li>
+
+                    <li>
+                        <strong>Organização das atividades:</strong>
+                        divida tarefas em etapas menores e estabeleça
+                        prioridades realistas.
+                    </li>
+
+                    <li>
+                        <strong>Conexões sociais:</strong>
+                        mantenha contato com pessoas de confiança e
+                        converse sobre dificuldades quando se sentir
+                        à vontade.
+                    </li>
+
+                    <li>
+                        <strong>Apoio profissional:</strong>
+                        se o sofrimento persistir ou prejudicar sua rotina,
+                        considere procurar um psicólogo ou outro
+                        profissional de saúde qualificado.
+                    </li>
+
+                </ul>
+
+            </div>
+
+            <p class="rodape-aviso">
+                Este relatório é informativo. Os resultados não substituem
+                uma avaliação profissional, um diagnóstico ou um plano
+                de acompanhamento individualizado.
+            </p>
+
+        </section>
+
+        <!-- =====================================
+        AÇÕES DO RELATÓRIO
+        ===================================== -->
+
+        <div class="acoes">
+
+            <a
+                class="botao"
+                href="{{ url_for('teste') }}"
+            >
+                Fazer novo teste
+            </a>
+
+            <a
+                class="botao botao-secundario"
+                href="{{ url_for('home') }}"
+            >
+                Voltar para início
+            </a>
+
+            <button
+                class="botao"
+                type="button"
+                id="botaoImprimir"
+            >
+                Imprimir relatório
+            </button>
 
         </div>
 
-        <p class="rodape-aviso">
-            Este relatório é informativo. Os resultados não substituem
-            uma avaliação profissional, um diagnóstico ou um plano
-            de acompanhamento individualizado.
-        </p>
+    </main>
 
-    </section>
+    <script
+        src="{{ url_for('static', filename='js/resultado.js') }}"
+    ></script>
 
-    <div class="acoes">
-
-        <a class="botao" href="{{ url_for('teste') }}">
-            Fazer novo teste
-        </a>
-
-        <a class="botao botao-secundario" href="{{ url_for('home') }}">
-            Voltar para início
-        </a>
-
-        <button class="botao" type="button" id="botaoImprimir">
-            Imprimir relatório
-        </button>
-
-    </div>
-
-    <a class="voltar" href="{{ url_for('home') }}">
-        Voltar à página inicial
-    </a>
-
-</main>
-
-<script src="{{ url_for('static', filename='js/resultado.js') }}"></script>
 </body>
 </html>
