@@ -429,6 +429,7 @@ width:100%;
 }
 
 
+
 /* NOSSO TIME */
 
 .time {
@@ -444,14 +445,18 @@ width:100%;
     margin-bottom: 55px;
 }
 
-.cards {
+/* CARTÕES E NOMES */
+.cards,
+.nomes {
     display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
+    grid-template-columns: repeat(6, minmax(0, 1fr));
     max-width: 1200px;
     margin: 0 auto;
     gap: 1px;
 }
 
+/* Cada integrante ocupa uma coluna da grade.
+   O sexto espaço fica vazio para manter o alinhamento. */
 .card {
     background: #08085c;
     color: white;
@@ -461,16 +466,23 @@ width:100%;
 }
 
 .card:nth-child(2),
-.card:nth-child(5) {
+.nomes div:nth-child(2) {
     background: #194b96;
 }
 
-.card:nth-child(3) {
+.card:nth-child(3),
+.nomes div:nth-child(3) {
     background: #101080;
 }
 
-.card:nth-child(4) {
+.card:nth-child(4),
+.nomes div:nth-child(4) {
     background: #11104f;
+}
+
+.card:nth-child(5),
+.nomes div:nth-child(5) {
+    background: #194b96;
 }
 
 .foto {
@@ -495,11 +507,7 @@ width:100%;
 }
 
 .nomes {
-    display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: 1px;
-    max-width: 1200px;
-    margin: 5px auto 0;
+    margin-top: 5px;
 }
 
 .nomes div {
@@ -510,18 +518,50 @@ width:100%;
     overflow-wrap: anywhere;
 }
 
-.nomes div:nth-child(2),
-.nomes div:nth-child(5) {
-    background: #194b96;
+/* TABLETS: duas colunas */
+@media (max-width: 800px) {
+    .time {
+        padding: 40px 15px;
+    }
+
+    .cards,
+    .nomes {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .card p {
+        font-size: 12px;
+    }
+
+    .card,
+    .nomes div {
+        min-width: 0;
+    }
+
+    .nomes div {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 65px;
+    }
 }
 
-.nomes div:nth-child(3) {
-    background: #101080;
+/* CELULARES: uma coluna */
+@media (max-width: 450px) {
+    .cards,
+    .nomes {
+        grid-template-columns: 1fr;
+    }
+
+    .card {
+        padding: 20px;
+    }
+
+    .card p {
+        text-align: center;
+    }
 }
 
-.nomes div:nth-child(4) {
-    background: #11104f;
-}
 
 /* RESPONSIVIDADE */
 
@@ -552,5 +592,38 @@ width:100%;
 
     .card p {
         text-align: center;
+    }
+}
+
+
+/* NOMES DOS INTEGRANTES */
+.nome-integrante {
+    margin: auto -15px -12px;
+    padding: 20px 5px;
+    background: rgba(0, 0, 0, 0.18);
+    color: white;
+    text-align: center;
+    font-size: 14px;
+    overflow-wrap: anywhere;
+}
+
+@media (max-width: 800px) {
+    .cards {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .card {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .nome-integrante {
+        margin: auto -20px -20px;
+    }
+}
+
+@media (max-width: 450px) {
+    .cards {
+        grid-template-columns: 1fr;
     }
 }

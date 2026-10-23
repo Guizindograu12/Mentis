@@ -1,4 +1,3 @@
-
 function mostrarLogin() {
     document.getElementById("cadastro-area").classList.add("escondido");
     document.getElementById("recuperacao-area").classList.add("escondido");

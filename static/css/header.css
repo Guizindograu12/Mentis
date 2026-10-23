@@ -9,6 +9,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 25px;
     padding: 18px 50px;
     background: rgba(217, 217, 217, 0.85);
     backdrop-filter: blur(8px);
@@ -34,7 +35,11 @@
     white-space: nowrap;
 }
 
-/* LOGIN E CONTA */
+.header .menu > a:hover {
+    color: #191970;
+}
+
+/* CONTA E LOGIN */
 
 .header .login {
     display: flex;
@@ -51,6 +56,7 @@
     align-items: center;
     justify-content: center;
     padding: 12px 24px;
+    border: none;
     border-radius: 30px;
     background: #191970;
     color: white;
@@ -80,29 +86,207 @@
     white-space: nowrap;
 }
 
-/* RESPONSIVIDADE */
+/* BOTÕES MOBILE: ESCONDIDOS NO COMPUTADOR */
 
-@media (max-width: 900px) {
+.menu-toggle,
+.menu-close,
+.sidebar-top,
+.menu-overlay {
+    display: none;
+}
+
+/* SIDEBAR NO MOBILE */
+
+@media (max-width: 800px) {
+
     .header {
-        flex-direction: column;
-        gap: 15px;
+        min-height: 82px;
+        height: 82px;
         padding: 12px 20px;
+        flex-direction: row;
+        justify-content: space-between;
+        gap: 12px;
+    }
+
+    .header .logo img {
+        width: 105px;
+    }
+
+    .menu-toggle {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 5px;
+        width: 46px;
+        height: 46px;
+        padding: 10px;
+        border: none;
+        border-radius: 10px;
+        background: #191970;
+        cursor: pointer;
+        flex-shrink: 0;
+    }
+
+    .menu-toggle span {
+        display: block;
+        width: 24px;
+        height: 2px;
+        border-radius: 2px;
+        background: white;
     }
 
     .header .menu {
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 15px;
+        position: fixed;
+        top: 0;
+        right: 0;
+        width: min(300px, 85vw);
+        height: 100vh;
+        height: 100dvh;
+        padding: 25px 22px;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        justify-content: flex-start;
+        gap: 0;
+        overflow-y: auto;
+        background: #f4f4f8;
+        box-shadow: -8px 0 25px rgba(0, 0, 0, 0.15);
+        z-index: 1002;
+        transform: translateX(110%);
+        visibility: hidden;
+        pointer-events: none;
+        transition: transform 0.3s ease, visibility 0.3s ease;
     }
-}
 
-@media (max-width: 800px) {
-    .header .login {
-        flex-wrap: wrap;
+    .header .menu.menu-aberto {
+        transform: translateX(0);
+        visibility: visible;
+        pointer-events: auto;
+    }
+
+    .sidebar-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 25px;
+        padding-bottom: 18px;
+        border-bottom: 1px solid #d7d7e2;
+        color: #191970;
+        font-size: 22px;
+        font-weight: bold;
+    }
+
+    .menu-close {
+        display: flex;
+        align-items: center;
         justify-content: center;
+        width: 38px;
+        height: 38px;
+        border: none;
+        border-radius: 8px;
+        background: #191970;
+        color: white;
+        font-size: 28px;
+        cursor: pointer;
+    }
+
+    .header .menu > a {
+        display: block;
+        padding: 16px 8px;
+        border-bottom: 1px solid #e0e0e8;
+        color: #191970;
+        font-size: 16px;
+        white-space: normal;
+    }
+
+    .header .menu > a:hover {
+        background: #e8e8f5;
+    }
+
+    .header .login {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+        margin-top: 25px;
     }
 
     .header .conta {
-        max-width: 180px;
+        max-width: 100%;
+        padding: 12px;
+        white-space: normal;
+        overflow-wrap: anywhere;
+        text-align: center;
+    }
+
+    .header .login .btn,
+    .header .login .btn-sair {
+        width: 100%;
+        min-height: 44px;
+    }
+
+    .menu-overlay {
+        display: block;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.45);
+        z-index: 1001;
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+
+    .menu-overlay.overlay-visivel {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+    }
+
+    body.menu-bloqueado {
+        overflow: hidden;
+    }
+}
+
+/* ACESSIBILIDADE: REDUZIR ANIMAÇÕES */
+
+@media (prefers-reduced-motion: reduce) {
+    .header .menu,
+    .menu-overlay {
+        transition: none;
+    }
+}
+
+
+/* CORREÇÃO DO MENU HAMBÚRGUER */
+@media (max-width: 800px) {
+    .header {
+        flex-direction: row !important;
+        justify-content: space-between;
+    }
+
+    .header .menu-toggle {
+        display: flex !important;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        width: 46px;
+        height: 46px;
+        flex-shrink: 0;
+        position: relative;
+        z-index: 1003;
+        background: #191970;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+    }
+
+    .header .menu-toggle span {
+        display: block;
+        width: 24px;
+        height: 2px;
+        background: white;
     }
 }

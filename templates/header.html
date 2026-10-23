@@ -8,7 +8,36 @@
         </a>
     </div>
 
-    <nav class="menu">
+    <!-- BOTÃO HAMBÚRGUER -->
+    <button
+        type="button"
+        class="menu-toggle"
+        id="menu-toggle"
+        aria-label="Abrir menu"
+        aria-controls="menu-principal"
+        aria-expanded="false">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+
+    <!-- FUNDO ESCURO ATRÁS DA SIDEBAR -->
+    <div class="menu-overlay" id="menu-overlay"></div>
+
+    <!-- MENU DE NAVEGAÇÃO -->
+    <nav class="menu" id="menu-principal" aria-label="Menu principal">
+
+        <div class="sidebar-top">
+            <span>Menu</span>
+
+            <button
+                type="button"
+                class="menu-close"
+                id="menu-close"
+                aria-label="Fechar menu">
+                &times;
+            </button>
+        </div>
 
         <a href="{{ url_for('home') }}#hero">Home</a>
         <a href="{{ url_for('home') }}#sobre">Sobre nós</a>
@@ -41,3 +70,45 @@
     </nav>
 
 </header>
+
+<script>
+(function () {
+    const botaoAbrir = document.getElementById("menu-toggle");
+    const botaoFechar = document.getElementById("menu-close");
+    const menu = document.getElementById("menu-principal");
+    const overlay = document.getElementById("menu-overlay");
+
+    if (!botaoAbrir || !botaoFechar || !menu || !overlay) return;
+
+    function abrirMenu() {
+        menu.classList.add("menu-aberto");
+        overlay.classList.add("overlay-visivel");
+        botaoAbrir.setAttribute("aria-expanded", "true");
+        botaoAbrir.setAttribute("aria-label", "Abrir menu");
+        document.body.classList.add("menu-bloqueado");
+    }
+
+    function fecharMenu() {
+        menu.classList.remove("menu-aberto");
+        overlay.classList.remove("overlay-visivel");
+        botaoAbrir.setAttribute("aria-expanded", "false");
+        document.body.classList.remove("menu-bloqueado");
+    }
+
+    botaoAbrir.addEventListener("click", abrirMenu);
+    botaoFechar.addEventListener("click", fecharMenu);
+    overlay.addEventListener("click", fecharMenu);
+
+    menu.querySelectorAll("a").forEach(function (link) {
+        link.addEventListener("click", fecharMenu);
+    });
+
+    document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape") fecharMenu();
+    });
+
+    window.addEventListener("resize", function () {
+        if (window.innerWidth > 800) fecharMenu();
+    });
+})();
+</script>
