@@ -1,4 +1,3 @@
-
 from flask import (
     Flask,
     render_template,
@@ -10,6 +9,7 @@ from flask import (
 )
 
 import os
+from sqlalchemy import select
 
 from dotenv import load_dotenv
 
@@ -27,7 +27,11 @@ from backend.database import (
     buscar_resultado,
     salvar_resultado,
     listar_perguntas,
-    buscar_ultimo_resultado_usuario
+    buscar_ultimo_resultado_usuario,
+    EmotionalCheckIn,
+    Teste,
+    Resultado,
+    ResultadoCategoria
 )
 
 from backend.perguntas import PERGUNTAS
@@ -337,6 +341,215 @@ def resultado(teste_id):
         usuario=session.get("usuario")
     )
 
+
+# ==========================================
+# PERFIL / PAINEL DE ACOMPANHAMENTO
+# ==========================================
+
+@app.route("/perfil")
+def perfil():
+    if "usuario_id" not in session:
+        return redirect(url_for("login"))
+
+    usuario_id = session["usuario_id"]
+
+    resultados_db = db.session.execute(
+        select(Resultado, Teste.data_teste)
+        .join(Teste, Resultado.teste_id == Teste.id)
+        .where(Teste.usuario_id == usuario_id)
+        .order_by(Teste.data_teste.asc(), Resultado.id.asc())
+    ).all()
+
+    historico = []
+    historico_categorias = {}
+
+    for resultado_db, data_teste in resultados_db:
+        data_formatada = (
+            data_teste.strftime("%d/%m/%Y")
+            if data_teste else "Data indisponível"
+        )
+
+        percentual = float(resultado_db.percentual_geral)
+
+        classificacao = getattr(
+            resultado_db,
+            "classificacao",
+            "Resultado registrado"
+        )
+
+        # Categorias e respectivos resultados deste teste.
+        categorias_teste = []
+
+        for categoria in resultado_db.categorias:
+            nome_categoria = categoria.categoria
+            percentual_categoria = float(categoria.percentual)
+
+            categorias_teste.append({
+                "nome": nome_categoria,
+                "percentual": percentual_categoria
+            })
+
+            historico_categorias.setdefault(
+                nome_categoria, []
+            ).append({
+                "data": data_formatada,
+                "percentual": percentual_categoria
+            })
+
+        # Histórico geral, incluindo os resultados por categoria.
+        historico.append({
+            "teste_id": resultado_db.teste_id,
+            "data": data_formatada,
+            "data_label": data_formatada,
+            "percentual": percentual,
+            "classificacao": classificacao,
+            "categorias": categorias_teste
+        })
+
+    # Check-ins emocionais.
+    checkins_db = db.session.execute(
+        select(EmotionalCheckIn)
+        .where(EmotionalCheckIn.usuario_id == usuario_id)
+        .order_by(EmotionalCheckIn.data_registro.asc())
+    ).scalars().all()
+
+    checkins = [
+        {
+            "humor": checkin.humor,
+            "data": (
+                checkin.data_registro.strftime("%d/%m/%Y")
+                if checkin.data_registro
+                else "Data indisponível"
+            )
+        }
+        for checkin in checkins_db
+    ]
+
+    # Média dos resultados gerais.
+    media_testes = (
+        round(
+            sum(item["percentual"] for item in historico)
+            / len(historico),
+            2
+        )
+        if historico else None
+    )
+
+    # Média dos check-ins.
+    media_humor = (
+        round(
+            sum(item["humor"] for item in checkins)
+            / len(checkins),
+            1
+        )
+        if checkins else None
+    )
+
+    ultimo = historico[-1] if historico else None
+
+    # Dados utilizados pelo perfil.html e perfil.js.
+    testes = [
+        {
+            "teste_id": item["teste_id"],
+            "data": item["data"],
+            "data_label": item["data_label"],
+            "percentual": item["percentual"],
+            "classificacao": item["classificacao"],
+            "categorias": item["categorias"]
+        }
+        for item in historico
+    ]
+
+    moods = checkins
+
+    ultimo_teste = (
+        dict(ultimo)
+        if ultimo else None
+    )
+
+    return render_template(
+        "perfil.html",
+        historico=historico,
+        historico_categorias=historico_categorias,
+        checkins=checkins,
+        ultimo=ultimo,
+        media_testes=media_testes,
+        media_humor=media_humor,
+        total_testes=len(historico),
+        categorias_media={
+            nome: round(
+                sum(item["percentual"] for item in valores)
+                / len(valores),
+                2
+            )
+            for nome, valores in historico_categorias.items()
+            if valores
+        },
+        testes=testes,
+        moods=moods,
+        ultimo_teste=ultimo_teste
+    )
+
+# ==========================================
+# CHECK-IN EMOCIONAL
+# ==========================================
+
+@app.route("/checkin-humor", methods=["POST"])
+def checkin_humor():
+    if "usuario_id" not in session:
+        return jsonify({
+            "mensagem": "Você precisa estar logado."
+        }), 401
+
+    dados = request.get_json(silent=True) or {}
+    humor = dados.get("humor")
+
+    if (
+        not isinstance(humor, int)
+        or isinstance(humor, bool)
+        or humor < 1
+        or humor > 10
+    ):
+        return jsonify({
+            "mensagem": "Selecione um valor de humor entre 1 e 10."
+        }), 400
+
+    try:
+        checkin = EmotionalCheckIn(
+            usuario_id=session["usuario_id"],
+            humor=humor
+        )
+
+        db.session.add(checkin)
+        db.session.commit()
+
+        checkins = db.session.execute(
+            select(EmotionalCheckIn).where(
+                EmotionalCheckIn.usuario_id == session["usuario_id"]
+            )
+        ).scalars().all()
+
+        media_humor = round(
+            sum(item.humor for item in checkins) / len(checkins),
+            1
+        )
+
+        return jsonify({
+            "mensagem": "Check-in registrado com sucesso.",
+            "humor": humor,
+            "media_humor": media_humor
+        })
+
+    except Exception:
+        db.session.rollback()
+
+        app.logger.exception(
+            "Erro ao salvar o check-in emocional."
+        )
+
+        return jsonify({
+            "mensagem": "Não foi possível salvar o check-in."
+        }), 500
 
 # ==========================================
 # OBRIGADO

@@ -1,5 +1,6 @@
 <header class="header">
 
+    <!-- LOGO -->
     <div class="logo">
         <a href="{{ url_for('home') }}">
             <img
@@ -8,7 +9,7 @@
         </a>
     </div>
 
-    <!-- BOTÃO HAMBÚRGUER -->
+    <!-- BOTÃO HAMBÚRGUER: MOBILE -->
     <button
         type="button"
         class="menu-toggle"
@@ -16,18 +17,28 @@
         aria-label="Abrir menu"
         aria-controls="menu-principal"
         aria-expanded="false">
+
         <span></span>
         <span></span>
         <span></span>
+
     </button>
 
-    <!-- FUNDO ESCURO ATRÁS DA SIDEBAR -->
-    <div class="menu-overlay" id="menu-overlay"></div>
+    <!-- FUNDO ESCURO DA SIDEBAR -->
+    <div
+        class="menu-overlay"
+        id="menu-overlay">
+    </div>
 
-    <!-- MENU DE NAVEGAÇÃO -->
-    <nav class="menu" id="menu-principal" aria-label="Menu principal">
+    <!-- MENU PRINCIPAL -->
+    <nav
+        class="menu"
+        id="menu-principal"
+        aria-label="Menu principal">
 
+        <!-- TOPO DA SIDEBAR -->
         <div class="sidebar-top">
+
             <span>Menu</span>
 
             <button
@@ -35,32 +46,64 @@
                 class="menu-close"
                 id="menu-close"
                 aria-label="Fechar menu">
+
                 &times;
+
             </button>
+
         </div>
 
-        <a href="{{ url_for('home') }}#hero">Home</a>
-        <a href="{{ url_for('home') }}#sobre">Sobre nós</a>
-        <a href="{{ url_for('home') }}#demo">Demo</a>
-        <a href="{{ url_for('home') }}#faq">FAQ</a>
-        <a href="{{ url_for('home') }}#time">Nosso time</a>
+        <!-- LINKS DE NAVEGAÇÃO -->
+        <a href="{{ url_for('home') }}#hero">
+            Home
+        </a>
 
+        <a href="{{ url_for('home') }}#sobre">
+            Sobre nós
+        </a>
+
+        <a href="{{ url_for('home') }}#demo">
+            Demo
+        </a>
+
+        <a href="{{ url_for('home') }}#faq">
+            FAQ
+        </a>
+
+        <a href="{{ url_for('home') }}#time">
+            Nosso time
+        </a>
+
+        <!-- LOGIN E PERFIL -->
         <div class="login">
 
             {% if usuario %}
 
-                <span class="conta" title="{{ usuario }}">
-                    {{ usuario }}
-                </span>
+                <a
+                    href="{{ url_for('perfil') }}"
+                    class="conta"
+                    title="Abrir meu perfil">
 
-                <a href="{{ url_for('logout') }}" class="btn-sair">
+                    {{ usuario }}
+
+                </a>
+
+                <a
+                    href="{{ url_for('logout') }}"
+                    class="btn-sair">
+
                     Sair
+
                 </a>
 
             {% else %}
 
-                <a href="{{ url_for('login') }}" class="btn">
+                <a
+                    href="{{ url_for('login') }}"
+                    class="btn">
+
                     Login
+
                 </a>
 
             {% endif %}
@@ -71,44 +114,77 @@
 
 </header>
 
+<!-- JAVASCRIPT DO MENU MOBILE -->
 <script>
 (function () {
+
     const botaoAbrir = document.getElementById("menu-toggle");
     const botaoFechar = document.getElementById("menu-close");
     const menu = document.getElementById("menu-principal");
     const overlay = document.getElementById("menu-overlay");
 
-    if (!botaoAbrir || !botaoFechar || !menu || !overlay) return;
+    // Interrompe caso os elementos não existam.
+    if (!botaoAbrir || !botaoFechar || !menu || !overlay) {
+        return;
+    }
 
+    // Abre a sidebar.
     function abrirMenu() {
+
         menu.classList.add("menu-aberto");
         overlay.classList.add("overlay-visivel");
+
         botaoAbrir.setAttribute("aria-expanded", "true");
-        botaoAbrir.setAttribute("aria-label", "Abrir menu");
+        botaoAbrir.setAttribute("aria-label", "Fechar menu");
+
         document.body.classList.add("menu-bloqueado");
+
     }
 
+    // Fecha a sidebar.
     function fecharMenu() {
+
         menu.classList.remove("menu-aberto");
         overlay.classList.remove("overlay-visivel");
+
         botaoAbrir.setAttribute("aria-expanded", "false");
+        botaoAbrir.setAttribute("aria-label", "Abrir menu");
+
         document.body.classList.remove("menu-bloqueado");
+
     }
 
+    // Eventos dos botões.
     botaoAbrir.addEventListener("click", abrirMenu);
     botaoFechar.addEventListener("click", fecharMenu);
+
+    // Fecha ao clicar no fundo escuro.
     overlay.addEventListener("click", fecharMenu);
 
+    // Fecha ao selecionar um link.
     menu.querySelectorAll("a").forEach(function (link) {
+
         link.addEventListener("click", fecharMenu);
+
     });
 
+    // Fecha ao pressionar Escape.
     document.addEventListener("keydown", function (event) {
-        if (event.key === "Escape") fecharMenu();
+
+        if (event.key === "Escape") {
+            fecharMenu();
+        }
+
     });
 
+    // Fecha ao voltar para o layout de computador.
     window.addEventListener("resize", function () {
-        if (window.innerWidth > 800) fecharMenu();
+
+        if (window.innerWidth > 800) {
+            fecharMenu();
+        }
+
     });
+
 })();
 </script>

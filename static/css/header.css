@@ -84,6 +84,8 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    text-decoration: none;
+    cursor: pointer;
 }
 
 /* BOTÕES MOBILE: ESCONDIDOS NO COMPUTADOR */

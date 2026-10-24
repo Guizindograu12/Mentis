@@ -428,178 +428,114 @@ width:100%;
     }
 }
 
-
-
-/* NOSSO TIME */
+/* =========================================
+   NOSSO TIME
+========================================= */
 
 .time {
-    padding: 60px 30px 75px;
+    padding: 0 30px 35px;
     background: #fffafb;
     text-align: center;
 }
 
+/* TÍTULO E ESPAÇO BRANCO */
+
 .time h2 {
     color: #191970;
-    font-size: 28px;
-    font-weight: 500;
-    margin-bottom: 55px;
+    background: #ffffff;
+    font-size: 32px;
+    font-weight: 600;
+    padding: 48px 0 20px;
+    margin: 0 -30px 42px;
 }
 
-/* CARTÕES E NOMES */
-.cards,
-.nomes {
+/* CARTÕES DOS INTEGRANTES */
+
+.cards {
     display: grid;
-    grid-template-columns: repeat(6, minmax(0, 1fr));
+    grid-template-columns: repeat(5, minmax(0, 1fr));
     max-width: 1200px;
     margin: 0 auto;
     gap: 1px;
+    align-items: stretch;
 }
 
-/* Cada integrante ocupa uma coluna da grade.
-   O sexto espaço fica vazio para manter o alinhamento. */
 .card {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    padding: 20px 17px 0;
     background: #08085c;
     color: white;
-    padding: 18px 15px 12px;
     text-align: left;
-    min-width: 0;
 }
 
-.card:nth-child(2),
-.nomes div:nth-child(2) {
+/* CORES DOS CARTÕES */
+
+.card:nth-child(1) {
+    background: #08085c;
+}
+
+.card:nth-child(2) {
+    background: #101064;
+}
+
+.card:nth-child(3) {
+    background: #080f8f;
+}
+
+.card:nth-child(4) {
+    background: #05083e;
+}
+
+.card:nth-child(5) {
     background: #194b96;
 }
 
-.card:nth-child(3),
-.nomes div:nth-child(3) {
-    background: #101080;
-}
-
-.card:nth-child(4),
-.nomes div:nth-child(4) {
-    background: #11104f;
-}
-
-.card:nth-child(5),
-.nomes div:nth-child(5) {
-    background: #194b96;
-}
+/* FOTO */
 
 .foto {
     width: 100%;
-    max-width: 108px;
-    aspect-ratio: 1;
+    max-width: 122px;
+    aspect-ratio: 1 / 1;
+    flex-shrink: 0;
     background: #d9d9d9;
     border-radius: 50%;
-    margin: 0 auto 10px;
+    margin: 0 auto 12px;
 }
 
+/* FUNÇÃO */
+
 .card h3 {
+    min-height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     font-size: 14px;
+    font-weight: 500;
     text-align: center;
     text-transform: lowercase;
     margin-bottom: 8px;
 }
 
+/* DESCRIÇÃO */
+
 .card p {
-    font-size: 10px;
-    line-height: 1.55;
+    flex-grow: 1;
+    font-size: 11px;
+    line-height: 1.4;
+    margin-bottom: 20px;
 }
 
-.nomes {
-    margin-top: 5px;
-}
+/* NOME DO INTEGRANTE */
 
-.nomes div {
-    background: #08085c;
-    color: white;
-    padding: 20px 5px;
-    font-size: 14px;
-    overflow-wrap: anywhere;
-}
-
-/* TABLETS: duas colunas */
-@media (max-width: 800px) {
-    .time {
-        padding: 40px 15px;
-    }
-
-    .cards,
-    .nomes {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .card p {
-        font-size: 12px;
-    }
-
-    .card,
-    .nomes div {
-        min-width: 0;
-    }
-
-    .nomes div {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        min-height: 65px;
-    }
-}
-
-/* CELULARES: uma coluna */
-@media (max-width: 450px) {
-    .cards,
-    .nomes {
-        grid-template-columns: 1fr;
-    }
-
-    .card {
-        padding: 20px;
-    }
-
-    .card p {
-        text-align: center;
-    }
-}
-
-
-/* RESPONSIVIDADE */
-
-@media (max-width: 800px) {
-    .time {
-        padding: 40px 15px;
-    }
-
-    .cards,
-    .nomes {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .card p {
-        font-size: 12px;
-    }
-}
-
-@media (max-width: 450px) {
-    .cards,
-    .nomes {
-        grid-template-columns: 1fr;
-    }
-
-    .card {
-        padding: 20px;
-    }
-
-    .card p {
-        text-align: center;
-    }
-}
-
-
-/* NOMES DOS INTEGRANTES */
 .nome-integrante {
-    margin: auto -15px -12px;
-    padding: 20px 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 62px;
+    margin: auto -17px 0;
+    padding: 12px 5px;
     background: rgba(0, 0, 0, 0.18);
     color: white;
     text-align: center;
@@ -607,23 +543,91 @@ width:100%;
     overflow-wrap: anywhere;
 }
 
+/* =========================================
+   TABLETS
+========================================= */
+
 @media (max-width: 800px) {
+
+    .time {
+        padding: 35px 15px 35px;
+    }
+
+    .time h2 {
+        padding: 25px 0 20px;
+        margin: -35px -15px 30px;
+    }
+
+    .cards {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 2px;
+    }
+
+    .card {
+        padding: 20px 15px 0;
+    }
+
+    .foto {
+        max-width: 108px;
+    }
+
+    .card h3 {
+        min-height: 36px;
+        font-size: 13px;
+    }
+
+    .card p {
+        font-size: 12px;
+    }
+
+    .nome-integrante {
+        min-height: 60px;
+        margin-right: -15px;
+        margin-left: -15px;
+        font-size: 14px;
+    }
+}
+
+/* =========================================
+   CELULARES
+========================================= */
+
+@media (max-width: 450px) {
+
+    .time {
+        padding: 25px 10px 30px;
+    }
+
+    .time h2 {
+        padding: 20px 0;
+        margin: -25px -10px 25px;
+        font-size: 28px;
+    }
+
     .cards {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     .card {
-        display: flex;
-        flex-direction: column;
+        padding: 20px 10px 0;
+    }
+
+    .foto {
+        max-width: 108px;
+    }
+
+    .card h3 {
+        font-size: 13px;
+    }
+
+    .card p {
+        font-size: 11px;
+        text-align: left;
     }
 
     .nome-integrante {
-        margin: auto -20px -20px;
-    }
-}
-
-@media (max-width: 450px) {
-    .cards {
-        grid-template-columns: 1fr;
+        margin-right: -10px;
+        margin-left: -10px;
+        font-size: 12px;
     }
 }

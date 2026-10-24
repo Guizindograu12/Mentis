@@ -283,6 +283,35 @@ class ResultadoCategoria(db.Model):
     )
 
 
+class EmotionalCheckIn(db.Model):
+
+    __tablename__ = "emotional_checkins"
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+    usuario_id = db.Column(
+        db.Integer,
+        db.ForeignKey("usuarios.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True
+    )
+
+    humor = db.Column(
+        db.Integer,
+        nullable=False
+    )
+
+    data_registro = db.Column(
+        db.DateTime(timezone=True),
+        server_default=db.func.now(),
+        nullable=False
+    )
+
+
+
 # ==========================================
 # BANCO
 # ==========================================
