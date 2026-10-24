@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Meu perfil | Mentis</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/header.css') }}">
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/perfil.css') }}">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+    {% include 'header.html' %}
+
+    <main class="dashboard">
+
+        <!-- BOAS-VINDAS -->
+        <section class="welcome">
+            <p class="eyebrow">SEU ESPAÇO MENTIS</p>
+
+            <h1>Olá, {{ usuario }}!</h1>
+
+            <p>
+                Acompanhe seus registros de bem-estar
+                e a evolução dos seus questionários.
+            </p>
+        </section>
+
+        <!-- CHECK-IN EMOCIONAL -->
+        <section class="panel checkin-panel">
+
+            <div class="section-title">
+                <span class="icon">♡</span>
+
+                <div>
+                    <h2>Emotional Check-in</h2>
+                    <p>Como você está se sentindo hoje?</p>
+                </div>
+            </div>
+
+            <div
+                class="mood-options"
+                role="group"
+                aria-label="Como você está se sentindo de 1 a 10">
+
+                {% for n in range(1, 11) %}
+
+                <button
+                    type="button"
+                    class="mood-option"
+                    data-mood="{{ n }}"
+                    aria-label="Humor {{ n }} de 10">
+
+                    <span class="face">
+                        {% if n <= 2 %}
+                            😞
+                        {% elif n <= 4 %}
+                            🙁
+                        {% elif n <= 6 %}
+                            😐
+                        {% elif n <= 8 %}
+                            🙂
+                        {% else %}
+                            😄
+                        {% endif %}
+                    </span>
+
+                    <span>{{ n }}</span>
+
+                </button>
+
+                {% endfor %}
+
+            </div>
+
+            <p
+                id="mood-feedback"
+                class="feedback"
+                aria-live="polite">
+
+                Escolha uma opção para registrar seu check-in.
+
+            </p>
+
+        </section>
+
+        <!-- INDICADORES DO USUÁRIO -->
+        <section class="stats">
+
+            <article class="stat-card">
+                <span>Avg. Mood</span>
+
+                <strong>
+                    {% if media_humor is not none %}
+                        {{ media_humor }}/10
+                    {% else %}
+                        —
+                    {% endif %}
+                </strong>
+
+                <small>Média dos seus check-ins</small>
+            </article>
+
+            <article class="stat-card">
+                <span>Testes realizados</span>
+
+                <strong>{{ testes|length }}</strong>
+
+                <small>Questionários concluídos</small>
+            </article>
+
+            <article class="stat-card">
+                <span>Média dos testes</span>
+
+                <strong>
+                    {% if media_testes is not none %}
+                        {{ "%.1f"|format(media_testes) }}%
+                    {% else %}
+                        —
+                    {% endif %}
+                </strong>
+
+                <small>Média dos resultados gerais</small>
+            </article>
+
+            <article class="stat-card">
+                <span>Último resultado</span>
+
+                <strong>
+                    {% if ultimo_teste %}
+                        {{ "%.1f"|format(ultimo_teste.percentual) }}%
+                    {% else %}
+                        —
+                    {% endif %}
+                </strong>
+
+                <small>
+                    {% if ultimo_teste %}
+                        {{ ultimo_teste.classificacao }}
+                    {% else %}
+                        Faça seu primeiro teste
+                    {% endif %}
+                </small>
+            </article>
+
+        </section>
+
+        <!-- GRÁFICOS PRINCIPAIS -->
+        <section class="charts-grid">
+
+            <article class="panel chart-panel">
+
+                <div class="section-title">
+                    <span class="icon">↗</span>
+
+                    <div>
+                        <h2>Evolução do bem-estar</h2>
+                        <p>Resultado geral em cada questionário</p>
+                    </div>
+                </div>
+
+                {% if testes %}
+
+                <div class="chart-wrap">
+                    <canvas
+                        id="trendChart"
+                        aria-label="Gráfico de linha dos resultados dos testes">
+                    </canvas>
+                </div>
+
+                {% else %}
+
+                <p class="empty">
+                    Quando você concluir questionários,
+                    sua evolução aparecerá aqui.
+                </p>
+
+                {% endif %}
+
+            </article>
+
+        </section>
+
+        <!-- DETALHAMENTO POR CATEGORIA -->
+        <section class="panel details-panel" id="detalhes">
+
+            <div class="section-title">
+                <span class="icon">◉</span>
+
+                <div>
+                    <h2>Resultados por categoria</h2>
+
+                    <p>
+                        Compare as categorias entre os questionários anteriores.
+                    </p>
+                </div>
+            </div>
+
+            {% if testes %}
+
+            <div class="detail-controls">
+
+                <label for="category-select">Categoria</label>
+
+                <select id="category-select"></select>
+
+            </div>
+
+            <div class="chart-wrap category-chart">
+
+                <canvas
+                    id="categoryChart"
+                    aria-label="Comparação de uma categoria ao longo dos testes">
+                </canvas>
+
+            </div>
+
+            <p
+                id="category-description"
+                class="category-description">
+            </p>
+
+            <h3>Histórico recente</h3>
+
+            <div class="history-list">
+
+                {% for teste in testes|reverse %}
+
+                <a
+                    class="history-item"
+                    href="{{ url_for('resultado', teste_id=teste.teste_id) }}">
+
+                    <span>
+                        <strong>Teste #{{ teste.teste_id }}</strong>
+
+                        <small>{{ teste.data_label }}</small>
+                    </span>
+
+                    <span class="history-score">
+                        {{ "%.1f"|format(teste.percentual) }}%
+
+                        <small>{{ teste.classificacao }}</small>
+                    </span>
+
+                    <span class="history-arrow">›</span>
+
+                </a>
+
+                {% endfor %}
+
+            </div>
+
+            {% else %}
+
+            <p class="empty">
+                Seu histórico aparecerá aqui depois do primeiro questionário.
+            </p>
+
+            <a
+                class="primary-button"
+                href="{{ url_for('teste') }}">
+
+                Fazer meu primeiro teste
+
+            </a>
+
+            {% endif %}
+
+        </section>
+
+        <!-- AVISO -->
+        <p class="disclaimer">
+            Os gráficos são informativos e não constituem diagnóstico
+            médico ou psicológico. O humor registrado é subjetivo e
+            não deve ser interpretado como equivalente aos indicadores
+            do questionário.
+        </p>
+
+    </main>
+
+    <!-- DADOS UTILIZADOS PELOS GRÁFICOS -->
+
+<script id="mentis-dashboard-data" type="application/json">
+{
+    "testes": {{ testes | tojson }},
+    "moods": {{ moods | tojson }},
+    "mediaTestes": {{ media_testes | tojson }},
+    "ultimoTeste": {{ ultimo_teste | tojson }}
+}
+</script>
+
+<script>
+    window.MENTIS_DASHBOARD = JSON.parse(
+        document.getElementById("mentis-dashboard-data").textContent
+    );
+</script>
+
+    <script
+        src="{{ url_for('static', filename='js/perfil.js') }}">
+    </script>
+
+</body>
+</html>
