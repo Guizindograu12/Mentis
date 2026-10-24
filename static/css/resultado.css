@@ -500,3 +500,14 @@ body {
         text-decoration: none !important;
     }
 }
+
+/* ESCONDER O HEADER AO IMPRIMIR O RELATÓRIO */
+@media print {
+    .header,
+    header,
+    .menu-overlay,
+    .menu-toggle,
+    .menu-close {
+        display: none !important;
+    }
+}
