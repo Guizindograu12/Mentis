@@ -1,3 +1,4 @@
+
 from flask import (
     Flask,
     render_template,
@@ -9,8 +10,9 @@ from flask import (
 )
 
 import os
-from sqlalchemy import select
+import random
 
+from sqlalchemy import select
 from dotenv import load_dotenv
 
 from backend.database import (
@@ -30,8 +32,7 @@ from backend.database import (
     buscar_ultimo_resultado_usuario,
     EmotionalCheckIn,
     Teste,
-    Resultado,
-    ResultadoCategoria
+    Resultado
 )
 
 from backend.perguntas import PERGUNTAS
@@ -66,6 +67,10 @@ if not DATABASE_URL:
 app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
+# Evita que a sessão seja acessível por JavaScript.
+app.config["SESSION_COOKIE_HTTPONLY"] = True
+app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
+
 
 # ==========================================
 # BANCO DE DADOS
@@ -76,6 +81,79 @@ db.init_app(app)
 with app.app_context():
     criar_tabelas()
     sincronizar_perguntas(PERGUNTAS)
+
+
+# ==========================================
+# SORTEIO DAS PERGUNTAS
+# ==========================================
+
+QUANTIDADE_PERGUNTAS = 25
+
+
+def selecionar_perguntas_teste():
+    """
+    Sorteia 25 perguntas distintas para uma nova tentativa.
+
+    Os IDs são guardados na sessão para que a seleção
+    permaneça igual durante o preenchimento do teste.
+    """
+
+    perguntas_disponiveis = listar_perguntas()
+
+    if len(perguntas_disponiveis) < QUANTIDADE_PERGUNTAS:
+        raise RuntimeError(
+            "O banco precisa ter pelo menos 25 perguntas cadastradas."
+        )
+
+    perguntas_sorteadas = random.sample(
+        perguntas_disponiveis,
+        QUANTIDADE_PERGUNTAS
+    )
+
+    # Guarda os IDs na mesma ordem do sorteio.
+    session["perguntas_teste_ids"] = [
+        pergunta.id
+        for pergunta in perguntas_sorteadas
+    ]
+
+    return perguntas_sorteadas
+
+
+def obter_perguntas_teste():
+    """
+    Recupera as perguntas da tentativa atual.
+
+    Se a página for atualizada, mantém as mesmas perguntas.
+    """
+
+    ids_selecionados = session.get("perguntas_teste_ids")
+
+    if (
+        not isinstance(ids_selecionados, list)
+        or len(ids_selecionados) != QUANTIDADE_PERGUNTAS
+        or len(set(ids_selecionados)) != QUANTIDADE_PERGUNTAS
+    ):
+        return selecionar_perguntas_teste()
+
+    perguntas_disponiveis = listar_perguntas()
+
+    perguntas_por_id = {
+        pergunta.id: pergunta
+        for pergunta in perguntas_disponiveis
+    }
+
+    # Verifica se todas as perguntas ainda existem no banco.
+    if any(
+        pergunta_id not in perguntas_por_id
+        for pergunta_id in ids_selecionados
+    ):
+        return selecionar_perguntas_teste()
+
+    # Preserva exatamente a ordem do sorteio.
+    return [
+        perguntas_por_id[pergunta_id]
+        for pergunta_id in ids_selecionados
+    ]
 
 
 # ==========================================
@@ -96,6 +174,7 @@ def dados_usuario():
 
 @app.route("/")
 def home():
+
     ultimo_resultado_id = None
 
     if "usuario_id" in session:
@@ -115,11 +194,26 @@ def home():
 
 @app.route("/iniciar-teste")
 def iniciar_teste():
+
     if "usuario_id" not in session:
         return redirect(url_for("login"))
 
-    # Não redireciona para resultados anteriores.
-    return redirect(url_for("teste"))
+    try:
+        # Cada início gera uma nova seleção aleatória.
+        selecionar_perguntas_teste()
+
+        return redirect(url_for("teste"))
+
+    except Exception:
+        app.logger.exception(
+            "Erro ao selecionar perguntas para o teste."
+        )
+
+        return (
+            "Não foi possível iniciar o teste. "
+            "Verifique se existem pelo menos 25 perguntas cadastradas.",
+            500
+        )
 
 
 # ==========================================
@@ -133,6 +227,7 @@ def login():
 
 @app.route("/entrar", methods=["POST"])
 def entrar():
+
     email = request.form.get(
         "email", ""
     ).strip().lower()
@@ -148,6 +243,9 @@ def entrar():
     usuario_id = validar_usuario(email, senha)
 
     if usuario_id is not None:
+
+        session.clear()
+
         session["usuario_id"] = usuario_id
         session["usuario"] = email
 
@@ -165,6 +263,7 @@ def entrar():
 
 @app.route("/cadastro", methods=["POST"])
 def cadastro():
+
     email = request.form.get(
         "email", ""
     ).strip().lower()
@@ -180,6 +279,7 @@ def cadastro():
     sucesso = cadastrar_usuario(email, senha)
 
     if sucesso:
+
         usuario_id = validar_usuario(email, senha)
 
         if usuario_id is None:
@@ -187,6 +287,8 @@ def cadastro():
                 "login.html",
                 erro="Não foi possível entrar na conta criada."
             )
+
+        session.clear()
 
         session["usuario_id"] = usuario_id
         session["usuario"] = email
@@ -205,17 +307,28 @@ def cadastro():
 
 @app.route("/teste")
 def teste():
+
     if "usuario_id" not in session:
         return redirect(url_for("login"))
 
-    # Permite abrir o questionário mesmo que
-    # existam testes anteriores para esta conta.
-    perguntas = listar_perguntas()
+    try:
+        perguntas = obter_perguntas_teste()
 
-    return render_template(
-        "teste.html",
-        perguntas=perguntas
-    )
+        return render_template(
+            "teste.html",
+            perguntas=perguntas
+        )
+
+    except Exception:
+        app.logger.exception(
+            "Erro ao carregar as perguntas do teste."
+        )
+
+        return (
+            "Não foi possível carregar o questionário. "
+            "Tente novamente mais tarde.",
+            500
+        )
 
 
 # ==========================================
@@ -224,6 +337,7 @@ def teste():
 
 @app.route("/analisar", methods=["POST"])
 def analisar():
+
     if "usuario_id" not in session:
         return jsonify({
             "status": "erro",
@@ -231,24 +345,78 @@ def analisar():
         }), 401
 
     usuario_id = session.get("usuario_id")
+
     respostas = request.get_json(silent=True)
 
-    if not respostas:
+    if not isinstance(respostas, dict) or not respostas:
         return jsonify({
             "status": "erro",
-            "mensagem": "Nenhuma resposta foi enviada."
+            "mensagem": "Nenhuma resposta válida foi enviada."
+        }), 400
+
+    # Recupera a seleção usada para exibir o questionário.
+    ids_selecionados = session.get("perguntas_teste_ids")
+
+    if (
+        not isinstance(ids_selecionados, list)
+        or len(ids_selecionados) != QUANTIDADE_PERGUNTAS
+        or len(set(ids_selecionados)) != QUANTIDADE_PERGUNTAS
+    ):
+        return jsonify({
+            "status": "erro",
+            "mensagem": (
+                "A seleção de perguntas expirou. "
+                "Inicie um novo teste."
+            )
+        }), 400
+
+    # Identifica as perguntas enviadas pelo formulário.
+    ids_enviados = set()
+
+    for chave in respostas:
+
+        if not isinstance(chave, str):
+            continue
+
+        if not chave.startswith("p"):
+            continue
+
+        try:
+            pergunta_id = int(chave[1:])
+        except (ValueError, TypeError):
+            return jsonify({
+                "status": "erro",
+                "mensagem": "Foi enviada uma pergunta inválida."
+            }), 400
+
+        ids_enviados.add(pergunta_id)
+
+    # Impede respostas de perguntas que não foram sorteadas.
+    if (
+        len(ids_enviados) != QUANTIDADE_PERGUNTAS
+        or ids_enviados != set(ids_selecionados)
+    ):
+        return jsonify({
+            "status": "erro",
+            "mensagem": (
+                "As respostas não correspondem às 25 perguntas "
+                "deste teste. Atualize a página e tente novamente."
+            )
         }), 400
 
     try:
-        # Cada envio cria um novo teste.
-        teste = criar_teste(usuario_id)
+        # Cada envio válido cria uma nova tentativa.
+        teste_db = criar_teste(usuario_id)
 
-        # Salva as respostas deste teste.
-        salvar_respostas(teste, respostas)
+        # Salva somente as respostas desta seleção.
+        salvar_respostas(
+            teste_db,
+            respostas
+        )
 
-        # Busca as respostas e as perguntas associadas.
+        # Recupera as perguntas e respostas associadas ao teste.
         linhas = buscar_teste(
-            teste.id,
+            teste_db.id,
             usuario_id
         )
 
@@ -267,35 +435,41 @@ def analisar():
             respostas_com_perguntas
         )
 
-        # Salva o resultado associado ao novo teste.
-        resultado = salvar_resultado(
-            teste,
+        # Salva o resultado vinculado a esta tentativa.
+        resultado_db = salvar_resultado(
+            teste_db,
             analise
         )
 
         db.session.commit()
 
+        # Limpa a seleção concluída.
+        # Um novo teste terá um novo sorteio.
+        session.pop("perguntas_teste_ids", None)
+
         print()
         print("===================================")
         print("NOVO TESTE REALIZADO")
-        print("Teste ID:", teste.id)
+        print("Teste ID:", teste_db.id)
         print("Usuário ID:", usuario_id)
         print("E-mail:", session.get("usuario"))
+        print("Quantidade de perguntas:", len(linhas))
         print("===================================")
         print()
 
         return jsonify({
             "status": "sucesso",
             "mensagem": "Respostas analisadas e salvas com sucesso.",
-            "teste_id": teste.id,
-            "resultado_id": resultado.id,
+            "teste_id": teste_db.id,
+            "resultado_id": resultado_db.id,
             "resultado_url": url_for(
                 "resultado",
-                teste_id=teste.id
+                teste_id=teste_db.id
             )
         })
 
     except ValueError as erro:
+
         db.session.rollback()
 
         return jsonify({
@@ -303,7 +477,8 @@ def analisar():
             "mensagem": str(erro)
         }), 400
 
-    except Exception as erro:
+    except Exception:
+
         db.session.rollback()
 
         app.logger.exception(
@@ -322,6 +497,7 @@ def analisar():
 
 @app.route("/resultado/<int:teste_id>")
 def resultado(teste_id):
+
     if "usuario_id" not in session:
         return redirect(url_for("login"))
 
@@ -348,6 +524,7 @@ def resultado(teste_id):
 
 @app.route("/perfil")
 def perfil():
+
     if "usuario_id" not in session:
         return redirect(url_for("login"))
 
@@ -355,34 +532,45 @@ def perfil():
 
     resultados_db = db.session.execute(
         select(Resultado, Teste.data_teste)
-        .join(Teste, Resultado.teste_id == Teste.id)
-        .where(Teste.usuario_id == usuario_id)
-        .order_by(Teste.data_teste.asc(), Resultado.id.asc())
+        .join(
+            Teste,
+            Resultado.teste_id == Teste.id
+        )
+        .where(
+            Teste.usuario_id == usuario_id
+        )
+        .order_by(
+            Teste.data_teste.asc(),
+            Resultado.id.asc()
+        )
     ).all()
 
     historico = []
     historico_categorias = {}
 
     for resultado_db, data_teste in resultados_db:
+
         data_formatada = (
             data_teste.strftime("%d/%m/%Y")
-            if data_teste else "Data indisponível"
+            if data_teste
+            else "Data indisponível"
         )
 
-        percentual = float(resultado_db.percentual_geral)
-
-        classificacao = getattr(
-            resultado_db,
-            "classificacao",
-            "Resultado registrado"
+        percentual = float(
+            resultado_db.percentual_geral
         )
 
-        # Categorias e respectivos resultados deste teste.
+        classificacao = resultado_db.classificacao_geral
+
         categorias_teste = []
 
         for categoria in resultado_db.categorias:
+
             nome_categoria = categoria.categoria
-            percentual_categoria = float(categoria.percentual)
+
+            percentual_categoria = float(
+                categoria.percentual
+            )
 
             categorias_teste.append({
                 "nome": nome_categoria,
@@ -390,13 +578,13 @@ def perfil():
             })
 
             historico_categorias.setdefault(
-                nome_categoria, []
+                nome_categoria,
+                []
             ).append({
                 "data": data_formatada,
                 "percentual": percentual_categoria
             })
 
-        # Histórico geral, incluindo os resultados por categoria.
         historico.append({
             "teste_id": resultado_db.teste_id,
             "data": data_formatada,
@@ -409,8 +597,12 @@ def perfil():
     # Check-ins emocionais.
     checkins_db = db.session.execute(
         select(EmotionalCheckIn)
-        .where(EmotionalCheckIn.usuario_id == usuario_id)
-        .order_by(EmotionalCheckIn.data_registro.asc())
+        .where(
+            EmotionalCheckIn.usuario_id == usuario_id
+        )
+        .order_by(
+            EmotionalCheckIn.data_registro.asc()
+        )
     ).scalars().all()
 
     checkins = [
@@ -428,26 +620,31 @@ def perfil():
     # Média dos resultados gerais.
     media_testes = (
         round(
-            sum(item["percentual"] for item in historico)
-            / len(historico),
+            sum(
+                item["percentual"]
+                for item in historico
+            ) / len(historico),
             2
         )
-        if historico else None
+        if historico
+        else None
     )
 
     # Média dos check-ins.
     media_humor = (
         round(
-            sum(item["humor"] for item in checkins)
-            / len(checkins),
+            sum(
+                item["humor"]
+                for item in checkins
+            ) / len(checkins),
             1
         )
-        if checkins else None
+        if checkins
+        else None
     )
 
     ultimo = historico[-1] if historico else None
 
-    # Dados utilizados pelo perfil.html e perfil.js.
     testes = [
         {
             "teste_id": item["teste_id"],
@@ -464,8 +661,21 @@ def perfil():
 
     ultimo_teste = (
         dict(ultimo)
-        if ultimo else None
+        if ultimo
+        else None
     )
+
+    categorias_media = {
+        nome: round(
+            sum(
+                item["percentual"]
+                for item in valores
+            ) / len(valores),
+            2
+        )
+        for nome, valores in historico_categorias.items()
+        if valores
+    }
 
     return render_template(
         "perfil.html",
@@ -476,19 +686,12 @@ def perfil():
         media_testes=media_testes,
         media_humor=media_humor,
         total_testes=len(historico),
-        categorias_media={
-            nome: round(
-                sum(item["percentual"] for item in valores)
-                / len(valores),
-                2
-            )
-            for nome, valores in historico_categorias.items()
-            if valores
-        },
+        categorias_media=categorias_media,
         testes=testes,
         moods=moods,
         ultimo_teste=ultimo_teste
     )
+
 
 # ==========================================
 # CHECK-IN EMOCIONAL
@@ -496,12 +699,14 @@ def perfil():
 
 @app.route("/checkin-humor", methods=["POST"])
 def checkin_humor():
+
     if "usuario_id" not in session:
         return jsonify({
             "mensagem": "Você precisa estar logado."
         }), 401
 
     dados = request.get_json(silent=True) or {}
+
     humor = dados.get("humor")
 
     if (
@@ -511,7 +716,9 @@ def checkin_humor():
         or humor > 10
     ):
         return jsonify({
-            "mensagem": "Selecione um valor de humor entre 1 e 10."
+            "mensagem": (
+                "Selecione um valor de humor entre 1 e 10."
+            )
         }), 400
 
     try:
@@ -525,12 +732,16 @@ def checkin_humor():
 
         checkins = db.session.execute(
             select(EmotionalCheckIn).where(
-                EmotionalCheckIn.usuario_id == session["usuario_id"]
+                EmotionalCheckIn.usuario_id
+                == session["usuario_id"]
             )
         ).scalars().all()
 
         media_humor = round(
-            sum(item.humor for item in checkins) / len(checkins),
+            sum(
+                item.humor
+                for item in checkins
+            ) / len(checkins),
             1
         )
 
@@ -541,6 +752,7 @@ def checkin_humor():
         })
 
     except Exception:
+
         db.session.rollback()
 
         app.logger.exception(
@@ -550,6 +762,7 @@ def checkin_humor():
         return jsonify({
             "mensagem": "Não foi possível salvar o check-in."
         }), 500
+
 
 # ==========================================
 # OBRIGADO
@@ -566,12 +779,20 @@ def obrigado():
 
 @app.route("/recuperar-senha", methods=["POST"])
 def recuperar_senha():
+
     email = request.form.get(
         "email", ""
     ).strip().lower()
 
-    nova_senha = request.form.get("nova_senha", "")
-    confirmar_senha = request.form.get("confirmar_senha", "")
+    nova_senha = request.form.get(
+        "nova_senha",
+        ""
+    )
+
+    confirmar_senha = request.form.get(
+        "confirmar_senha",
+        ""
+    )
 
     def resposta_recuperacao(mensagem, sucesso=False):
         return render_template(
@@ -620,7 +841,9 @@ def recuperar_senha():
 
 @app.route("/logout")
 def logout():
+
     session.clear()
+
     return redirect(url_for("home"))
 
 
