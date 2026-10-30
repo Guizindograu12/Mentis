@@ -25,13 +25,14 @@ from backend.database import (
     salvar_respostas,
     buscar_usuario_por_email,
     alterar_senha,
-    buscar_teste,
     buscar_resultado,
     salvar_resultado,
     listar_perguntas,
     buscar_ultimo_resultado_usuario,
     EmotionalCheckIn,
     Teste,
+    Resposta,
+    Pergunta,
     Resultado
 )
 
@@ -67,7 +68,6 @@ if not DATABASE_URL:
 app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
-# Evita que a sessão seja acessível por JavaScript.
 app.config["SESSION_COOKIE_HTTPONLY"] = True
 app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
 
@@ -79,7 +79,9 @@ app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
 db.init_app(app)
 
 with app.app_context():
+
     criar_tabelas()
+
     sincronizar_perguntas(PERGUNTAS)
 
 
@@ -94,13 +96,14 @@ def selecionar_perguntas_teste():
     """
     Sorteia 25 perguntas distintas para uma nova tentativa.
 
-    Os IDs são guardados na sessão para que a seleção
-    permaneça igual durante o preenchimento do teste.
+    Os IDs são guardados na sessão para manter a seleção
+    durante o preenchimento do questionário.
     """
 
     perguntas_disponiveis = listar_perguntas()
 
     if len(perguntas_disponiveis) < QUANTIDADE_PERGUNTAS:
+
         raise RuntimeError(
             "O banco precisa ter pelo menos 25 perguntas cadastradas."
         )
@@ -110,7 +113,6 @@ def selecionar_perguntas_teste():
         QUANTIDADE_PERGUNTAS
     )
 
-    # Guarda os IDs na mesma ordem do sorteio.
     session["perguntas_teste_ids"] = [
         pergunta.id
         for pergunta in perguntas_sorteadas
@@ -126,13 +128,16 @@ def obter_perguntas_teste():
     Se a página for atualizada, mantém as mesmas perguntas.
     """
 
-    ids_selecionados = session.get("perguntas_teste_ids")
+    ids_selecionados = session.get(
+        "perguntas_teste_ids"
+    )
 
     if (
         not isinstance(ids_selecionados, list)
         or len(ids_selecionados) != QUANTIDADE_PERGUNTAS
         or len(set(ids_selecionados)) != QUANTIDADE_PERGUNTAS
     ):
+
         return selecionar_perguntas_teste()
 
     perguntas_disponiveis = listar_perguntas()
@@ -142,14 +147,13 @@ def obter_perguntas_teste():
         for pergunta in perguntas_disponiveis
     }
 
-    # Verifica se todas as perguntas ainda existem no banco.
     if any(
         pergunta_id not in perguntas_por_id
         for pergunta_id in ids_selecionados
     ):
+
         return selecionar_perguntas_teste()
 
-    # Preserva exatamente a ordem do sorteio.
     return [
         perguntas_por_id[pergunta_id]
         for pergunta_id in ids_selecionados
@@ -162,6 +166,7 @@ def obter_perguntas_teste():
 
 @app.context_processor
 def dados_usuario():
+
     return {
         "usuario": session.get("usuario"),
         "usuario_id": session.get("usuario_id")
@@ -178,6 +183,7 @@ def home():
     ultimo_resultado_id = None
 
     if "usuario_id" in session:
+
         ultimo_resultado_id = buscar_ultimo_resultado_usuario(
             session["usuario_id"]
         )
@@ -196,15 +202,17 @@ def home():
 def iniciar_teste():
 
     if "usuario_id" not in session:
+
         return redirect(url_for("login"))
 
     try:
-        # Cada início gera uma nova seleção aleatória.
+
         selecionar_perguntas_teste()
 
         return redirect(url_for("teste"))
 
     except Exception:
+
         app.logger.exception(
             "Erro ao selecionar perguntas para o teste."
         )
@@ -222,6 +230,7 @@ def iniciar_teste():
 
 @app.route("/login")
 def login():
+
     return render_template("login.html")
 
 
@@ -229,18 +238,23 @@ def login():
 def entrar():
 
     email = request.form.get(
-        "email", ""
+        "email",
+        ""
     ).strip().lower()
 
     senha = request.form.get("senha", "")
 
     if not email or not senha:
+
         return render_template(
             "login.html",
             erro="Preencha o e-mail e a senha."
         )
 
-    usuario_id = validar_usuario(email, senha)
+    usuario_id = validar_usuario(
+        email,
+        senha
+    )
 
     if usuario_id is not None:
 
@@ -265,24 +279,33 @@ def entrar():
 def cadastro():
 
     email = request.form.get(
-        "email", ""
+        "email",
+        ""
     ).strip().lower()
 
     senha = request.form.get("senha", "")
 
     if not email or not senha:
+
         return render_template(
             "login.html",
             erro="Preencha o e-mail e a senha."
         )
 
-    sucesso = cadastrar_usuario(email, senha)
+    sucesso = cadastrar_usuario(
+        email,
+        senha
+    )
 
     if sucesso:
 
-        usuario_id = validar_usuario(email, senha)
+        usuario_id = validar_usuario(
+            email,
+            senha
+        )
 
         if usuario_id is None:
+
             return render_template(
                 "login.html",
                 erro="Não foi possível entrar na conta criada."
@@ -309,9 +332,11 @@ def cadastro():
 def teste():
 
     if "usuario_id" not in session:
+
         return redirect(url_for("login"))
 
     try:
+
         perguntas = obter_perguntas_teste()
 
         return render_template(
@@ -320,6 +345,7 @@ def teste():
         )
 
     except Exception:
+
         app.logger.exception(
             "Erro ao carregar as perguntas do teste."
         )
@@ -339,6 +365,7 @@ def teste():
 def analisar():
 
     if "usuario_id" not in session:
+
         return jsonify({
             "status": "erro",
             "mensagem": "Você precisa estar logado."
@@ -349,19 +376,22 @@ def analisar():
     respostas = request.get_json(silent=True)
 
     if not isinstance(respostas, dict) or not respostas:
+
         return jsonify({
             "status": "erro",
             "mensagem": "Nenhuma resposta válida foi enviada."
         }), 400
 
-    # Recupera a seleção usada para exibir o questionário.
-    ids_selecionados = session.get("perguntas_teste_ids")
+    ids_selecionados = session.get(
+        "perguntas_teste_ids"
+    )
 
     if (
         not isinstance(ids_selecionados, list)
         or len(ids_selecionados) != QUANTIDADE_PERGUNTAS
         or len(set(ids_selecionados)) != QUANTIDADE_PERGUNTAS
     ):
+
         return jsonify({
             "status": "erro",
             "mensagem": (
@@ -370,20 +400,30 @@ def analisar():
             )
         }), 400
 
-    # Identifica as perguntas enviadas pelo formulário.
     ids_enviados = set()
 
     for chave in respostas:
 
         if not isinstance(chave, str):
-            continue
+
+            return jsonify({
+                "status": "erro",
+                "mensagem": "Foi enviada uma pergunta inválida."
+            }), 400
 
         if not chave.startswith("p"):
-            continue
+
+            return jsonify({
+                "status": "erro",
+                "mensagem": "Foi enviada uma pergunta inválida."
+            }), 400
 
         try:
+
             pergunta_id = int(chave[1:])
+
         except (ValueError, TypeError):
+
             return jsonify({
                 "status": "erro",
                 "mensagem": "Foi enviada uma pergunta inválida."
@@ -391,11 +431,11 @@ def analisar():
 
         ids_enviados.add(pergunta_id)
 
-    # Impede respostas de perguntas que não foram sorteadas.
     if (
         len(ids_enviados) != QUANTIDADE_PERGUNTAS
         or ids_enviados != set(ids_selecionados)
     ):
+
         return jsonify({
             "status": "erro",
             "mensagem": (
@@ -405,37 +445,115 @@ def analisar():
         }), 400
 
     try:
-        # Cada envio válido cria uma nova tentativa.
+
+        # ------------------------------------------
+        # 1. CRIAR NOVA TENTATIVA
+        # ------------------------------------------
+
         teste_db = criar_teste(usuario_id)
 
-        # Salva somente as respostas desta seleção.
+        # ------------------------------------------
+        # 2. SALVAR RESPOSTAS
+        # ------------------------------------------
+
         salvar_respostas(
             teste_db,
             respostas
         )
 
-        # Recupera as perguntas e respostas associadas ao teste.
-        linhas = buscar_teste(
-            teste_db.id,
-            usuario_id
-        )
+        # ------------------------------------------
+        # 3. BUSCAR RESPOSTAS E DADOS DAS PERGUNTAS
+        # ------------------------------------------
+        #
+        # Aqui selecionamos diretamente as colunas
+        # da pergunta, incluindo peso e invertida.
+        #
+        # Assim, não precisamos acessar:
+        # pergunta.peso
+        # pergunta.invertida
+        #
+        # Isso evita o problema anterior com atributos
+        # ausentes no objeto Pergunta.
 
-        respostas_com_perguntas = [
-            {
-                "pergunta_id": linha[4],
-                "texto": linha[5],
-                "categoria": linha[6],
-                "resposta": linha[7]
-            }
-            for linha in linhas
-        ]
+        linhas = db.session.execute(
+            select(
+                Resposta.pergunta_id,
+                Resposta.resposta,
+                Pergunta.texto,
+                Pergunta.categoria,
+                Pergunta.peso,
+                Pergunta.invertida
+            )
+            .join(
+                Pergunta,
+                Resposta.pergunta_id == Pergunta.id
+            )
+            .where(
+                Resposta.teste_id == teste_db.id
+            )
+            .order_by(
+                Pergunta.ordem
+            )
+        ).all()
 
-        # Calcula os indicadores do questionário.
+        respostas_com_perguntas = []
+
+        for linha in linhas:
+
+            pergunta_id = linha[0]
+            resposta_valor = linha[1]
+            texto = linha[2]
+            categoria = linha[3]
+            peso = linha[4]
+            invertida = linha[5]
+
+            # Valores padrão caso algum registro antigo
+            # esteja sem configuração de peso ou inversão.
+
+            if peso is None:
+                peso = 1.00
+
+            if invertida is None:
+                invertida = False
+
+            respostas_com_perguntas.append({
+
+                "pergunta_id": pergunta_id,
+
+                "texto": texto,
+
+                "categoria": categoria,
+
+                "resposta": resposta_valor,
+
+                "peso": float(peso),
+
+                "invertida": bool(invertida)
+
+            })
+
+        # ------------------------------------------
+        # 4. VALIDAR RECUPERAÇÃO DAS RESPOSTAS
+        # ------------------------------------------
+
+        if len(respostas_com_perguntas) != QUANTIDADE_PERGUNTAS:
+
+            raise ValueError(
+                "Não foi possível recuperar todas as respostas do teste."
+            )
+
+        # ------------------------------------------
+        # 5. ANALISAR RESPOSTAS
+        # ------------------------------------------
+
         analise = analisar_respostas(
             respostas_com_perguntas
         )
 
-        # Salva o resultado vinculado a esta tentativa.
+        # ------------------------------------------
+        # 6. SALVAR RESULTADO
+        # ------------------------------------------
+
         resultado_db = salvar_resultado(
             teste_db,
             analise
@@ -443,29 +561,69 @@ def analisar():
 
         db.session.commit()
 
-        # Limpa a seleção concluída.
-        # Um novo teste terá um novo sorteio.
-        session.pop("perguntas_teste_ids", None)
+        # ------------------------------------------
+        # 7. GUARDAR IDENTIFICADORES
+        # ------------------------------------------
+
+        teste_id = teste_db.id
+        resultado_id = resultado_db.id
+
+        # ------------------------------------------
+        # 8. LIMPAR PERGUNTAS DA SESSÃO
+        # ------------------------------------------
+        #
+        # Ao iniciar outro teste, serão sorteadas
+        # 25 novas perguntas.
+
+        session.pop(
+            "perguntas_teste_ids",
+            None
+        )
+
+        # ------------------------------------------
+        # 9. REGISTRO NO TERMINAL
+        # ------------------------------------------
 
         print()
         print("===================================")
         print("NOVO TESTE REALIZADO")
-        print("Teste ID:", teste_db.id)
+        print("Teste ID:", teste_id)
         print("Usuário ID:", usuario_id)
         print("E-mail:", session.get("usuario"))
-        print("Quantidade de perguntas:", len(linhas))
+        print(
+            "Quantidade de perguntas:",
+            len(respostas_com_perguntas)
+        )
+        print(
+            "Percentual geral:",
+            analise["percentual_geral"]
+        )
+        print(
+            "Classificação:",
+            analise["classificacao_geral"]
+        )
         print("===================================")
         print()
 
+        # ------------------------------------------
+        # 10. RESPOSTA PARA O JAVASCRIPT
+        # ------------------------------------------
+
         return jsonify({
+
             "status": "sucesso",
+
             "mensagem": "Respostas analisadas e salvas com sucesso.",
-            "teste_id": teste_db.id,
-            "resultado_id": resultado_db.id,
+
+            "teste_id": teste_id,
+
+            "resultado_id": resultado_id,
+
             "resultado_url": url_for(
                 "resultado",
-                teste_id=teste_db.id
+                teste_id=teste_id
             )
+
         })
 
     except ValueError as erro:
@@ -473,8 +631,11 @@ def analisar():
         db.session.rollback()
 
         return jsonify({
+
             "status": "erro",
+
             "mensagem": str(erro)
+
         }), 400
 
     except Exception:
@@ -486,8 +647,11 @@ def analisar():
         )
 
         return jsonify({
+
             "status": "erro",
+
             "mensagem": "Não foi possível processar o teste."
+
         }), 500
 
 
@@ -499,6 +663,7 @@ def analisar():
 def resultado(teste_id):
 
     if "usuario_id" not in session:
+
         return redirect(url_for("login"))
 
     resultado_db = buscar_resultado(
@@ -507,9 +672,12 @@ def resultado(teste_id):
     )
 
     if resultado_db is None:
+
         return redirect(url_for("iniciar_teste"))
 
-    relatorio = montar_relatorio(resultado_db)
+    relatorio = montar_relatorio(
+        resultado_db
+    )
 
     return render_template(
         "resultado.html",
@@ -526,12 +694,16 @@ def resultado(teste_id):
 def perfil():
 
     if "usuario_id" not in session:
+
         return redirect(url_for("login"))
 
     usuario_id = session["usuario_id"]
 
     resultados_db = db.session.execute(
-        select(Resultado, Teste.data_teste)
+        select(
+            Resultado,
+            Teste.data_teste
+        )
         .join(
             Teste,
             Resultado.teste_id == Teste.id
@@ -573,28 +745,44 @@ def perfil():
             )
 
             categorias_teste.append({
+
                 "nome": nome_categoria,
+
                 "percentual": percentual_categoria
+
             })
 
             historico_categorias.setdefault(
                 nome_categoria,
                 []
             ).append({
+
                 "data": data_formatada,
+
                 "percentual": percentual_categoria
+
             })
 
         historico.append({
+
             "teste_id": resultado_db.teste_id,
+
             "data": data_formatada,
+
             "data_label": data_formatada,
+
             "percentual": percentual,
+
             "classificacao": classificacao,
+
             "categorias": categorias_teste
+
         })
 
-    # Check-ins emocionais.
+    # ------------------------------------------
+    # CHECK-INS EMOCIONAIS
+    # ------------------------------------------
+
     checkins_db = db.session.execute(
         select(EmotionalCheckIn)
         .where(
@@ -606,19 +794,27 @@ def perfil():
     ).scalars().all()
 
     checkins = [
+
         {
             "humor": checkin.humor,
+
             "data": (
                 checkin.data_registro.strftime("%d/%m/%Y")
                 if checkin.data_registro
                 else "Data indisponível"
             )
         }
+
         for checkin in checkins_db
+
     ]
 
-    # Média dos resultados gerais.
+    # ------------------------------------------
+    # MÉDIA DOS RESULTADOS
+    # ------------------------------------------
+
     media_testes = (
+
         round(
             sum(
                 item["percentual"]
@@ -626,12 +822,19 @@ def perfil():
             ) / len(historico),
             2
         )
+
         if historico
+
         else None
+
     )
 
-    # Média dos check-ins.
+    # ------------------------------------------
+    # MÉDIA DOS CHECK-INS
+    # ------------------------------------------
+
     media_humor = (
+
         round(
             sum(
                 item["humor"]
@@ -639,22 +842,34 @@ def perfil():
             ) / len(checkins),
             1
         )
+
         if checkins
+
         else None
+
     )
 
     ultimo = historico[-1] if historico else None
 
     testes = [
+
         {
             "teste_id": item["teste_id"],
+
             "data": item["data"],
+
             "data_label": item["data_label"],
+
             "percentual": item["percentual"],
+
             "classificacao": item["classificacao"],
+
             "categorias": item["categorias"]
+
         }
+
         for item in historico
+
     ]
 
     moods = checkins
@@ -666,6 +881,7 @@ def perfil():
     )
 
     categorias_media = {
+
         nome: round(
             sum(
                 item["percentual"]
@@ -673,23 +889,39 @@ def perfil():
             ) / len(valores),
             2
         )
+
         for nome, valores in historico_categorias.items()
+
         if valores
+
     }
 
     return render_template(
+
         "perfil.html",
+
         historico=historico,
+
         historico_categorias=historico_categorias,
+
         checkins=checkins,
+
         ultimo=ultimo,
+
         media_testes=media_testes,
+
         media_humor=media_humor,
+
         total_testes=len(historico),
+
         categorias_media=categorias_media,
+
         testes=testes,
+
         moods=moods,
+
         ultimo_teste=ultimo_teste
+
     )
 
 
@@ -701,8 +933,11 @@ def perfil():
 def checkin_humor():
 
     if "usuario_id" not in session:
+
         return jsonify({
+
             "mensagem": "Você precisa estar logado."
+
         }), 401
 
     dados = request.get_json(silent=True) or {}
@@ -715,19 +950,27 @@ def checkin_humor():
         or humor < 1
         or humor > 10
     ):
+
         return jsonify({
+
             "mensagem": (
                 "Selecione um valor de humor entre 1 e 10."
             )
+
         }), 400
 
     try:
+
         checkin = EmotionalCheckIn(
+
             usuario_id=session["usuario_id"],
+
             humor=humor
+
         )
 
         db.session.add(checkin)
+
         db.session.commit()
 
         checkins = db.session.execute(
@@ -738,17 +981,24 @@ def checkin_humor():
         ).scalars().all()
 
         media_humor = round(
+
             sum(
                 item.humor
                 for item in checkins
             ) / len(checkins),
+
             1
+
         )
 
         return jsonify({
+
             "mensagem": "Check-in registrado com sucesso.",
+
             "humor": humor,
+
             "media_humor": media_humor
+
         })
 
     except Exception:
@@ -760,7 +1010,9 @@ def checkin_humor():
         )
 
         return jsonify({
+
             "mensagem": "Não foi possível salvar o check-in."
+
         }), 500
 
 
@@ -770,6 +1022,7 @@ def checkin_humor():
 
 @app.route("/obrigado")
 def obrigado():
+
     return render_template("obrigado.html")
 
 
@@ -781,7 +1034,8 @@ def obrigado():
 def recuperar_senha():
 
     email = request.form.get(
-        "email", ""
+        "email",
+        ""
     ).strip().lower()
 
     nova_senha = request.form.get(
@@ -795,24 +1049,33 @@ def recuperar_senha():
     )
 
     def resposta_recuperacao(mensagem, sucesso=False):
+
         return render_template(
+
             "login.html",
+
             recovery_mode=True,
+
             erro=None if sucesso else mensagem,
+
             sucesso=mensagem if sucesso else None
+
         )
 
     if not email or not nova_senha or not confirmar_senha:
+
         return resposta_recuperacao(
             "Preencha todos os campos."
         )
 
     if len(nova_senha) < 8:
+
         return resposta_recuperacao(
             "A senha precisa ter pelo menos 8 caracteres."
         )
 
     if nova_senha != confirmar_senha:
+
         return resposta_recuperacao(
             "As senhas não são iguais."
         )
@@ -820,11 +1083,13 @@ def recuperar_senha():
     usuario = buscar_usuario_por_email(email)
 
     if usuario is None:
+
         return resposta_recuperacao(
             "Não encontramos uma conta com esse e-mail."
         )
 
     if alterar_senha(email, nova_senha):
+
         return resposta_recuperacao(
             "Senha alterada! Agora você pode voltar ao login.",
             sucesso=True
@@ -852,6 +1117,7 @@ def logout():
 # ==========================================
 
 if __name__ == "__main__":
+
     app.run(
         host="0.0.0.0",
         port=5000,

@@ -1,6 +1,15 @@
+
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import select, update, UniqueConstraint
+
+from sqlalchemy import (
+    select,
+    update,
+    UniqueConstraint,
+    text
+)
+
 from sqlalchemy.exc import IntegrityError
+
 from werkzeug.security import (
     generate_password_hash,
     check_password_hash
@@ -12,6 +21,72 @@ from werkzeug.security import (
 # ==========================================
 
 db = SQLAlchemy()
+
+
+# ==========================================
+# CONFIGURAÇÃO DAS PERGUNTAS
+# ==========================================
+
+# Formato: ID: (peso, invertida)
+#
+# Peso:
+# 1.00 = Alta relevância
+# 0.70 = Média relevância
+# 0.50 = Baixa relevância
+#
+# invertida:
+# False = Pergunta negativa
+# True = Pergunta positiva
+
+CONFIGURACAO_PERGUNTAS = {
+    1: (1.00, False),
+    2: (0.70, True),
+    3: (1.00, False),
+    4: (0.70, True),
+    5: (1.00, False),
+    6: (0.70, False),
+    7: (1.00, False),
+    8: (0.70, True),
+    9: (0.70, False),
+    10: (0.70, False),
+    11: (1.00, False),
+    12: (0.70, False),
+    13: (0.70, True),
+    14: (0.70, False),
+    15: (0.70, True),
+    16: (1.00, False),
+    17: (0.70, False),
+    18: (0.70, False),
+    19: (1.00, False),
+    20: (0.70, True),
+    21: (1.00, False),
+    22: (0.70, False),
+    23: (0.50, False),
+    24: (0.70, False),
+    25: (0.70, True),
+    26: (0.70, False),
+    27: (0.70, True),
+    28: (1.00, False),
+    29: (0.70, True),
+    30: (1.00, False),
+    31: (0.70, True),
+    32: (1.00, False),
+    33: (0.70, True),
+    34: (0.70, True),
+    35: (1.00, False),
+    36: (0.70, True),
+    37: (0.70, True),
+    38: (0.70, True),
+    39: (0.70, True),
+    40: (1.00, False)
+}
+
+
+def configuracao_pergunta(pergunta_id):
+    return CONFIGURACAO_PERGUNTAS.get(
+        pergunta_id,
+        (1.00, False)
+    )
 
 
 # ==========================================
@@ -81,6 +156,24 @@ class Pergunta(db.Model):
     sub_discorda = db.Column(
         db.JSON,
         nullable=True
+    )
+
+    # IMPORTANTE:
+    # Estes dois campos são utilizados pelo sistema
+    # de pontuação ponderada e inversão das perguntas.
+
+    peso = db.Column(
+        db.Numeric(3, 2),
+        nullable=False,
+        default=1.00,
+        server_default="1.00"
+    )
+
+    invertida = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False,
+        server_default=text("FALSE")
     )
 
     respostas = db.relationship(
@@ -294,7 +387,10 @@ class EmotionalCheckIn(db.Model):
 
     usuario_id = db.Column(
         db.Integer,
-        db.ForeignKey("usuarios.id", ondelete="CASCADE"),
+        db.ForeignKey(
+            "usuarios.id",
+            ondelete="CASCADE"
+        ),
         nullable=False,
         index=True
     )
@@ -311,13 +407,34 @@ class EmotionalCheckIn(db.Model):
     )
 
 
-
 # ==========================================
-# BANCO
+# BANCO DE DADOS
 # ==========================================
 
 def criar_tabelas():
+
     db.create_all()
+
+    # Garante que bancos já existentes também
+    # recebam as colunas peso e invertida.
+
+    with db.engine.begin() as conexao:
+
+        conexao.execute(
+            text("""
+                ALTER TABLE public.perguntas
+                ADD COLUMN IF NOT EXISTS peso
+                NUMERIC(3,2) NOT NULL DEFAULT 1.00
+            """)
+        )
+
+        conexao.execute(
+            text("""
+                ALTER TABLE public.perguntas
+                ADD COLUMN IF NOT EXISTS invertida
+                BOOLEAN NOT NULL DEFAULT FALSE
+            """)
+        )
 
 
 # ==========================================
@@ -330,38 +447,56 @@ def sincronizar_perguntas(perguntas):
 
         for dados in perguntas:
 
+            pergunta_id = dados["id"]
+
+            peso, invertida = configuracao_pergunta(
+                pergunta_id
+            )
+
             pergunta = db.session.get(
                 Pergunta,
-                dados["id"]
+                pergunta_id
             )
 
             if pergunta is None:
 
                 pergunta = Pergunta(
-                    id=dados["id"]
+                    id=pergunta_id,
+                    texto=dados["texto"],
+                    categoria=dados["categoria"],
+                    ordem=pergunta_id,
+                    sub_concorda=dados.get("sub_concorda", []),
+                    sub_discorda=dados.get("sub_discorda", []),
+                    peso=peso,
+                    invertida=invertida
                 )
 
                 db.session.add(pergunta)
 
+            else:
 
-            pergunta.texto = dados["texto"]
-            pergunta.categoria = dados["categoria"]
-            pergunta.ordem = dados["id"]
-            pergunta.sub_concorda = dados.get(
-                "sub_concorda",
-                []
-            )
-            pergunta.sub_discorda = dados.get(
-                "sub_discorda",
-                []
-            )
+                pergunta.texto = dados["texto"]
+                pergunta.categoria = dados["categoria"]
+                pergunta.ordem = pergunta_id
+
+                pergunta.sub_concorda = dados.get(
+                    "sub_concorda",
+                    []
+                )
+
+                pergunta.sub_discorda = dados.get(
+                    "sub_discorda",
+                    []
+                )
+
+                pergunta.peso = peso
+                pergunta.invertida = invertida
 
         db.session.commit()
 
     except Exception:
 
         db.session.rollback()
-
         raise
 
 
@@ -369,14 +504,9 @@ def sincronizar_perguntas(perguntas):
 # USUÁRIOS
 # ==========================================
 
-def cadastrar_usuario(
-    email,
-    senha
-):
+def cadastrar_usuario(email, senha):
 
-    senha_hash = generate_password_hash(
-        senha
-    )
+    senha_hash = generate_password_hash(senha)
 
     usuario = Usuario(
         email=email,
@@ -393,66 +523,45 @@ def cadastrar_usuario(
     except IntegrityError:
 
         db.session.rollback()
-
         return False
 
 
-def validar_usuario(
-    email,
-    senha
-):
+def validar_usuario(email, senha):
 
     usuario = db.session.execute(
-
         select(
             Usuario.id,
             Usuario.senha
         ).where(
             Usuario.email == email
         )
-
     ).first()
 
-
     if usuario is None:
-
         return None
-
 
     usuario_id = usuario[0]
     senha_hash = usuario[1]
 
-
-    if check_password_hash(
-        senha_hash,
-        senha
-    ):
-
+    if check_password_hash(senha_hash, senha):
         return usuario_id
-
 
     return None
 
 
-def buscar_usuario_por_email(
-    email
-):
+def buscar_usuario_por_email(email):
 
     usuario = db.session.execute(
-
         select(
             Usuario.id,
             Usuario.email
         ).where(
             Usuario.email == email
         )
-
     ).first()
-
 
     if usuario is None:
         return None
-
 
     return (
         usuario[0],
@@ -460,30 +569,21 @@ def buscar_usuario_por_email(
     )
 
 
-def alterar_senha(
-    email,
-    nova_senha
-):
+def alterar_senha(email, nova_senha):
 
-    senha_hash = generate_password_hash(
-        nova_senha
-    )
-
-    resultado = db.session.execute(
-
-        update(Usuario)
-
-        .where(
-            Usuario.email == email
-        )
-
-        .values(
-            senha=senha_hash
-        )
-
-    )
+    senha_hash = generate_password_hash(nova_senha)
 
     try:
+
+        resultado = db.session.execute(
+            update(Usuario)
+            .where(
+                Usuario.email == email
+            )
+            .values(
+                senha=senha_hash
+            )
+        )
 
         db.session.commit()
 
@@ -492,7 +592,6 @@ def alterar_senha(
     except Exception:
 
         db.session.rollback()
-
         return False
 
 
@@ -500,9 +599,7 @@ def alterar_senha(
 # TESTES E RESPOSTAS
 # ==========================================
 
-def criar_teste(
-    usuario_id
-):
+def criar_teste(usuario_id):
 
     teste = Teste(
         usuario_id=usuario_id
@@ -514,47 +611,61 @@ def criar_teste(
     return teste
 
 
-def salvar_respostas(
-    teste,
-    respostas
-):
+def salvar_respostas(teste, respostas):
 
-    perguntas = db.session.execute(
-
-        select(Pergunta.id)
-
-        .order_by(
-            Pergunta.ordem
-        )
-
-    ).scalars().all()
-
+    perguntas_disponiveis = set(
+        db.session.execute(
+            select(Pergunta.id)
+        ).scalars().all()
+    )
 
     respostas_normalizadas = {}
 
     for chave, valor in respostas.items():
 
         if not isinstance(chave, str):
-            continue
+            raise ValueError(
+                "Foi enviada uma pergunta inválida."
+            )
 
         if not chave.startswith("p"):
-            continue
+            raise ValueError(
+                "Foi enviada uma pergunta inválida."
+            )
 
         try:
+
             pergunta_id = int(chave[1:])
+
             resposta = int(valor)
+
         except (ValueError, TypeError):
-            continue
+
+            raise ValueError(
+                "Foi enviada uma resposta inválida."
+            )
+
+        if pergunta_id in respostas_normalizadas:
+
+            raise ValueError(
+                "Uma pergunta não pode ter mais de uma resposta."
+            )
 
         respostas_normalizadas[pergunta_id] = resposta
 
-
-    if set(respostas_normalizadas.keys()) != set(perguntas):
+    if len(respostas_normalizadas) != 25:
 
         raise ValueError(
-            "O teste precisa conter uma resposta para todas as perguntas."
+            "O teste precisa conter exatamente 25 respostas."
         )
 
+    if not set(respostas_normalizadas).issubset(
+        perguntas_disponiveis
+    ):
+
+        raise ValueError(
+            "O teste contém uma pergunta que não existe no banco."
+        )
 
     if any(
         valor < 1 or valor > 7
@@ -565,32 +676,22 @@ def salvar_respostas(
             "Todas as respostas precisam estar entre 1 e 7."
         )
 
-
-    for pergunta_id in perguntas:
+    for pergunta_id, valor in respostas_normalizadas.items():
 
         db.session.add(
-
             Resposta(
                 teste_id=teste.id,
                 pergunta_id=pergunta_id,
-                resposta=respostas_normalizadas[
-                    pergunta_id
-                ]
+                resposta=valor
             )
-
         )
-
 
     return respostas_normalizadas
 
 
-def buscar_teste(
-    teste_id,
-    usuario_id=None
-):
+def buscar_teste(teste_id, usuario_id=None):
 
     consulta = (
-
         select(
             Teste.id,
             Teste.data_teste,
@@ -599,33 +700,29 @@ def buscar_teste(
             Resposta.pergunta_id,
             Pergunta.texto,
             Pergunta.categoria,
-            Resposta.resposta
+            Resposta.resposta,
+            Pergunta.peso,
+            Pergunta.invertida
         )
-
         .join(
             Usuario,
             Teste.usuario_id == Usuario.id
         )
-
         .join(
             Resposta,
             Teste.id == Resposta.teste_id
         )
-
         .join(
             Pergunta,
             Resposta.pergunta_id == Pergunta.id
         )
-
         .where(
             Teste.id == teste_id
         )
-
         .order_by(
             Pergunta.ordem
         )
     )
-
 
     if usuario_id is not None:
 
@@ -633,11 +730,9 @@ def buscar_teste(
             Teste.usuario_id == usuario_id
         )
 
-
     resultados = db.session.execute(
         consulta
     ).all()
-
 
     return [
         tuple(linha)
@@ -648,13 +743,10 @@ def buscar_teste(
 def listar_perguntas():
 
     return db.session.execute(
-
         select(Pergunta)
-
         .order_by(
             Pergunta.ordem
         )
-
     ).scalars().all()
 
 
@@ -662,62 +754,43 @@ def listar_perguntas():
 # RESULTADOS / RELATÓRIO
 # ==========================================
 
-def salvar_resultado(
-    teste,
-    analise
-):
+def salvar_resultado(teste, analise):
 
     resultado = Resultado(
         teste_id=teste.id,
         percentual_geral=analise["percentual_geral"],
-        classificacao_geral=analise[
-            "classificacao_geral"
-        ]
+        classificacao_geral=analise["classificacao_geral"]
     )
 
     db.session.add(resultado)
-
     db.session.flush()
-
 
     for categoria in analise["categorias"]:
 
         db.session.add(
-
             ResultadoCategoria(
                 resultado_id=resultado.id,
                 categoria=categoria["categoria"],
                 percentual=categoria["percentual"],
-                classificacao=categoria[
-                    "classificacao"
-                ]
+                classificacao=categoria["classificacao"]
             )
-
         )
-
 
     return resultado
 
 
-def buscar_resultado(
-    teste_id,
-    usuario_id=None
-):
+def buscar_resultado(teste_id, usuario_id=None):
 
     consulta = (
-
         select(Resultado)
-
         .join(
             Teste,
             Resultado.teste_id == Teste.id
         )
-
         .where(
             Resultado.teste_id == teste_id
         )
     )
-
 
     if usuario_id is not None:
 
@@ -725,16 +798,13 @@ def buscar_resultado(
             Teste.usuario_id == usuario_id
         )
 
-
-    resultado = db.session.execute(
+    return db.session.execute(
         consulta
     ).scalar_one_or_none()
 
 
-    return resultado
-
-
 def buscar_ultimo_resultado_usuario(usuario_id):
+
     consulta = (
         select(Resultado.teste_id)
         .join(
@@ -753,14 +823,3 @@ def buscar_ultimo_resultado_usuario(usuario_id):
     return db.session.execute(
         consulta
     ).scalar_one_or_none()
-
-def buscar_ultimo_resultado_usuario(usuario_id):
-    consulta = (
-        select(Resultado.teste_id)
-        .join(Teste, Resultado.teste_id == Teste.id)
-        .where(Teste.usuario_id == usuario_id)
-        .order_by(Resultado.data_geracao.desc())
-        .limit(1)
-    )
-
-    return db.session.execute(consulta).scalar_one_or_none()
