@@ -49,6 +49,11 @@ load_dotenv()
 
 app = Flask(__name__)
 
+# Recarrega os templates (.html) automaticamente quando forem alterados.
+app.config["TEMPLATES_AUTO_RELOAD"] = True
+
+# Mostra no terminal de quais pastas o Flask está lendo os arquivos.
+
 app.secret_key = os.getenv("SECRET_KEY")
 
 if not app.secret_key:

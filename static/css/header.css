@@ -292,3 +292,216 @@
         background: white;
     }
 }
+
+
+/* =========================================
+   ÍCONE DA CONTA E PAINEL LATERAL
+========================================= */
+
+/* ÍCONE DA PESSOA NO CABEÇALHO */
+
+.header .btn-conta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 46px;
+    height: 46px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: #191970;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.header .btn-conta:hover,
+.header .btn-conta:focus-visible {
+    background: rgba(25, 25, 112, 0.12);
+}
+
+.header .btn-conta svg {
+    display: block;
+}
+
+/* Computador: o menu vai para a direita e o ícone fica logo depois dele */
+@media (min-width: 801px) {
+
+    .header .menu {
+        margin-left: auto;
+    }
+
+}
+
+/* Celular: o ícone fica ao lado do hambúrguer */
+@media (max-width: 800px) {
+
+    .header .btn-conta {
+        order: 1;
+        margin-left: auto;
+    }
+
+    .header .menu-toggle {
+        order: 2;
+    }
+
+}
+
+/* FUNDO ESCURO DO PAINEL */
+
+.conta-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    z-index: 1100;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.conta-overlay.conta-overlay-visivel {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+/* PAINEL LATERAL */
+
+.conta-painel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: min(340px, 88vw);
+    height: 100vh;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    padding: 25px 22px;
+    overflow-y: auto;
+    background: #f4f4f8;
+    box-shadow: -8px 0 25px rgba(0, 0, 0, 0.15);
+    z-index: 1101;
+    transform: translateX(110%);
+    visibility: hidden;
+    pointer-events: none;
+    transition: transform 0.3s ease, visibility 0.3s ease;
+}
+
+.conta-painel.conta-aberta {
+    transform: translateX(0);
+    visibility: visible;
+    pointer-events: auto;
+}
+
+/* Topo do painel */
+
+.conta-painel-topo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid #d7d7e2;
+    color: #191970;
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.conta-fechar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border: none;
+    border-radius: 8px;
+    background: #191970;
+    color: white;
+    font-size: 28px;
+    cursor: pointer;
+}
+
+.conta-fechar:hover {
+    background: #2b2bb3;
+}
+
+/* E-mail */
+
+.conta-email {
+    margin-bottom: 20px;
+    color: #191970;
+    font-size: 14px;
+    font-weight: bold;
+    overflow-wrap: anywhere;
+}
+
+/* Links */
+
+.conta-links {
+    display: flex;
+    flex-direction: column;
+}
+
+.conta-links a,
+.conta-link-desativado {
+    display: block;
+    padding: 16px 8px;
+    border-bottom: 1px solid #e0e0e8;
+    color: #191970;
+    font-size: 16px;
+    text-decoration: none;
+}
+
+.conta-links a:hover {
+    background: #e8e8f5;
+}
+
+.conta-link-desativado {
+    color: #8a8aa8;
+    cursor: not-allowed;
+}
+
+.conta-link-desativado small {
+    margin-left: 6px;
+    font-size: 12px;
+}
+
+/* Botão Sair, no fim do painel */
+
+.conta-sair {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    margin-top: auto;
+    padding: 12px 24px;
+    border-radius: 30px;
+    background: #191970;
+    color: white;
+    font-weight: bold;
+    text-decoration: none;
+    transition: background 0.3s;
+}
+
+.conta-sair:hover {
+    background: #2b2bb3;
+}
+
+/* Impede a rolagem da página com o painel aberto */
+
+body.conta-bloqueado {
+    overflow: hidden;
+}
+
+/* ACESSIBILIDADE: REDUZIR ANIMAÇÕES */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .conta-painel,
+    .conta-overlay {
+        transition: none;
+    }
+
+}

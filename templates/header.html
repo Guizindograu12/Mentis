@@ -74,29 +74,10 @@
             Nosso time
         </a>
 
-        <!-- LOGIN E PERFIL -->
-        <div class="login">
+        <!-- LOGIN: aparece só para quem NÃO está logado -->
+        {% if not usuario %}
 
-            {% if usuario %}
-
-                <a
-                    href="{{ url_for('perfil') }}"
-                    class="conta"
-                    title="Abrir meu perfil">
-
-                    {{ usuario }}
-
-                </a>
-
-                <a
-                    href="{{ url_for('logout') }}"
-                    class="btn-sair">
-
-                    Sair
-
-                </a>
-
-            {% else %}
+            <div class="login">
 
                 <a
                     href="{{ url_for('login') }}"
@@ -106,13 +87,114 @@
 
                 </a>
 
-            {% endif %}
+            </div>
 
-        </div>
+        {% endif %}
 
     </nav>
 
+    <!-- ÍCONE DA PESSOA: aparece só para quem está logado -->
+    {% if usuario %}
+
+        <button
+            type="button"
+            class="btn-conta"
+            id="btn-conta"
+            aria-label="Abrir painel da conta"
+            aria-controls="painel-conta"
+            aria-expanded="false">
+
+            <svg
+                viewBox="0 0 24 24"
+                width="28"
+                height="28"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true">
+
+                <circle cx="12" cy="8" r="4"></circle>
+                <path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"></path>
+
+            </svg>
+
+        </button>
+
+    {% endif %}
+
 </header>
+
+<!-- =====================================
+PAINEL LATERAL DA CONTA
+(fica FORA do <header> de propósito: o header usa
+backdrop-filter, que atrapalha elementos "fixed" dentro dele)
+==================================== -->
+
+{% if usuario %}
+
+    <!-- FUNDO ESCURO DO PAINEL -->
+    <div
+        class="conta-overlay"
+        id="conta-overlay">
+    </div>
+
+    <!-- PAINEL -->
+    <aside
+        class="conta-painel"
+        id="painel-conta"
+        aria-label="Painel da conta"
+        aria-hidden="true">
+
+        <div class="conta-painel-topo">
+
+            <span>Minha conta</span>
+
+            <button
+                type="button"
+                class="conta-fechar"
+                id="conta-fechar"
+                aria-label="Fechar painel">
+
+                &times;
+
+            </button>
+
+        </div>
+
+        <!-- E-mail do usuário logado -->
+        <p class="conta-email">{{ usuario }}</p>
+
+        <!-- Opções da conta -->
+        <nav
+            class="conta-links"
+            aria-label="Opções da conta">
+
+            <a href="{{ url_for('perfil') }}">
+                Meu perfil e resultados
+            </a>
+
+            <!-- Ainda não existe página de configurações -->
+            <span class="conta-link-desativado">
+                Configurações
+                <small>em breve</small>
+            </span>
+
+        </nav>
+
+        <!-- Sair fica no fim do painel -->
+        <a
+            href="{{ url_for('logout') }}"
+            class="conta-sair">
+
+            Sair
+
+        </a>
+
+    </aside>
+
+{% endif %}
 
 <!-- JAVASCRIPT DO MENU MOBILE -->
 <script>
@@ -182,6 +264,72 @@
 
         if (window.innerWidth > 800) {
             fecharMenu();
+        }
+
+    });
+
+})();
+</script>
+
+<!-- JAVASCRIPT DO PAINEL DA CONTA -->
+<script>
+(function () {
+
+    const botao = document.getElementById("btn-conta");
+    const painel = document.getElementById("painel-conta");
+    const overlay = document.getElementById("conta-overlay");
+    const botaoFechar = document.getElementById("conta-fechar");
+
+    // Se o usuário não está logado, esses elementos não existem.
+    if (!botao || !painel || !overlay || !botaoFechar) {
+        return;
+    }
+
+    // Abre o painel lateral.
+    function abrirPainel() {
+
+        painel.classList.add("conta-aberta");
+        overlay.classList.add("conta-overlay-visivel");
+
+        painel.setAttribute("aria-hidden", "false");
+        botao.setAttribute("aria-expanded", "true");
+
+        document.body.classList.add("conta-bloqueado");
+
+        botaoFechar.focus();
+
+    }
+
+    // Fecha o painel lateral.
+    function fecharPainel() {
+
+        if (!painel.classList.contains("conta-aberta")) {
+            return;
+        }
+
+        painel.classList.remove("conta-aberta");
+        overlay.classList.remove("conta-overlay-visivel");
+
+        painel.setAttribute("aria-hidden", "true");
+        botao.setAttribute("aria-expanded", "false");
+
+        document.body.classList.remove("conta-bloqueado");
+
+        botao.focus();
+
+    }
+
+    // Clicar no ícone abre o painel.
+    botao.addEventListener("click", abrirPainel);
+
+    // Fecha pelo X, pelo fundo escuro ou pela tecla Escape.
+    botaoFechar.addEventListener("click", fecharPainel);
+    overlay.addEventListener("click", fecharPainel);
+
+    document.addEventListener("keydown", function (event) {
+
+        if (event.key === "Escape") {
+            fecharPainel();
         }
 
     });
