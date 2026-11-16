@@ -1,338 +1,1152 @@
-<header class="header">
-
-    <!-- LOGO -->
-    <div class="logo">
-        <a href="{{ url_for('home') }}">
-            <img
-                src="{{ url_for('static', filename='imagens/logo.png') }}"
-                alt="Logo Mentis">
-        </a>
-    </div>
-
-    <!-- BOTÃO HAMBÚRGUER: MOBILE -->
-    <button
-        type="button"
-        class="menu-toggle"
-        id="menu-toggle"
-        aria-label="Abrir menu"
-        aria-controls="menu-principal"
-        aria-expanded="false">
-
-        <span></span>
-        <span></span>
-        <span></span>
-
-    </button>
-
-    <!-- FUNDO ESCURO DA SIDEBAR -->
-    <div
-        class="menu-overlay"
-        id="menu-overlay">
-    </div>
-
-    <!-- MENU PRINCIPAL -->
-    <nav
-        class="menu"
-        id="menu-principal"
-        aria-label="Menu principal">
-
-        <!-- TOPO DA SIDEBAR -->
-        <div class="sidebar-top">
-
-            <span>Menu</span>
-
-            <button
-                type="button"
-                class="menu-close"
-                id="menu-close"
-                aria-label="Fechar menu">
-
-                &times;
-
-            </button>
-
+<!-- JAVASCRIPT: APLICA AS CONFIGURAÇÕES SALVAS (roda primeiro, para a página não "piscar") -->
+<script>
+    (function () {
+    
+        // Lista das configurações: valor padrão e valores permitidos.
+        const CONFIG = {
+            fonte:     { padrao: "normal",   valores: ["normal", "grande", "muito-grande"] },
+            tema:      { padrao: "claro",    valores: ["claro", "escuro"] },
+            contraste: { padrao: "normal",   valores: ["normal", "alto"] },
+            animacoes: { padrao: "normal",   valores: ["normal", "reduzidas"] },
+            dislexia:  { padrao: "normal",   valores: ["normal", "ligada"] }
+        };
+    
+        // Deixa a lista disponível para o script do painel.
+        window.MENTIS_CONFIG = CONFIG;
+    
+        // Para cada configuração, lê o valor salvo e aplica no <html>.
+        Object.keys(CONFIG).forEach(function (chave) {
+    
+            let valor = CONFIG[chave].padrao;
+    
+            try {
+    
+                const salvo = localStorage.getItem("mentis-" + chave);
+    
+                if (salvo && CONFIG[chave].valores.indexOf(salvo) !== -1) {
+                    valor = salvo;
+                }
+    
+            } catch (erro) {}
+    
+            document.documentElement.setAttribute("data-" + chave, valor);
+    
+        });
+    
+    })();
+    </script>
+    
+    <header class="header">
+    
+        <!-- LOGO -->
+        <div class="logo">
+            <a href="{{ url_for('home') }}">
+                <img
+                    src="{{ url_for('static', filename='imagens/logo.png') }}"
+                    alt="Logo Mentis">
+            </a>
         </div>
-
-        <!-- LINKS DE NAVEGAÇÃO -->
-        <a href="{{ url_for('home') }}#hero">
-            Home
-        </a>
-
-        <a href="{{ url_for('home') }}#sobre">
-            Sobre nós
-        </a>
-
-        <a href="{{ url_for('home') }}#demo">
-            Demo
-        </a>
-
-        <a href="{{ url_for('home') }}#faq">
-            FAQ
-        </a>
-
-        <a href="{{ url_for('home') }}#time">
-            Nosso time
-        </a>
-
-        <!-- LOGIN: aparece só para quem NÃO está logado -->
-        {% if not usuario %}
-
-            <div class="login">
-
-                <a
-                    href="{{ url_for('login') }}"
-                    class="btn">
-
-                    Login
-
-                </a>
-
-            </div>
-
-        {% endif %}
-
-    </nav>
-
-    <!-- ÍCONE DA PESSOA: aparece só para quem está logado -->
-    {% if usuario %}
-
+    
+        <!-- BOTÃO HAMBÚRGUER: MOBILE -->
         <button
             type="button"
-            class="btn-conta"
-            id="btn-conta"
-            aria-label="Abrir painel da conta"
-            aria-controls="painel-conta"
+            class="menu-toggle"
+            id="menu-toggle"
+            aria-label="Abrir menu"
+            aria-controls="menu-principal"
             aria-expanded="false">
-
-            <svg
-                viewBox="0 0 24 24"
-                width="28"
-                height="28"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.8"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                aria-hidden="true">
-
-                <circle cx="12" cy="8" r="4"></circle>
-                <path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"></path>
-
-            </svg>
-
+    
+            <span></span>
+            <span></span>
+            <span></span>
+    
         </button>
-
-    {% endif %}
-
-</header>
-
-<!-- =====================================
-PAINEL LATERAL DA CONTA
-(fica FORA do <header> de propósito: o header usa
-backdrop-filter, que atrapalha elementos "fixed" dentro dele)
-==================================== -->
-
-{% if usuario %}
-
-    <!-- FUNDO ESCURO DO PAINEL -->
-    <div
-        class="conta-overlay"
-        id="conta-overlay">
-    </div>
-
-    <!-- PAINEL -->
-    <aside
-        class="conta-painel"
-        id="painel-conta"
-        aria-label="Painel da conta"
-        aria-hidden="true">
-
-        <div class="conta-painel-topo">
-
-            <span>Minha conta</span>
-
+    
+        <!-- FUNDO ESCURO DA SIDEBAR -->
+        <div
+            class="menu-overlay"
+            id="menu-overlay">
+        </div>
+    
+        <!-- MENU PRINCIPAL -->
+        <nav
+            class="menu"
+            id="menu-principal"
+            aria-label="Menu principal">
+    
+            <!-- TOPO DA SIDEBAR -->
+            <div class="sidebar-top">
+    
+                <span>Menu</span>
+    
+                <button
+                    type="button"
+                    class="menu-close"
+                    id="menu-close"
+                    aria-label="Fechar menu">
+    
+                    &times;
+    
+                </button>
+    
+            </div>
+    
+            <!-- LINKS DE NAVEGAÇÃO -->
+            <a href="{{ url_for('home') }}#hero">
+                Home
+            </a>
+    
+            <a href="{{ url_for('home') }}#sobre">
+                Sobre nós
+            </a>
+    
+            <a href="{{ url_for('home') }}#demo">
+                Demo
+            </a>
+    
+            <a href="{{ url_for('home') }}#faq">
+                FAQ
+            </a>
+    
+            <a href="{{ url_for('home') }}#time">
+                Nosso time
+            </a>
+    
+            <!-- LOGIN: aparece só para quem NÃO está logado -->
+            {% if not usuario %}
+    
+                <div class="login">
+    
+                    <a
+                        href="{{ url_for('login') }}"
+                        class="btn">
+    
+                        Login
+    
+                    </a>
+    
+                </div>
+    
+            {% endif %}
+    
+        </nav>
+    
+        <!-- ÍCONE DA PESSOA: aparece só para quem está logado -->
+        {% if usuario %}
+    
             <button
                 type="button"
-                class="conta-fechar"
-                id="conta-fechar"
-                aria-label="Fechar painel">
-
-                &times;
-
+                class="btn-conta"
+                id="btn-conta"
+                aria-label="Abrir painel da conta"
+                aria-controls="painel-conta"
+                aria-expanded="false">
+    
+                <svg
+                    viewBox="0 0 24 24"
+                    width="28"
+                    height="28"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true">
+    
+                    <circle cx="12" cy="8" r="4"></circle>
+                    <path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"></path>
+    
+                </svg>
+    
             </button>
-
+    
+        {% endif %}
+    
+    </header>
+    
+    <!-- =====================================
+    PAINEL LATERAL DA CONTA
+    (fica FORA do <header> de propósito: o header usa
+    backdrop-filter, que atrapalha elementos "fixed" dentro dele)
+    ==================================== -->
+    
+    {% if usuario %}
+    
+        <!-- FUNDO ESCURO DO PAINEL -->
+        <div
+            class="conta-overlay"
+            id="conta-overlay">
         </div>
-
-        <!-- E-mail do usuário logado -->
-        <p class="conta-email">{{ usuario }}</p>
-
-        <!-- Opções da conta -->
-        <nav
-            class="conta-links"
-            aria-label="Opções da conta">
-
-            <a href="{{ url_for('perfil') }}">
-                Meu perfil e resultados
+    
+        <!-- PAINEL -->
+        <aside
+            class="conta-painel"
+            id="painel-conta"
+            aria-label="Painel da conta"
+            aria-hidden="true">
+    
+            <div class="conta-painel-topo">
+    
+                <span>Minha conta</span>
+    
+                <button
+                    type="button"
+                    class="conta-fechar"
+                    id="conta-fechar"
+                    aria-label="Fechar painel">
+    
+                    &times;
+    
+                </button>
+    
+            </div>
+    
+            <!-- E-mail do usuário logado -->
+            <p class="conta-email">{{ usuario }}</p>
+    
+            <!-- Opções da conta -->
+            <nav
+                class="conta-links"
+                aria-label="Opções da conta">
+    
+                <a href="{{ url_for('perfil') }}">
+                    Meu perfil e resultados
+                </a>
+    
+                <!-- Abre o painel de configurações -->
+                <button
+                    type="button"
+                    class="conta-link-botao"
+                    id="abrir-config"
+                    aria-controls="painel-config"
+                    aria-expanded="false">
+    
+                    Configurações
+    
+                </button>
+    
+                <!-- Abre o painel de privacidade e segurança -->
+                <button
+                    type="button"
+                    class="conta-link-botao"
+                    id="abrir-privacidade"
+                    aria-controls="painel-privacidade"
+                    aria-expanded="false">
+    
+                    Privacidade e segurança
+    
+                </button>
+    
+            </nav>
+    
+            <!-- Sair fica no fim do painel -->
+            <a
+                href="{{ url_for('logout') }}"
+                class="conta-sair">
+    
+                Sair
+    
             </a>
-
-            <!-- Ainda não existe página de configurações -->
-            <span class="conta-link-desativado">
-                Configurações
-                <small>em breve</small>
-            </span>
-
-        </nav>
-
-        <!-- Sair fica no fim do painel -->
-        <a
-            href="{{ url_for('logout') }}"
-            class="conta-sair">
-
-            Sair
-
-        </a>
-
-    </aside>
-
-{% endif %}
-
-<!-- JAVASCRIPT DO MENU MOBILE -->
-<script>
-(function () {
-
-    const botaoAbrir = document.getElementById("menu-toggle");
-    const botaoFechar = document.getElementById("menu-close");
-    const menu = document.getElementById("menu-principal");
-    const overlay = document.getElementById("menu-overlay");
-
-    // Interrompe caso os elementos não existam.
-    if (!botaoAbrir || !botaoFechar || !menu || !overlay) {
-        return;
-    }
-
-    // Abre a sidebar.
-    function abrirMenu() {
-
-        menu.classList.add("menu-aberto");
-        overlay.classList.add("overlay-visivel");
-
-        botaoAbrir.setAttribute("aria-expanded", "true");
-        botaoAbrir.setAttribute("aria-label", "Fechar menu");
-
-        document.body.classList.add("menu-bloqueado");
-
-    }
-
-    // Fecha a sidebar.
-    function fecharMenu() {
-
-        menu.classList.remove("menu-aberto");
-        overlay.classList.remove("overlay-visivel");
-
-        botaoAbrir.setAttribute("aria-expanded", "false");
-        botaoAbrir.setAttribute("aria-label", "Abrir menu");
-
-        document.body.classList.remove("menu-bloqueado");
-
-    }
-
-    // Eventos dos botões.
-    botaoAbrir.addEventListener("click", abrirMenu);
-    botaoFechar.addEventListener("click", fecharMenu);
-
-    // Fecha ao clicar no fundo escuro.
-    overlay.addEventListener("click", fecharMenu);
-
-    // Fecha ao selecionar um link.
-    menu.querySelectorAll("a").forEach(function (link) {
-
-        link.addEventListener("click", fecharMenu);
-
-    });
-
-    // Fecha ao pressionar Escape.
-    document.addEventListener("keydown", function (event) {
-
-        if (event.key === "Escape") {
-            fecharMenu();
-        }
-
-    });
-
-    // Fecha ao voltar para o layout de computador.
-    window.addEventListener("resize", function () {
-
-        if (window.innerWidth > 800) {
-            fecharMenu();
-        }
-
-    });
-
-})();
-</script>
-
-<!-- JAVASCRIPT DO PAINEL DA CONTA -->
-<script>
-(function () {
-
-    const botao = document.getElementById("btn-conta");
-    const painel = document.getElementById("painel-conta");
-    const overlay = document.getElementById("conta-overlay");
-    const botaoFechar = document.getElementById("conta-fechar");
-
-    // Se o usuário não está logado, esses elementos não existem.
-    if (!botao || !painel || !overlay || !botaoFechar) {
-        return;
-    }
-
-    // Abre o painel lateral.
-    function abrirPainel() {
-
-        painel.classList.add("conta-aberta");
-        overlay.classList.add("conta-overlay-visivel");
-
-        painel.setAttribute("aria-hidden", "false");
-        botao.setAttribute("aria-expanded", "true");
-
-        document.body.classList.add("conta-bloqueado");
-
-        botaoFechar.focus();
-
-    }
-
-    // Fecha o painel lateral.
-    function fecharPainel() {
-
-        if (!painel.classList.contains("conta-aberta")) {
+    
+        </aside>
+    
+        <!-- PAINEL DE CONFIGURAÇÕES (desliza por cima do painel da conta) -->
+        <aside
+            class="conta-painel config-painel"
+            id="painel-config"
+            aria-label="Configurações"
+            aria-hidden="true">
+    
+            <div class="conta-painel-topo">
+    
+                <button
+                    type="button"
+                    class="conta-fechar"
+                    id="config-voltar"
+                    aria-label="Voltar para Minha conta">
+    
+                    &larr;
+    
+                </button>
+    
+                <span>Configurações</span>
+    
+                <button
+                    type="button"
+                    class="conta-fechar"
+                    id="config-fechar"
+                    aria-label="Fechar painel">
+    
+                    &times;
+    
+                </button>
+    
+            </div>
+    
+            <!-- ACESSIBILIDADE -->
+            <section class="config-grupo">
+    
+                <h3>Acessibilidade</h3>
+    
+                <!-- Tamanho da fonte -->
+                <div class="config-item config-item-coluna" id="config-fonte">
+    
+                    <div class="config-item-texto">
+                        <strong>Tamanho da fonte</strong>
+                        <span>Aumenta ou diminui os textos</span>
+                    </div>
+    
+                    <div class="config-opcoes" role="group" aria-label="Tamanho da fonte">
+    
+                        <button
+                            type="button"
+                            class="config-opcao"
+                            data-config="fonte"
+                            data-valor="normal"
+                            aria-pressed="true">
+                            Normal
+                        </button>
+    
+                        <button
+                            type="button"
+                            class="config-opcao"
+                            data-config="fonte"
+                            data-valor="grande"
+                            aria-pressed="false">
+                            Grande
+                        </button>
+    
+                        <button
+                            type="button"
+                            class="config-opcao"
+                            data-config="fonte"
+                            data-valor="muito-grande"
+                            aria-pressed="false">
+                            Muito grande
+                        </button>
+    
+                    </div>
+    
+                </div>
+    
+                <!-- Alto contraste -->
+                <div class="config-item" id="config-contraste">
+    
+                    <div class="config-item-texto">
+                        <strong id="rotulo-contraste">Alto contraste</strong>
+                        <span>Textos e botões mais fáceis de ler</span>
+                    </div>
+    
+                    <button
+                        type="button"
+                        class="config-switch"
+                        role="switch"
+                        aria-checked="false"
+                        aria-labelledby="rotulo-contraste"
+                        data-config="contraste"
+                        data-ligado="alto"
+                        data-desligado="normal">
+                    </button>
+    
+                </div>
+    
+                <!-- Reduzir animações -->
+                <div class="config-item" id="config-animacoes">
+    
+                    <div class="config-item-texto">
+                        <strong id="rotulo-animacoes">Reduzir animações</strong>
+                        <span>Diminui os movimentos na tela</span>
+                    </div>
+    
+                    <button
+                        type="button"
+                        class="config-switch"
+                        role="switch"
+                        aria-checked="false"
+                        aria-labelledby="rotulo-animacoes"
+                        data-config="animacoes"
+                        data-ligado="reduzidas"
+                        data-desligado="normal">
+                    </button>
+    
+                </div>
+    
+                <!-- Fonte para dislexia -->
+                <div class="config-item" id="config-dislexia">
+    
+                    <div class="config-item-texto">
+                        <strong id="rotulo-dislexia">Fonte para dislexia</strong>
+                        <span>Letras mais fáceis de distinguir</span>
+                    </div>
+    
+                    <button
+                        type="button"
+                        class="config-switch"
+                        role="switch"
+                        aria-checked="false"
+                        aria-labelledby="rotulo-dislexia"
+                        data-config="dislexia"
+                        data-ligado="ligada"
+                        data-desligado="normal">
+                    </button>
+    
+                </div>
+    
+            </section>
+    
+            <!-- APARÊNCIA -->
+            <section class="config-grupo">
+    
+                <h3>Aparência</h3>
+    
+                <!-- Tema -->
+                <div class="config-item config-item-coluna" id="config-tema">
+    
+                    <div class="config-item-texto">
+                        <strong>Tema</strong>
+                        <span>Claro ou escuro</span>
+                    </div>
+    
+                    <div class="config-opcoes" role="group" aria-label="Tema">
+    
+                        <button
+                            type="button"
+                            class="config-opcao"
+                            data-config="tema"
+                            data-valor="claro"
+                            aria-pressed="true">
+                            Claro
+                        </button>
+    
+                        <button
+                            type="button"
+                            class="config-opcao"
+                            data-config="tema"
+                            data-valor="escuro"
+                            aria-pressed="false">
+                            Escuro
+                        </button>
+    
+                    </div>
+    
+                </div>
+    
+            </section>
+    
+            <!-- RESTAURAR PADRÃO -->
+            <button
+                type="button"
+                class="config-restaurar"
+                id="config-restaurar">
+    
+                Restaurar padrão
+    
+            </button>
+    
+        </aside>
+    
+        <!-- PAINEL DE PRIVACIDADE E SEGURANÇA (desliza por cima do painel da conta) -->
+        <aside
+            class="conta-painel config-painel"
+            id="painel-privacidade"
+            aria-label="Privacidade e segurança"
+            aria-hidden="true">
+    
+            <div class="conta-painel-topo">
+    
+                <button
+                    type="button"
+                    class="conta-fechar"
+                    id="privacidade-voltar"
+                    aria-label="Voltar para Minha conta">
+    
+                    &larr;
+    
+                </button>
+    
+                <span>Privacidade e segurança</span>
+    
+                <button
+                    type="button"
+                    class="conta-fechar"
+                    id="privacidade-fechar"
+                    aria-label="Fechar painel">
+    
+                    &times;
+    
+                </button>
+    
+            </div>
+    
+            <!-- SEGURANÇA: ALTERAR SENHA -->
+            <section class="config-grupo">
+    
+                <h3>Segurança</h3>
+    
+                <form class="priv-form" id="form-senha" novalidate>
+    
+                    <div class="priv-campo">
+                        <label for="senha-atual">Senha atual</label>
+                        <input
+                            type="password"
+                            id="senha-atual"
+                            autocomplete="current-password"
+                            required>
+                    </div>
+    
+                    <div class="priv-campo">
+                        <label for="senha-nova">Nova senha (mínimo 8 caracteres)</label>
+                        <input
+                            type="password"
+                            id="senha-nova"
+                            autocomplete="new-password"
+                            minlength="8"
+                            required>
+                    </div>
+    
+                    <div class="priv-campo">
+                        <label for="senha-confirmar">Confirmar nova senha</label>
+                        <input
+                            type="password"
+                            id="senha-confirmar"
+                            autocomplete="new-password"
+                            minlength="8"
+                            required>
+                    </div>
+    
+                    <p class="priv-mensagem" id="msg-senha" role="status" aria-live="polite"></p>
+    
+                    <button type="submit" class="priv-botao">
+                        Alterar senha
+                    </button>
+    
+                </form>
+    
+            </section>
+    
+            <!-- PRIVACIDADE: TEXTO E DOWNLOAD DOS DADOS -->
+            <section class="config-grupo">
+    
+                <h3>Privacidade</h3>
+    
+                <p class="priv-texto">
+                    A Mentis guarda seu e-mail, suas respostas, seus resultados
+                    e seus check-ins de humor para montar o seu histórico, que
+                    só é exibido na sua conta. A senha é guardada de forma
+                    protegida (hash), nunca em texto. Os resultados são
+                    indicadores de bem-estar e não substituem um diagnóstico
+                    médico.
+                </p>
+    
+                <div class="priv-acoes">
+    
+                    <a
+                        class="priv-botao priv-botao-contorno"
+                        href="{{ url_for('baixar_dados') }}"
+                        download>
+    
+                        Baixar meus dados
+    
+                    </a>
+    
+                </div>
+    
+            </section>
+    
+            <!-- EXCLUIR CONTA -->
+            <section class="config-grupo">
+    
+                <h3>Excluir conta</h3>
+    
+                <p class="priv-texto">
+                    Apaga sua conta e todos os seus testes, resultados e
+                    check-ins. Essa ação não pode ser desfeita.
+                </p>
+    
+                <div class="priv-acoes">
+    
+                    <button
+                        type="button"
+                        class="priv-botao priv-botao-perigo"
+                        id="abrir-exclusao"
+                        aria-expanded="false"
+                        aria-controls="form-exclusao">
+    
+                        Excluir minha conta
+    
+                    </button>
+    
+                </div>
+    
+                <form class="priv-form" id="form-exclusao" hidden novalidate>
+    
+                    <div class="priv-campo">
+                        <label for="senha-exclusao">Digite sua senha para confirmar</label>
+                        <input
+                            type="password"
+                            id="senha-exclusao"
+                            autocomplete="current-password"
+                            required>
+                    </div>
+    
+                    <p class="priv-mensagem" id="msg-exclusao" role="status" aria-live="polite"></p>
+    
+                    <button type="submit" class="priv-botao priv-botao-perigo-cheio">
+                        Excluir definitivamente
+                    </button>
+    
+                    <button
+                        type="button"
+                        class="priv-botao priv-botao-contorno"
+                        id="cancelar-exclusao">
+    
+                        Cancelar
+    
+                    </button>
+    
+                </form>
+    
+            </section>
+    
+        </aside>
+    
+    {% endif %}
+    
+    <!-- JAVASCRIPT DO MENU MOBILE -->
+    <script>
+    (function () {
+    
+        const botaoAbrir = document.getElementById("menu-toggle");
+        const botaoFechar = document.getElementById("menu-close");
+        const menu = document.getElementById("menu-principal");
+        const overlay = document.getElementById("menu-overlay");
+    
+        // Interrompe caso os elementos não existam.
+        if (!botaoAbrir || !botaoFechar || !menu || !overlay) {
             return;
         }
-
-        painel.classList.remove("conta-aberta");
-        overlay.classList.remove("conta-overlay-visivel");
-
-        painel.setAttribute("aria-hidden", "true");
-        botao.setAttribute("aria-expanded", "false");
-
-        document.body.classList.remove("conta-bloqueado");
-
-        botao.focus();
-
-    }
-
-    // Clicar no ícone abre o painel.
-    botao.addEventListener("click", abrirPainel);
-
-    // Fecha pelo X, pelo fundo escuro ou pela tecla Escape.
-    botaoFechar.addEventListener("click", fecharPainel);
-    overlay.addEventListener("click", fecharPainel);
-
-    document.addEventListener("keydown", function (event) {
-
-        if (event.key === "Escape") {
-            fecharPainel();
+    
+        // Abre a sidebar.
+        function abrirMenu() {
+    
+            menu.classList.add("menu-aberto");
+            overlay.classList.add("overlay-visivel");
+    
+            botaoAbrir.setAttribute("aria-expanded", "true");
+            botaoAbrir.setAttribute("aria-label", "Fechar menu");
+    
+            document.body.classList.add("menu-bloqueado");
+    
         }
-
-    });
-
-})();
-</script>
+    
+        // Fecha a sidebar.
+        function fecharMenu() {
+    
+            menu.classList.remove("menu-aberto");
+            overlay.classList.remove("overlay-visivel");
+    
+            botaoAbrir.setAttribute("aria-expanded", "false");
+            botaoAbrir.setAttribute("aria-label", "Abrir menu");
+    
+            document.body.classList.remove("menu-bloqueado");
+    
+        }
+    
+        // Eventos dos botões.
+        botaoAbrir.addEventListener("click", abrirMenu);
+        botaoFechar.addEventListener("click", fecharMenu);
+    
+        // Fecha ao clicar no fundo escuro.
+        overlay.addEventListener("click", fecharMenu);
+    
+        // Fecha ao selecionar um link.
+        menu.querySelectorAll("a").forEach(function (link) {
+    
+            link.addEventListener("click", fecharMenu);
+    
+        });
+    
+        // Fecha ao pressionar Escape.
+        document.addEventListener("keydown", function (event) {
+    
+            if (event.key === "Escape") {
+                fecharMenu();
+            }
+    
+        });
+    
+        // Fecha ao voltar para o layout de computador.
+        window.addEventListener("resize", function () {
+    
+            if (window.innerWidth > 800) {
+                fecharMenu();
+            }
+    
+        });
+    
+    })();
+    </script>
+    
+    <!-- JAVASCRIPT DO PAINEL DA CONTA -->
+    <script>
+    (function () {
+    
+        const botao = document.getElementById("btn-conta");
+        const painel = document.getElementById("painel-conta");
+        const overlay = document.getElementById("conta-overlay");
+        const botaoFechar = document.getElementById("conta-fechar");
+    
+        // Se o usuário não está logado, esses elementos não existem.
+        if (!botao || !painel || !overlay || !botaoFechar) {
+            return;
+        }
+    
+        // Abre o painel lateral.
+        function abrirPainel() {
+    
+            painel.classList.add("conta-aberta");
+            overlay.classList.add("conta-overlay-visivel");
+    
+            painel.setAttribute("aria-hidden", "false");
+            botao.setAttribute("aria-expanded", "true");
+    
+            document.body.classList.add("conta-bloqueado");
+    
+            botaoFechar.focus();
+    
+        }
+    
+        // Fecha o painel lateral.
+        function fecharPainel() {
+    
+            if (!painel.classList.contains("conta-aberta")) {
+                return;
+            }
+    
+            painel.classList.remove("conta-aberta");
+            overlay.classList.remove("conta-overlay-visivel");
+    
+            painel.setAttribute("aria-hidden", "true");
+            botao.setAttribute("aria-expanded", "false");
+    
+            document.body.classList.remove("conta-bloqueado");
+    
+            botao.focus();
+    
+        }
+    
+        // Clicar no ícone abre o painel.
+        botao.addEventListener("click", abrirPainel);
+    
+        // Fecha pelo X, pelo fundo escuro ou pela tecla Escape.
+        botaoFechar.addEventListener("click", fecharPainel);
+        overlay.addEventListener("click", fecharPainel);
+    
+        document.addEventListener("keydown", function (event) {
+    
+            if (event.key === "Escape") {
+                fecharPainel();
+            }
+    
+        });
+    
+    })();
+    </script>
+    
+    <!-- JAVASCRIPT DOS PAINÉIS SECUNDÁRIOS (configurações e privacidade) -->
+    <script>
+    (function () {
+    
+        const overlay = document.getElementById("conta-overlay");
+        const fecharConta = document.getElementById("conta-fechar");
+    
+        // Se o usuário não está logado, esses elementos não existem.
+        if (!overlay || !fecharConta) {
+            return;
+        }
+    
+        // Cada item liga um botão do painel da conta a um painel secundário.
+        const paineis = [
+    
+            {
+                abrir: "abrir-config",
+                painel: "painel-config",
+                voltar: "config-voltar",
+                fechar: "config-fechar"
+            },
+    
+            {
+                abrir: "abrir-privacidade",
+                painel: "painel-privacidade",
+                voltar: "privacidade-voltar",
+                fechar: "privacidade-fechar"
+            }
+    
+        ].map(function (ids) {
+    
+            return {
+                botaoAbrir: document.getElementById(ids.abrir),
+                painel: document.getElementById(ids.painel),
+                botaoVoltar: document.getElementById(ids.voltar),
+                botaoFechar: document.getElementById(ids.fechar)
+            };
+    
+        }).filter(function (item) {
+    
+            return item.botaoAbrir && item.painel && item.botaoVoltar && item.botaoFechar;
+    
+        });
+    
+        // Abre um painel secundário.
+        function abrir(item) {
+    
+            item.painel.classList.add("conta-aberta");
+            item.painel.setAttribute("aria-hidden", "false");
+            item.botaoAbrir.setAttribute("aria-expanded", "true");
+    
+            item.botaoVoltar.focus();
+    
+        }
+    
+        // Fecha um painel secundário.
+        function fechar(item) {
+    
+            if (!item.painel.classList.contains("conta-aberta")) {
+                return;
+            }
+    
+            item.painel.classList.remove("conta-aberta");
+            item.painel.setAttribute("aria-hidden", "true");
+            item.botaoAbrir.setAttribute("aria-expanded", "false");
+    
+            // Avisa o painel que ele foi fechado (usado para limpar campos).
+            item.painel.dispatchEvent(new CustomEvent("painel-fechado"));
+    
+        }
+    
+        paineis.forEach(function (item) {
+    
+            item.botaoAbrir.addEventListener("click", function () {
+                abrir(item);
+            });
+    
+            // Seta: volta para "Minha conta".
+            item.botaoVoltar.addEventListener("click", function () {
+                fechar(item);
+                item.botaoAbrir.focus();
+            });
+    
+            // X: fecha o painel secundário e o painel da conta.
+            item.botaoFechar.addEventListener("click", function () {
+                fechar(item);
+                fecharConta.click();
+            });
+    
+        });
+    
+        // Fundo escuro e Escape fecham os painéis secundários.
+        overlay.addEventListener("click", function () {
+            paineis.forEach(fechar);
+        });
+    
+        document.addEventListener("keydown", function (event) {
+    
+            if (event.key === "Escape") {
+                paineis.forEach(fechar);
+            }
+    
+        });
+    
+    })();
+    </script>
+    
+    <!-- JAVASCRIPT DAS OPÇÕES DE CONFIGURAÇÃO -->
+    <script>
+    (function () {
+    
+        const CONFIG = window.MENTIS_CONFIG;
+    
+        // Se a lista de configurações não existir, não faz nada.
+        if (!CONFIG) {
+            return;
+        }
+    
+        const html = document.documentElement;
+    
+        // Valor atual de uma configuração (lido do <html>).
+        function valorAtual(chave) {
+            return html.getAttribute("data-" + chave) || CONFIG[chave].padrao;
+        }
+    
+        // Atualiza a aparência dos botões e dos interruptores.
+        function atualizarPainel() {
+    
+            document.querySelectorAll("[data-config][data-valor]").forEach(function (botao) {
+    
+                botao.setAttribute(
+                    "aria-pressed",
+                    valorAtual(botao.dataset.config) === botao.dataset.valor ? "true" : "false"
+                );
+    
+            });
+    
+            document.querySelectorAll(".config-switch").forEach(function (botao) {
+    
+                botao.setAttribute(
+                    "aria-checked",
+                    valorAtual(botao.dataset.config) === botao.dataset.ligado ? "true" : "false"
+                );
+    
+            });
+    
+        }
+    
+        // Aplica um valor, salva no navegador e atualiza o painel.
+        function definir(chave, valor) {
+    
+            html.setAttribute("data-" + chave, valor);
+    
+            try {
+                localStorage.setItem("mentis-" + chave, valor);
+            } catch (erro) {}
+    
+            atualizarPainel();
+    
+        }
+    
+        // Botões de escolha (fonte e tema).
+        document.querySelectorAll("[data-config][data-valor]").forEach(function (botao) {
+    
+            botao.addEventListener("click", function () {
+                definir(botao.dataset.config, botao.dataset.valor);
+            });
+    
+        });
+    
+        // Interruptores (contraste, animações e dislexia).
+        document.querySelectorAll(".config-switch").forEach(function (botao) {
+    
+            botao.addEventListener("click", function () {
+    
+                const ligado = valorAtual(botao.dataset.config) === botao.dataset.ligado;
+    
+                definir(
+                    botao.dataset.config,
+                    ligado ? botao.dataset.desligado : botao.dataset.ligado
+                );
+    
+            });
+    
+        });
+    
+        // Botão "Restaurar padrão".
+        const restaurar = document.getElementById("config-restaurar");
+    
+        if (restaurar) {
+    
+            restaurar.addEventListener("click", function () {
+    
+                Object.keys(CONFIG).forEach(function (chave) {
+                    definir(chave, CONFIG[chave].padrao);
+                });
+    
+            });
+    
+        }
+    
+        atualizarPainel();
+    
+    })();
+    </script>
+    
+    <!-- JAVASCRIPT DA PRIVACIDADE E SEGURANÇA -->
+    <script>
+    (function () {
+    
+        const painel = document.getElementById("painel-privacidade");
+        const formSenha = document.getElementById("form-senha");
+        const formExclusao = document.getElementById("form-exclusao");
+        const botaoAbrirExclusao = document.getElementById("abrir-exclusao");
+        const botaoCancelarExclusao = document.getElementById("cancelar-exclusao");
+    
+        // Se o usuário não está logado, esses elementos não existem.
+        if (!painel || !formSenha || !formExclusao || !botaoAbrirExclusao || !botaoCancelarExclusao) {
+            return;
+        }
+    
+        const msgSenha = document.getElementById("msg-senha");
+        const msgExclusao = document.getElementById("msg-exclusao");
+    
+        // Mostra uma mensagem de erro ou de sucesso.
+        function mostrarMensagem(elemento, texto, tipo) {
+    
+            elemento.textContent = texto;
+            elemento.className = "priv-mensagem priv-" + tipo;
+    
+        }
+    
+        // Apaga a mensagem.
+        function limparMensagem(elemento) {
+    
+            elemento.textContent = "";
+            elemento.className = "priv-mensagem";
+    
+        }
+    
+        // Envia os dados para o servidor em formato JSON.
+        async function enviar(url, dados) {
+    
+            try {
+    
+                const resposta = await fetch(url, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(dados)
+                });
+    
+                let corpo = {};
+    
+                try {
+                    corpo = await resposta.json();
+                } catch (erro) {}
+    
+                return {
+                    ok: resposta.ok && corpo.status === "sucesso",
+                    dados: corpo
+                };
+    
+            } catch (erro) {
+    
+                return {
+                    ok: false,
+                    dados: { mensagem: "Não foi possível conectar ao servidor. Tente novamente." }
+                };
+    
+            }
+    
+        }
+    
+        // ---------- ALTERAR SENHA ----------
+    
+        formSenha.addEventListener("submit", async function (evento) {
+    
+            evento.preventDefault();
+    
+            const senhaAtual = document.getElementById("senha-atual").value;
+            const senhaNova = document.getElementById("senha-nova").value;
+            const senhaConfirmar = document.getElementById("senha-confirmar").value;
+    
+            if (!senhaAtual || !senhaNova || !senhaConfirmar) {
+                mostrarMensagem(msgSenha, "Preencha todos os campos.", "erro");
+                return;
+            }
+    
+            if (senhaNova.length < 8) {
+                mostrarMensagem(msgSenha, "A nova senha precisa ter pelo menos 8 caracteres.", "erro");
+                return;
+            }
+    
+            if (senhaNova !== senhaConfirmar) {
+                mostrarMensagem(msgSenha, "As senhas novas não são iguais.", "erro");
+                return;
+            }
+    
+            const botao = formSenha.querySelector("button[type='submit']");
+            botao.disabled = true;
+    
+            const resultado = await enviar("{{ url_for('conta_alterar_senha') }}", {
+                senha_atual: senhaAtual,
+                nova_senha: senhaNova,
+                confirmar_senha: senhaConfirmar
+            });
+    
+            botao.disabled = false;
+    
+            if (resultado.ok) {
+    
+                formSenha.reset();
+                mostrarMensagem(msgSenha, resultado.dados.mensagem || "Senha alterada com sucesso.", "sucesso");
+    
+            } else {
+    
+                mostrarMensagem(
+                    msgSenha,
+                    resultado.dados.mensagem || "Não foi possível alterar a senha.",
+                    "erro"
+                );
+    
+            }
+    
+        });
+    
+        // ---------- EXCLUIR CONTA ----------
+    
+        // Mostra o campo de senha para confirmar a exclusão.
+        botaoAbrirExclusao.addEventListener("click", function () {
+    
+            formExclusao.hidden = false;
+            botaoAbrirExclusao.setAttribute("aria-expanded", "true");
+    
+            document.getElementById("senha-exclusao").focus();
+    
+        });
+    
+        // Esconde a confirmação e limpa o que foi digitado.
+        function cancelarExclusao() {
+    
+            formExclusao.reset();
+            formExclusao.hidden = true;
+            botaoAbrirExclusao.setAttribute("aria-expanded", "false");
+    
+            limparMensagem(msgExclusao);
+    
+        }
+    
+        botaoCancelarExclusao.addEventListener("click", cancelarExclusao);
+    
+        formExclusao.addEventListener("submit", async function (evento) {
+    
+            evento.preventDefault();
+    
+            const senha = document.getElementById("senha-exclusao").value;
+    
+            if (!senha) {
+                mostrarMensagem(msgExclusao, "Digite sua senha para confirmar.", "erro");
+                return;
+            }
+    
+            const botao = formExclusao.querySelector("button[type='submit']");
+            botao.disabled = true;
+    
+            const resultado = await enviar("{{ url_for('conta_excluir') }}", { senha: senha });
+    
+            botao.disabled = false;
+    
+            if (resultado.ok) {
+    
+                window.location.href = resultado.dados.redirecionar || "/";
+    
+            } else {
+    
+                mostrarMensagem(
+                    msgExclusao,
+                    resultado.dados.mensagem || "Não foi possível excluir a conta.",
+                    "erro"
+                );
+    
+            }
+    
+        });
+    
+        // Ao fechar o painel, limpa campos e mensagens (por segurança).
+        painel.addEventListener("painel-fechado", function () {
+    
+            formSenha.reset();
+            limparMensagem(msgSenha);
+    
+            cancelarExclusao();
+    
+        });
+    
+    })();
+    </script>

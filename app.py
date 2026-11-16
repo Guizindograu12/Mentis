@@ -6,9 +6,11 @@ from flask import (
     jsonify,
     redirect,
     url_for,
-    session
+    session,
+    Response
 )
 
+import json
 import os
 import random
 
@@ -34,6 +36,11 @@ from backend.database import (
     Resposta,
     Pergunta,
     Resultado
+)
+
+from backend.conta import (
+    exportar_dados_usuario,
+    excluir_usuario
 )
 
 from backend.perguntas import PERGUNTAS
@@ -1103,6 +1110,218 @@ def recuperar_senha():
     return resposta_recuperacao(
         "Não foi possível alterar a senha. Tente novamente."
     )
+
+
+# ==========================================
+# CONTA: PRIVACIDADE E SEGURANÇA
+# ==========================================
+
+@app.route("/conta/alterar-senha", methods=["POST"])
+def conta_alterar_senha():
+
+    if "usuario_id" not in session:
+
+        return jsonify({
+
+            "status": "erro",
+
+            "mensagem": "Você precisa estar logado."
+
+        }), 401
+
+    dados = request.get_json(silent=True)
+
+    if not isinstance(dados, dict):
+
+        dados = {}
+
+    senha_atual = dados.get("senha_atual", "")
+    nova_senha = dados.get("nova_senha", "")
+    confirmar_senha = dados.get("confirmar_senha", "")
+
+    if not all(
+        isinstance(valor, str)
+        for valor in (senha_atual, nova_senha, confirmar_senha)
+    ):
+
+        return jsonify({
+
+            "status": "erro",
+
+            "mensagem": "Dados inválidos."
+
+        }), 400
+
+    if not senha_atual or not nova_senha or not confirmar_senha:
+
+        return jsonify({
+
+            "status": "erro",
+
+            "mensagem": "Preencha todos os campos."
+
+        }), 400
+
+    if len(nova_senha) < 8:
+
+        return jsonify({
+
+            "status": "erro",
+
+            "mensagem": "A nova senha precisa ter pelo menos 8 caracteres."
+
+        }), 400
+
+    if nova_senha != confirmar_senha:
+
+        return jsonify({
+
+            "status": "erro",
+
+            "mensagem": "As senhas novas não são iguais."
+
+        }), 400
+
+    if nova_senha == senha_atual:
+
+        return jsonify({
+
+            "status": "erro",
+
+            "mensagem": "A nova senha precisa ser diferente da atual."
+
+        }), 400
+
+    email = session.get("usuario")
+
+    # Confere a senha atual antes de trocar.
+    if validar_usuario(email, senha_atual) != session["usuario_id"]:
+
+        return jsonify({
+
+            "status": "erro",
+
+            "mensagem": "A senha atual está incorreta."
+
+        }), 403
+
+    if alterar_senha(email, nova_senha):
+
+        return jsonify({
+
+            "status": "sucesso",
+
+            "mensagem": "Senha alterada com sucesso."
+
+        })
+
+    return jsonify({
+
+        "status": "erro",
+
+        "mensagem": "Não foi possível alterar a senha. Tente novamente."
+
+    }), 500
+
+
+@app.route("/conta/baixar-dados")
+def baixar_dados():
+
+    if "usuario_id" not in session:
+
+        return redirect(url_for("login"))
+
+    dados = exportar_dados_usuario(
+        session["usuario_id"]
+    )
+
+    if dados is None:
+
+        return redirect(url_for("logout"))
+
+    conteudo = json.dumps(
+        dados,
+        ensure_ascii=False,
+        indent=2
+    )
+
+    resposta = Response(
+        conteudo,
+        mimetype="application/json; charset=utf-8"
+    )
+
+    resposta.headers["Content-Disposition"] = (
+        "attachment; filename=meus-dados-mentis.json"
+    )
+
+    return resposta
+
+
+@app.route("/conta/excluir", methods=["POST"])
+def conta_excluir():
+
+    if "usuario_id" not in session:
+
+        return jsonify({
+
+            "status": "erro",
+
+            "mensagem": "Você precisa estar logado."
+
+        }), 401
+
+    dados = request.get_json(silent=True)
+
+    if not isinstance(dados, dict):
+
+        dados = {}
+
+    senha = dados.get("senha", "")
+
+    if not isinstance(senha, str) or not senha:
+
+        return jsonify({
+
+            "status": "erro",
+
+            "mensagem": "Digite sua senha para confirmar."
+
+        }), 400
+
+    usuario_id = session["usuario_id"]
+
+    # Confere a senha antes de apagar a conta.
+    if validar_usuario(session.get("usuario"), senha) != usuario_id:
+
+        return jsonify({
+
+            "status": "erro",
+
+            "mensagem": "Senha incorreta."
+
+        }), 403
+
+    if excluir_usuario(usuario_id):
+
+        session.clear()
+
+        return jsonify({
+
+            "status": "sucesso",
+
+            "mensagem": "Conta excluída.",
+
+            "redirecionar": url_for("home")
+
+        })
+
+    return jsonify({
+
+        "status": "erro",
+
+        "mensagem": "Não foi possível excluir a conta. Tente novamente."
+
+    }), 500
 
 
 # ==========================================
