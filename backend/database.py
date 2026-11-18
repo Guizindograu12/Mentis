@@ -1,4 +1,3 @@
-
 from flask_sqlalchemy import SQLAlchemy
 
 from sqlalchemy import (
@@ -112,6 +111,53 @@ class Usuario(db.Model):
     senha = db.Column(
         db.String(255),
         nullable=False
+    )
+
+    # Tipo da conta:
+    # "funcionario" = pessoa que responde o teste
+    # "empresa_rh"  = empresa / RH
+    #
+    # Contas antigas (criadas antes desta mudança)
+    # ficam como "funcionario".
+
+    tipo_conta = db.Column(
+        db.String(20),
+        nullable=False,
+        default="funcionario",
+        server_default="funcionario"
+    )
+
+    # Usados somente por Funcionário
+
+    nome = db.Column(
+        db.String(100),
+        nullable=True
+    )
+
+    sobrenome = db.Column(
+        db.String(100),
+        nullable=True
+    )
+
+    data_nascimento = db.Column(
+        db.Date,
+        nullable=True
+    )
+
+    # Funcionário: empresa onde trabalha
+    # Empresa/RH: nome da própria empresa
+
+    empresa = db.Column(
+        db.String(200),
+        nullable=True
+    )
+
+    # Usado somente por Empresa/RH (apenas números, 14 dígitos).
+    # A regra de CNPJ único é criada em criar_tabelas().
+
+    cnpj = db.Column(
+        db.String(14),
+        nullable=True
     )
 
     testes = db.relationship(
@@ -416,9 +462,11 @@ def criar_tabelas():
     db.create_all()
 
     # Garante que bancos já existentes também
-    # recebam as colunas peso e invertida.
+    # recebam as colunas novas.
 
     with db.engine.begin() as conexao:
+
+        # ----- perguntas -----
 
         conexao.execute(
             text("""
@@ -433,6 +481,66 @@ def criar_tabelas():
                 ALTER TABLE public.perguntas
                 ADD COLUMN IF NOT EXISTS invertida
                 BOOLEAN NOT NULL DEFAULT FALSE
+            """)
+        )
+
+        # ----- usuarios (cadastro Funcionário / Empresa-RH) -----
+
+        conexao.execute(
+            text("""
+                ALTER TABLE public.usuarios
+                ADD COLUMN IF NOT EXISTS tipo_conta
+                VARCHAR(20) NOT NULL DEFAULT 'funcionario'
+            """)
+        )
+
+        conexao.execute(
+            text("""
+                ALTER TABLE public.usuarios
+                ADD COLUMN IF NOT EXISTS nome
+                VARCHAR(100)
+            """)
+        )
+
+        conexao.execute(
+            text("""
+                ALTER TABLE public.usuarios
+                ADD COLUMN IF NOT EXISTS sobrenome
+                VARCHAR(100)
+            """)
+        )
+
+        conexao.execute(
+            text("""
+                ALTER TABLE public.usuarios
+                ADD COLUMN IF NOT EXISTS data_nascimento
+                DATE
+            """)
+        )
+
+        conexao.execute(
+            text("""
+                ALTER TABLE public.usuarios
+                ADD COLUMN IF NOT EXISTS empresa
+                VARCHAR(200)
+            """)
+        )
+
+        conexao.execute(
+            text("""
+                ALTER TABLE public.usuarios
+                ADD COLUMN IF NOT EXISTS cnpj
+                VARCHAR(14)
+            """)
+        )
+
+        # Não permite dois cadastros com o mesmo CNPJ.
+        # (Vários usuários sem CNPJ são permitidos.)
+
+        conexao.execute(
+            text("""
+                CREATE UNIQUE INDEX IF NOT EXISTS uq_usuarios_cnpj
+                ON public.usuarios (cnpj)
             """)
         )
 
@@ -504,13 +612,48 @@ def sincronizar_perguntas(perguntas):
 # USUÁRIOS
 # ==========================================
 
-def cadastrar_usuario(email, senha):
+def cadastrar_usuario(
+    email,
+    senha,
+    tipo_conta="funcionario",
+    nome=None,
+    sobrenome=None,
+    empresa=None,
+    data_nascimento=None,
+    cnpj=None
+):
+    """
+    Cria uma conta nova.
 
-    senha_hash = generate_password_hash(senha)
+    Retorna (True, None) se deu certo,
+    ou (False, "mensagem de erro") se não deu.
+    """
+
+    if buscar_usuario_por_email(email) is not None:
+
+        return False, "Este e-mail já está cadastrado."
+
+    if cnpj is not None:
+
+        cnpj_existente = db.session.execute(
+            select(Usuario.id).where(
+                Usuario.cnpj == cnpj
+            )
+        ).first()
+
+        if cnpj_existente is not None:
+
+            return False, "Este CNPJ já está cadastrado."
 
     usuario = Usuario(
         email=email,
-        senha=senha_hash
+        senha=generate_password_hash(senha),
+        tipo_conta=tipo_conta,
+        nome=nome,
+        sobrenome=sobrenome,
+        empresa=empresa,
+        data_nascimento=data_nascimento,
+        cnpj=cnpj
     )
 
     try:
@@ -518,12 +661,13 @@ def cadastrar_usuario(email, senha):
         db.session.add(usuario)
         db.session.commit()
 
-        return True
+        return True, None
 
     except IntegrityError:
 
         db.session.rollback()
-        return False
+
+        return False, "Este e-mail ou CNPJ já está cadastrado."
 
 
 def validar_usuario(email, senha):

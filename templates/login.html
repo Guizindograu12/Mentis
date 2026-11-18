@@ -7,6 +7,7 @@
 
     <link rel="stylesheet" href="{{ url_for('static', filename='css/header.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/cadastro.css') }}">
 </head>
 
 <body data-recovery-mode="{{ 'true' if recovery_mode|default(false) else 'false' }}">
@@ -39,44 +40,298 @@
         <section class="right">
 
             <!-- CADASTRO -->
-            <div id="cadastro-area" class="form-area">
+            <div
+                id="cadastro-area"
+                class="form-area"
+                data-tipo-inicial="{{ tipo_cadastro|default('funcionario') }}">
 
                 <h1>Criar conta</h1>
 
                 <div class="facalog">
-                    <p>Cadastre-se no Mentis</p>
+                    <p>Escolha o tipo de cadastro:</p>
+                </div>
+
+                <!-- ABAS: FUNCIONÁRIO / EMPRESA-RH -->
+                <div class="abas-cadastro" role="tablist">
+
+                    <button
+                        type="button"
+                        id="aba-funcionario"
+                        class="aba-cadastro ativa"
+                        role="tab"
+                        aria-selected="true"
+                        aria-controls="painel-funcionario"
+                        data-tipo="funcionario">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <circle cx="12" cy="8" r="4"></circle>
+                            <path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7z"></path>
+                        </svg>
+                        Funcionário
+                    </button>
+
+                    <button
+                        type="button"
+                        id="aba-empresa"
+                        class="aba-cadastro"
+                        role="tab"
+                        aria-selected="false"
+                        aria-controls="painel-empresa"
+                        data-tipo="empresa_rh">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M4 21V4a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v6h4a1 1 0 0 1 1 1v10z"></path>
+                        </svg>
+                        Empresa / RH
+                    </button>
+
                 </div>
 
                 {% if erro and not recovery_mode|default(false) %}
                     <div class="erro">{{ erro }}</div>
                 {% endif %}
 
-                <form action="{{ url_for('cadastro') }}" method="POST">
-                    <div class="input">
-                        <input
-                            name="email"
-                            type="email"
-                            placeholder="Digite seu e-mail"
-                            autocomplete="email"
-                            required>
-                    </div>
+                <!-- ========== PAINEL: FUNCIONÁRIO ========== -->
+                {% set d_func = dados if (dados and tipo_cadastro == 'funcionario') else {} %}
 
-                    <div class="input">
-                        <input
-                            name="senha"
-                            type="password"
-                            placeholder="Digite sua senha"
-                            autocomplete="new-password"
-                            required>
-                    </div>
+                <div
+                    id="painel-funcionario"
+                    class="painel-cadastro"
+                    role="tabpanel"
+                    aria-labelledby="aba-funcionario">
 
-                    <button type="submit" class="entrar">Cadastrar</button>
-                </form>
+                    <form
+                        action="{{ url_for('cadastro') }}"
+                        method="POST"
+                        class="form-cadastro"
+                        data-tipo="funcionario">
 
-                <div class="social">
-                    <img src="{{ url_for('static', filename='imagens/google.png') }}" alt="Google">
-                    <img src="{{ url_for('static', filename='imagens/microsoft.png') }}" alt="Microsoft">
+                        <input type="hidden" name="tipo_conta" value="funcionario">
+
+                        <div class="cartao-cadastro">
+
+                            <div class="cartao-cabecalho">
+                                <svg viewBox="0 0 24 24" aria-hidden="true">
+                                    <circle cx="12" cy="8" r="4"></circle>
+                                    <path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7z"></path>
+                                </svg>
+                                <div>
+                                    <h2>Cadastro de Funcionário</h2>
+                                    <p>Preencha os dados abaixo para criar sua conta.</p>
+                                </div>
+                            </div>
+
+                            <div class="grade-campos">
+
+                                <div class="campo">
+                                    <input
+                                        name="nome"
+                                        type="text"
+                                        placeholder="Nome"
+                                        maxlength="100"
+                                        autocomplete="given-name"
+                                        value="{{ d_func.get('nome', '') }}"
+                                        required>
+                                </div>
+
+                                <div class="campo">
+                                    <input
+                                        name="sobrenome"
+                                        type="text"
+                                        placeholder="Sobrenome"
+                                        maxlength="100"
+                                        autocomplete="family-name"
+                                        value="{{ d_func.get('sobrenome', '') }}"
+                                        required>
+                                </div>
+
+                                <div class="campo campo-largo">
+                                    <input
+                                        name="empresa"
+                                        type="text"
+                                        placeholder="Nome da empresa onde trabalha"
+                                        maxlength="200"
+                                        autocomplete="organization"
+                                        value="{{ d_func.get('empresa', '') }}"
+                                        required>
+                                </div>
+
+                                <div class="campo campo-data">
+                                    <label for="data-nascimento">Data de nascimento</label>
+                                    <input
+                                        id="data-nascimento"
+                                        name="data_nascimento"
+                                        type="date"
+                                        autocomplete="bday"
+                                        value="{{ d_func.get('data_nascimento', '') }}"
+                                        required>
+                                </div>
+
+                                <div class="aviso-idade">
+                                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                                        <circle cx="12" cy="12" r="9"></circle>
+                                        <line x1="12" y1="11" x2="12" y2="17"></line>
+                                        <circle cx="12" cy="7.5" r="0.6"></circle>
+                                    </svg>
+                                    <span>Você precisa ter pelo menos 14 anos.</span>
+                                </div>
+
+                                <div class="campo campo-largo campo-icone">
+                                    <input
+                                        name="email"
+                                        type="email"
+                                        placeholder="E-mail (@mentis.com)"
+                                        autocomplete="email"
+                                        value="{{ d_func.get('email', '') }}"
+                                        required>
+                                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                                        <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+                                        <path d="M3 7l9 6 9-6"></path>
+                                    </svg>
+                                </div>
+
+                                <div class="campo campo-icone">
+                                    <input
+                                        name="senha"
+                                        type="password"
+                                        placeholder="Senha"
+                                        minlength="8"
+                                        autocomplete="new-password"
+                                        required>
+                                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                                        <rect x="5" y="11" width="14" height="10" rx="2"></rect>
+                                        <path d="M8 11V8a4 4 0 0 1 8 0v3"></path>
+                                    </svg>
+                                </div>
+
+                                <div class="campo campo-icone">
+                                    <input
+                                        name="confirmar_senha"
+                                        type="password"
+                                        placeholder="Confirmar senha"
+                                        minlength="8"
+                                        autocomplete="new-password"
+                                        required>
+                                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                                        <rect x="5" y="11" width="14" height="10" rx="2"></rect>
+                                        <path d="M8 11V8a4 4 0 0 1 8 0v3"></path>
+                                    </svg>
+                                </div>
+
+                            </div>
+
+                            <div class="erro erro-cliente" hidden></div>
+
+                            <button type="submit" class="entrar">Cadastrar</button>
+
+                        </div>
+                    </form>
                 </div>
+
+                <!-- ========== PAINEL: EMPRESA / RH ========== -->
+                {% set d_rh = dados if (dados and tipo_cadastro == 'empresa_rh') else {} %}
+
+                <div
+                    id="painel-empresa"
+                    class="painel-cadastro"
+                    role="tabpanel"
+                    aria-labelledby="aba-empresa"
+                    hidden>
+
+                    <form
+                        action="{{ url_for('cadastro') }}"
+                        method="POST"
+                        class="form-cadastro"
+                        data-tipo="empresa_rh">
+
+                        <input type="hidden" name="tipo_conta" value="empresa_rh">
+
+                        <div class="cartao-cadastro">
+
+                            <div class="cartao-cabecalho">
+                                <svg viewBox="0 0 24 24" aria-hidden="true">
+                                    <path d="M4 21V4a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v6h4a1 1 0 0 1 1 1v10z"></path>
+                                </svg>
+                                <div>
+                                    <h2>Cadastro de Empresa / RH</h2>
+                                    <p>Preencha os dados da empresa para criar a conta.</p>
+                                </div>
+                            </div>
+
+                            <div class="grade-campos">
+
+                                <div class="campo campo-largo">
+                                    <input
+                                        name="empresa"
+                                        type="text"
+                                        placeholder="Nome da empresa"
+                                        maxlength="200"
+                                        autocomplete="organization"
+                                        value="{{ d_rh.get('empresa', '') }}"
+                                        required>
+                                </div>
+
+                                <div class="campo campo-largo">
+                                    <input
+                                        name="cnpj"
+                                        type="text"
+                                        placeholder="CNPJ (00.000.000/0000-00)"
+                                        inputmode="numeric"
+                                        maxlength="18"
+                                        value="{{ d_rh.get('cnpj', '') }}"
+                                        required>
+                                </div>
+
+                                <div class="campo campo-largo campo-icone">
+                                    <input
+                                        name="email"
+                                        type="email"
+                                        placeholder="E-mail (@mentisrh.com)"
+                                        autocomplete="email"
+                                        value="{{ d_rh.get('email', '') }}"
+                                        required>
+                                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                                        <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+                                        <path d="M3 7l9 6 9-6"></path>
+                                    </svg>
+                                </div>
+
+                                <div class="campo campo-icone">
+                                    <input
+                                        name="senha"
+                                        type="password"
+                                        placeholder="Senha"
+                                        minlength="8"
+                                        autocomplete="new-password"
+                                        required>
+                                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                                        <rect x="5" y="11" width="14" height="10" rx="2"></rect>
+                                        <path d="M8 11V8a4 4 0 0 1 8 0v3"></path>
+                                    </svg>
+                                </div>
+
+                                <div class="campo campo-icone">
+                                    <input
+                                        name="confirmar_senha"
+                                        type="password"
+                                        placeholder="Confirmar senha"
+                                        minlength="8"
+                                        autocomplete="new-password"
+                                        required>
+                                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                                        <rect x="5" y="11" width="14" height="10" rx="2"></rect>
+                                        <path d="M8 11V8a4 4 0 0 1 8 0v3"></path>
+                                    </svg>
+                                </div>
+
+                            </div>
+
+                            <div class="erro erro-cliente" hidden></div>
+
+                            <button type="submit" class="entrar">Cadastrar</button>
+
+                        </div>
+                    </form>
+                </div>
+
             </div>
 
             <!-- LOGIN -->
@@ -199,5 +454,6 @@
     </main>
 
     <script src="{{ url_for('static', filename='js/login.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/cadastro.js') }}"></script>
 </body>
 </html>

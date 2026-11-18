@@ -1,4 +1,3 @@
-
 from flask import (
     Flask,
     render_template,
@@ -41,6 +40,11 @@ from backend.database import (
 from backend.conta import (
     exportar_dados_usuario,
     excluir_usuario
+)
+
+from backend.validacoes import (
+    validar_cadastro,
+    TIPOS_CONTA
 )
 
 from backend.perguntas import PERGUNTAS
@@ -284,56 +288,78 @@ def entrar():
 
 
 # ==========================================
-# CADASTRO
+# CADASTRO (Funcionário ou Empresa/RH)
 # ==========================================
 
 @app.route("/cadastro", methods=["POST"])
 def cadastro():
 
-    email = request.form.get(
-        "email",
-        ""
-    ).strip().lower()
+    # Qual aba foi usada: "funcionario" ou "empresa_rh"
+    tipo_conta = request.form.get(
+        "tipo_conta",
+        "funcionario"
+    )
 
-    senha = request.form.get("senha", "")
+    if tipo_conta not in TIPOS_CONTA:
 
-    if not email or not senha:
+        tipo_conta = "funcionario"
+
+    def resposta_erro(mensagem):
+
+        # Devolve a página com a mensagem, na mesma aba,
+        # e com os campos preenchidos (menos as senhas).
 
         return render_template(
             "login.html",
-            erro="Preencha o e-mail e a senha."
+            erro=mensagem,
+            tipo_cadastro=tipo_conta,
+            dados=request.form
         )
 
-    sucesso = cadastrar_usuario(
-        email,
-        senha
+    # ------------------------------------------
+    # 1. VALIDAR OS DADOS
+    # ------------------------------------------
+
+    dados, erro = validar_cadastro(
+        tipo_conta,
+        request.form
     )
 
-    if sucesso:
+    if erro:
 
-        usuario_id = validar_usuario(
-            email,
-            senha
+        return resposta_erro(erro)
+
+    # ------------------------------------------
+    # 2. SALVAR NO BANCO
+    # ------------------------------------------
+
+    sucesso, erro = cadastrar_usuario(**dados)
+
+    if not sucesso:
+
+        return resposta_erro(erro)
+
+    # ------------------------------------------
+    # 3. ENTRAR NA CONTA CRIADA
+    # ------------------------------------------
+
+    usuario_id = validar_usuario(
+        dados["email"],
+        dados["senha"]
+    )
+
+    if usuario_id is None:
+
+        return resposta_erro(
+            "Não foi possível entrar na conta criada."
         )
 
-        if usuario_id is None:
+    session.clear()
 
-            return render_template(
-                "login.html",
-                erro="Não foi possível entrar na conta criada."
-            )
+    session["usuario_id"] = usuario_id
+    session["usuario"] = dados["email"]
 
-        session.clear()
-
-        session["usuario_id"] = usuario_id
-        session["usuario"] = email
-
-        return redirect(url_for("home"))
-
-    return render_template(
-        "login.html",
-        erro="Este e-mail já está cadastrado."
-    )
+    return redirect(url_for("home"))
 
 
 # ==========================================

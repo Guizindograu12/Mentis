@@ -1,0 +1,261 @@
+/* ==========================================
+   CADASTRO COM DUAS OPÇÕES (Funcionário / Empresa-RH)
+   Este arquivo só mexe na área #cadastro-area.
+   ========================================== */
+
+:root {
+    --cad-azul: #1b1b6f;
+    --cad-azul-escuro: #14145a;
+    --cad-fundo-aba: #e9ebf2;
+    --cad-borda: #d6dbe8;
+    --cad-texto: #1b1b3a;
+    --cad-texto-suave: #5b6078;
+}
+
+/* Permite rolar o lado direito caso o card fique mais alto que a tela */
+.right {
+    overflow-y: auto;
+}
+
+#cadastro-area {
+    width: min(640px, 92%);
+    max-width: none;
+    margin: auto;
+    padding: 24px 0;
+    box-sizing: border-box;
+    text-align: center;
+}
+
+#cadastro-area h1 {
+    color: var(--cad-azul);
+}
+
+/* ---------- ABAS ---------- */
+
+.abas-cadastro {
+    display: flex;
+    gap: 0;
+    width: fit-content;
+    max-width: 100%;
+    margin: 14px auto 18px;
+    padding: 0;
+    background: var(--cad-fundo-aba);
+    border-radius: 16px;
+}
+
+.aba-cadastro {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-width: 190px;
+    padding: 14px 24px;
+    border: none;
+    border-radius: 16px;
+    background: transparent;
+    color: var(--cad-texto);
+    font: inherit;
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: background 0.25s ease, color 0.25s ease;
+}
+
+.aba-cadastro svg {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+    stroke: none;
+}
+
+.aba-cadastro.ativa {
+    background: var(--cad-azul);
+    color: #ffffff;
+}
+
+.aba-cadastro:not(.ativa):hover {
+    background: #dde0ec;
+}
+
+/* ---------- CARTÃO ---------- */
+
+.painel-cadastro[hidden] {
+    display: none;
+}
+
+.painel-cadastro {
+    animation: cadastro-aparecer 0.25s ease;
+}
+
+@keyframes cadastro-aparecer {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.cartao-cadastro {
+    padding: 22px 24px 24px;
+    background: #ffffff;
+    border: 1px solid #e3e6ef;
+    border-radius: 20px;
+    box-shadow: 0 6px 24px rgba(27, 27, 111, 0.08);
+    text-align: left;
+}
+
+.cartao-cabecalho {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 18px;
+}
+
+.cartao-cabecalho > svg {
+    flex-shrink: 0;
+    width: 38px;
+    height: 38px;
+    fill: var(--cad-azul);
+}
+
+.cartao-cabecalho h2 {
+    margin: 0;
+    font-size: 1.15rem;
+    color: var(--cad-azul);
+}
+
+.cartao-cabecalho p {
+    margin: 2px 0 0;
+    font-size: 0.85rem;
+    color: var(--cad-texto-suave);
+}
+
+/* ---------- CAMPOS ---------- */
+
+.grade-campos {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.campo {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+
+.campo-largo {
+    grid-column: 1 / -1;
+}
+
+.campo input {
+    width: 100%;
+    box-sizing: border-box;
+    height: 46px;
+    padding: 0 14px;
+    border: 1.5px solid var(--cad-borda);
+    border-radius: 12px;
+    background: #ffffff;
+    color: var(--cad-texto);
+    font: inherit;
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.campo input::placeholder {
+    color: #7b8199;
+}
+
+.campo input:focus {
+    border-color: var(--cad-azul);
+    box-shadow: 0 0 0 3px rgba(27, 27, 111, 0.12);
+}
+
+.campo label {
+    margin: 0 0 4px 4px;
+    font-size: 0.75rem;
+    color: var(--cad-texto-suave);
+}
+
+/* Ícone à direita (e-mail e senha) */
+.campo-icone input {
+    padding-right: 44px;
+}
+
+.campo-icone svg {
+    position: absolute;
+    right: 14px;
+    bottom: 13px;
+    width: 20px;
+    height: 20px;
+    fill: none;
+    stroke: var(--cad-texto-suave);
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    pointer-events: none;
+}
+
+/* Aviso de idade mínima, ao lado da data */
+.aviso-idade {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-top: 18px;
+    color: var(--cad-azul);
+    font-size: 0.85rem;
+    line-height: 1.3;
+}
+
+.aviso-idade svg {
+    flex-shrink: 0;
+    width: 26px;
+    height: 26px;
+    fill: none;
+    stroke: var(--cad-azul);
+    stroke-width: 1.8;
+    stroke-linecap: round;
+}
+
+.aviso-idade svg circle:last-child {
+    fill: var(--cad-azul);
+}
+
+/* ---------- BOTÃO E ERROS ---------- */
+
+.cartao-cadastro .entrar {
+    width: 100%;
+    margin-top: 4px;
+}
+
+.cartao-cadastro .erro-cliente {
+    margin: 0 0 12px;
+}
+
+.cartao-cadastro .erro-cliente[hidden] {
+    display: none;
+}
+
+/* ---------- CELULAR ---------- */
+
+@media (max-width: 640px) {
+
+    .grade-campos {
+        grid-template-columns: 1fr;
+    }
+
+    .aviso-idade {
+        padding-top: 0;
+    }
+
+    .aba-cadastro {
+        min-width: 0;
+        padding: 12px 16px;
+    }
+}
