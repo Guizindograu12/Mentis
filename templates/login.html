@@ -340,7 +340,39 @@
                 <h1>Entrar</h1>
 
                 <div class="facalog">
-                    <p>Entre na sua conta Mentis</p>
+                    <p>Escolha o tipo de acesso:</p>
+                </div>
+
+                <!-- ABAS: FUNCIONÁRIO / EMPRESA-RH -->
+                <div class="abas-cadastro" role="tablist">
+
+                    <button
+                        type="button"
+                        id="aba-login-funcionario"
+                        class="aba-cadastro ativa"
+                        role="tab"
+                        aria-selected="true"
+                        data-tipo="funcionario">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <circle cx="12" cy="8" r="4"></circle>
+                            <path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7z"></path>
+                        </svg>
+                        Funcionário
+                    </button>
+
+                    <button
+                        type="button"
+                        id="aba-login-empresa"
+                        class="aba-cadastro"
+                        role="tab"
+                        aria-selected="false"
+                        data-tipo="empresa_rh">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M4 21V4a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v6h4a1 1 0 0 1 1 1v10z"></path>
+                        </svg>
+                        Empresa / RH
+                    </button>
+
                 </div>
 
                 {% if erro and not recovery_mode|default(false) %}
@@ -348,35 +380,60 @@
                 {% endif %}
 
                 <form action="{{ url_for('entrar') }}" method="POST">
-                    <div class="input">
-                        <input
-                            name="email"
-                            type="email"
-                            placeholder="Digite seu e-mail"
-                            autocomplete="email"
-                            required>
+
+                    <div class="cartao-cadastro">
+
+                        <div class="cartao-cabecalho">
+                            <svg id="login-cartao-icone" viewBox="0 0 24 24" aria-hidden="true">
+                                <circle cx="12" cy="8" r="4"></circle>
+                                <path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7z"></path>
+                            </svg>
+                            <div>
+                                <h2 id="login-cartao-titulo">Entrar como Funcionário</h2>
+                                <p id="login-cartao-subtitulo">Use o e-mail e a senha da sua conta.</p>
+                            </div>
+                        </div>
+
+                        <div class="grade-campos uma-coluna">
+
+                            <div class="campo campo-icone">
+                                <input
+                                    id="login-email"
+                                    name="email"
+                                    type="email"
+                                    placeholder="E-mail (@mentis.com)"
+                                    autocomplete="email"
+                                    required>
+                                <svg viewBox="0 0 24 24" aria-hidden="true">
+                                    <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+                                    <path d="M3 7l9 6 9-6"></path>
+                                </svg>
+                            </div>
+
+                            <div class="campo campo-icone">
+                                <input
+                                    name="senha"
+                                    type="password"
+                                    placeholder="Senha"
+                                    autocomplete="current-password"
+                                    required>
+                                <svg viewBox="0 0 24 24" aria-hidden="true">
+                                    <rect x="5" y="11" width="14" height="10" rx="2"></rect>
+                                    <path d="M8 11V8a4 4 0 0 1 8 0v3"></path>
+                                </svg>
+                            </div>
+
+                        </div>
+
+                        <a href="#" class="esqueci" onclick="mostrarRecuperacao(event)">
+                            Esqueci minha senha
+                        </a>
+
+                        <button type="submit" class="entrar">Entrar</button>
+
                     </div>
-
-                    <div class="input">
-                        <input
-                            name="senha"
-                            type="password"
-                            placeholder="Digite sua senha"
-                            autocomplete="current-password"
-                            required>
-                    </div>
-
-                    <a href="#" class="esqueci" onclick="mostrarRecuperacao(event)">
-                        Esqueci minha senha
-                    </a>
-
-                    <button type="submit" class="entrar">Entrar</button>
                 </form>
 
-                <div class="social">
-                    <img src="{{ url_for('static', filename='imagens/google.png') }}" alt="Google">
-                    <img src="{{ url_for('static', filename='imagens/microsoft.png') }}" alt="Microsoft">
-                </div>
             </div>
 
             <!-- RECUPERAÇÃO DEMONSTRATIVA -->
@@ -407,45 +464,65 @@
                 {% else %}
                     <form action="{{ url_for('recuperar_senha') }}" method="POST">
 
-                        <div class="input">
-                            <input
-                                name="email"
-                                type="email"
-                                placeholder="E-mail cadastrado"
-                                autocomplete="email"
-                                required>
+                        <div class="cartao-cadastro">
+
+                            <div class="grade-campos uma-coluna">
+
+                                <div class="campo campo-icone">
+                                    <input
+                                        name="email"
+                                        type="email"
+                                        placeholder="E-mail cadastrado"
+                                        autocomplete="email"
+                                        required>
+                                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                                        <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+                                        <path d="M3 7l9 6 9-6"></path>
+                                    </svg>
+                                </div>
+
+                                <div class="campo campo-icone">
+                                    <input
+                                        name="nova_senha"
+                                        type="password"
+                                        placeholder="Nova senha (mínimo 8 caracteres)"
+                                        minlength="8"
+                                        autocomplete="new-password"
+                                        required>
+                                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                                        <rect x="5" y="11" width="14" height="10" rx="2"></rect>
+                                        <path d="M8 11V8a4 4 0 0 1 8 0v3"></path>
+                                    </svg>
+                                </div>
+
+                                <div class="campo campo-icone">
+                                    <input
+                                        name="confirmar_senha"
+                                        type="password"
+                                        placeholder="Confirme a nova senha"
+                                        minlength="8"
+                                        autocomplete="new-password"
+                                        required>
+                                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                                        <rect x="5" y="11" width="14" height="10" rx="2"></rect>
+                                        <path d="M8 11V8a4 4 0 0 1 8 0v3"></path>
+                                    </svg>
+                                </div>
+
+                            </div>
+
+                            <button type="submit" class="entrar">
+                                Alterar senha
+                            </button>
+
+                            <button
+                                type="button"
+                                class="voltar-login"
+                                onclick="mostrarLogin()">
+                                Voltar
+                            </button>
+
                         </div>
-
-                        <div class="input">
-                            <input
-                                name="nova_senha"
-                                type="password"
-                                placeholder="Nova senha (mínimo 8 caracteres)"
-                                minlength="8"
-                                autocomplete="new-password"
-                                required>
-                        </div>
-
-                        <div class="input">
-                            <input
-                                name="confirmar_senha"
-                                type="password"
-                                placeholder="Confirme a nova senha"
-                                minlength="8"
-                                autocomplete="new-password"
-                                required>
-                        </div>
-
-                        <button type="submit" class="entrar">
-                            Alterar senha
-                        </button>
-
-                        <button
-                            type="button"
-                            class="voltar-login"
-                            onclick="mostrarLogin()">
-                            Voltar
-                        </button>
                     </form>
                 {% endif %}
             </div>

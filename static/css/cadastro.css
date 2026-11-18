@@ -1,6 +1,7 @@
 /* ==========================================
-   CADASTRO COM DUAS OPÇÕES (Funcionário / Empresa-RH)
-   Este arquivo só mexe na área #cadastro-area.
+   CADASTRO / LOGIN COM DUAS OPÇÕES (Funcionário / Empresa-RH)
+   Este arquivo mexe nas áreas #cadastro-area, #login-area
+   e #recuperacao-area.
    ========================================== */
 
 :root {
@@ -17,7 +18,9 @@
     overflow-y: auto;
 }
 
-#cadastro-area {
+#cadastro-area,
+#login-area,
+#recuperacao-area {
     width: min(640px, 92%);
     max-width: none;
     margin: auto;
@@ -26,7 +29,9 @@
     text-align: center;
 }
 
-#cadastro-area h1 {
+#cadastro-area h1,
+#login-area h1,
+#recuperacao-area h1 {
     color: var(--cad-azul);
 }
 
@@ -142,6 +147,11 @@
     margin-bottom: 14px;
 }
 
+/* Login e recuperação: um campo embaixo do outro */
+.grade-campos.uma-coluna {
+    grid-template-columns: 1fr;
+}
+
 .campo {
     position: relative;
     display: flex;
@@ -227,11 +237,23 @@
     fill: var(--cad-azul);
 }
 
-/* ---------- BOTÃO E ERROS ---------- */
+/* ---------- BOTÕES, LINKS E ERROS ---------- */
 
 .cartao-cadastro .entrar {
     width: 100%;
     margin-top: 4px;
+}
+
+.cartao-cadastro .voltar-login {
+    width: 100%;
+    margin-top: 10px;
+}
+
+/* "Esqueci minha senha" alinhado à direita, logo abaixo dos campos */
+.cartao-cadastro .esqueci {
+    display: block;
+    margin: -2px 0 14px;
+    text-align: right;
 }
 
 .cartao-cadastro .erro-cliente {
@@ -240,6 +262,11 @@
 
 .cartao-cadastro .erro-cliente[hidden] {
     display: none;
+}
+
+/* Ícones do Google e da Microsoft embaixo do card do login */
+#login-area .social {
+    margin-top: 18px;
 }
 
 /* ---------- CELULAR ---------- */
