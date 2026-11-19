@@ -1,17 +1,43 @@
-let current = 0;
-const slides = document.querySelectorAll(".slide");
+document.addEventListener("DOMContentLoaded", function () {
 
-function showSlide(index) {
-  slides.forEach(s => s.classList.remove("active"));
-  slides[index].classList.add("active");
-}
+    const perguntas = document.querySelectorAll(".faq-pergunta");
 
-function nextSlide() {
-  current = (current + 1) % slides.length;
-  showSlide(current);
-}
+    perguntas.forEach(function (pergunta) {
 
-function prevSlide() {
-  current = (current - 1 + slides.length) % slides.length;
-  showSlide(current);
-}
+        pergunta.addEventListener("click", function () {
+
+            const respostaId = pergunta.getAttribute("aria-controls");
+            const resposta = document.getElementById(respostaId);
+
+            if (!resposta) {
+                return;
+            }
+
+            const estavaAberta =
+                pergunta.getAttribute("aria-expanded") === "true";
+
+            // Fecha todas as outras perguntas.
+            perguntas.forEach(function (outraPergunta) {
+
+                const outroId = outraPergunta.getAttribute("aria-controls");
+                const outraResposta = document.getElementById(outroId);
+
+                outraPergunta.setAttribute("aria-expanded", "false");
+
+                if (outraResposta) {
+                    outraResposta.hidden = true;
+                }
+
+            });
+
+            // Abre ou fecha a pergunta selecionada.
+            if (!estavaAberta) {
+                pergunta.setAttribute("aria-expanded", "true");
+                resposta.hidden = false;
+            }
+
+        });
+
+    });
+
+});

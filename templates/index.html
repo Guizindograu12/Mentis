@@ -4,300 +4,570 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mentis</title>
+    <meta name="theme-color" content="#17175e">
+
+    <title>Mentis | Tecnologia e bem-estar no trabalho</title>
+
     <link rel="stylesheet" href="{{ url_for('static', filename='css/header.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 
 <body>
 
-<!-- =====================================
-CABEÇALHO
-==================================== -->
+    {% include 'header.html' %}
 
-  {% include 'header.html' %}
+    <main>
 
-    <!-- HERO -->
-    <section class="hero" id="hero">
+        <!-- HERO -->
+        <section class="hero" id="hero">
 
-        <img
-            class="bg"
-            src="{{ url_for('static', filename='imagens/fundo.png') }}"
-            alt="Imagem principal">
+            <img
+                class="bg"
+                src="{{ url_for('static', filename='imagens/fundo.png') }}"
+                alt=""
+            >
 
-        <div class="overlay">
+            <div class="hero-overlay"></div>
 
-            <h1>Tecnologia. Bem-Estar. Futuro.</h1>
+            <div class="hero-conteudo">
+                <span class="hero-etiqueta">TECNOLOGIA • BEM-ESTAR • FUTURO</span>
 
-            <p>
-                A IA que revolucionará a saúde mental
-                no mercado de trabalho.
-            </p>
+                <h1>
+                    Tecnologia a favor da
+                    <span>saúde mental.</span>
+                </h1>
 
-        </div>
+                <p>
+                    Transformamos dados em indicadores para apoiar
+                    iniciativas de bem-estar emocional no ambiente de trabalho.
+                </p>
 
-        <div class="setinhas">
-            <a href="#sobre">↓ saiba mais ↓</a>
-        </div>
-
-    </section>
-
-    <!-- SOBRE NÓS -->
-    <section id="sobre" class="sobre">
-
-        <img
-            src="{{ url_for('static', filename='imagens/work.png') }}"
-            alt="Equipe trabalhando">
-
-        <div class="texto">
-
-            <h2>Sobre nós</h2>
-
-            <p>
-                A Mentis acredita que saúde mental no trabalho
-                não é um luxo — é essencial.
-
-                Criamos soluções inteligentes para
-                transformar cuidado em estratégia.
-            </p>
-
-        </div>
-
-    </section>
-
-    <!-- O QUE FAZEMOS -->
-    <section id="oq" class="oq">
-
-        <div>
-
-            <h2>O que fazemos</h2>
-
-            <p>
-                O propósito da Mentis é transformar a forma como
-                a saúde mental é retratada pelo mercado de trabalho,
-                reduzir o estigma e promover um mundo corporativo
-                mais aberto e preventivo em relação ao bem-estar
-                psicológico.
-
-                <br><br>
-
-                Tornamos isso realidade por meio de um questionário
-                online trimestral. As respostas são processadas pelo
-                nosso sistema de análise, que identifica indicadores
-                relacionados ao bem-estar emocional e à sobrecarga
-                mental.
-
-                Os resultados devem ser utilizados como indicadores
-                de bem-estar, e não como diagnóstico médico.
-            </p>
-
-        </div>
-
-        <img
-            src="{{ url_for('static', filename='imagens/trabalho2.png') }}"
-            alt="Ambiente corporativo">
-
-    </section>
-
-    <!-- DEMO -->
-    <section id="demo" class="demo">
-
-        <h2>Demo</h2>
-
-        <p>Experimente nossa versão beta.</p>
-
-        <div class="botaodemo">
-
-            {% if usuario %}
-
-                {% if ultimo_resultado_id %}
-
-                    <!-- USUÁRIO JÁ CONCLUIU O QUESTIONÁRIO -->
-                    <a
-                        class="btn"
-                        href="{{ url_for(
-                            'resultado',
-                            teste_id=ultimo_resultado_id
-                        ) }}">
-                        Ver meus resultados
-                    </a>
-
-                {% else %}
-
-                    <!-- USUÁRIO LOGADO, MAS AINDA NÃO CONCLUIU -->
-                    <a
-                        class="btn"
-                        href="{{ url_for('iniciar_teste') }}">
-                        Faça o teste!
-                    </a>
-
-                {% endif %}
-
-            {% else %}
-
-                <!-- USUÁRIO PRECISA ENTRAR NA CONTA -->
-                <a
-                    class="btn"
-                    href="{{ url_for('login') }}">
-                    Faça o teste!
+                <a class="botao botao-claro" href="#sobre">
+                    Conheça a Mentis
+                    <span aria-hidden="true">→</span>
                 </a>
+            </div>
 
-            {% endif %}
+            <a class="hero-rolagem" href="#sobre">
+                <span>Descubra nossa proposta</span>
+                <span aria-hidden="true">↓</span>
+            </a>
 
-        </div>
+        </section>
 
-    </section>
 
-    <!-- FAQ -->
-    <section id="faq" class="faq">
+        <!-- SOBRE NÓS -->
+        <section class="sobre secao" id="sobre">
 
-        <div class="tituloFAQ">
-            <h2>FAQ</h2>
-        </div>
+            <div class="sobre-imagem">
+                <img
+                    src="{{ url_for('static', filename='imagens/work.png') }}"
+                    alt="Pessoas trabalhando em equipe"
+                    loading="lazy"
+                >
 
-        <div class="carrossel">
+                <div class="sobre-detalhe">
+                    <span class="detalhe-ponto"></span>
+                    Cuidado que também é estratégia
+                </div>
+            </div>
 
-            <button
-                type="button"
-                onclick="prevSlide()"
-                aria-label="Pergunta anterior">
-                ❮
-            </button>
+            <div class="sobre-conteudo">
+                <span class="sobretitulo">QUEM SOMOS</span>
 
-            <div class="slide active">
-
-                <h3>Como a Mentis te ajuda?</h3>
+                <h2>
+                    Um ambiente de trabalho melhor começa com pessoas bem.
+                </h2>
 
                 <p>
-                    A plataforma Mentis é uma ferramenta para auxiliar
-                    empresas a promover um ambiente de trabalho saudável
-                    e humanizado. Ao incentivar o cuidado com o bem-estar
-                    mental e emocional dos funcionários, buscamos
-                    contribuir para uma equipe mais saudável e para
-                    melhores resultados organizacionais.
+                    A Mentis acredita que saúde mental no trabalho não é um
+                    luxo — é essencial.
                 </p>
+
+                <p>
+                    Criamos soluções inteligentes para transformar o cuidado
+                    com o bem-estar em parte das estratégias das organizações.
+                </p>
+
+                <a class="link-seta" href="#oq">
+                    Entenda o que fazemos
+                    <span aria-hidden="true">→</span>
+                </a>
+            </div>
+
+        </section>
+
+
+        <!-- O QUE FAZEMOS -->
+        <section class="oq secao" id="oq">
+
+            <div class="secao-cabecalho">
+                <span class="sobretitulo">NOSSA PROPOSTA</span>
+
+                <h2>
+                    Do cuidado à informação.
+                    <span>Da informação à prevenção.</span>
+                </h2>
+
+                <p>
+                    A Mentis utiliza questionários periódicos e análise de dados
+                    para identificar indicadores relacionados ao bem-estar
+                    emocional e à sobrecarga mental.
+                </p>
+            </div>
+
+            <div class="processos">
+
+                <article class="processo-card">
+                    <span class="processo-numero">01</span>
+                    <div class="processo-icone" aria-hidden="true">✳</div>
+
+                    <h3>Avaliação</h3>
+
+                    <p>
+                        Questionários online trimestrais ajudam a compreender
+                        percepções relacionadas ao bem-estar no trabalho.
+                    </p>
+                </article>
+
+                <article class="processo-card">
+                    <span class="processo-numero">02</span>
+                    <div class="processo-icone" aria-hidden="true">⌁</div>
+
+                    <h3>Análise</h3>
+
+                    <p>
+                        As respostas são processadas pelo sistema para
+                        identificar indicadores e padrões relevantes.
+                    </p>
+                </article>
+
+                <article class="processo-card">
+                    <span class="processo-numero">03</span>
+                    <div class="processo-icone" aria-hidden="true">▥</div>
+
+                    <h3>Indicadores</h3>
+
+                    <p>
+                        As informações são organizadas em resultados que
+                        ajudam a observar aspectos do bem-estar emocional.
+                    </p>
+                </article>
+
+                <article class="processo-card">
+                    <span class="processo-numero">04</span>
+                    <div class="processo-icone" aria-hidden="true">↗</div>
+
+                    <h3>Prevenção</h3>
+
+                    <p>
+                        Os indicadores podem apoiar conversas e iniciativas
+                        voltadas a um ambiente de trabalho mais saudável.
+                    </p>
+                </article>
 
             </div>
 
-            <div class="slide">
+            <p class="aviso-indicadores">
+                <span aria-hidden="true">ⓘ</span>
+                Os resultados da Mentis são indicadores de bem-estar e não
+                substituem uma avaliação ou diagnóstico médico.
+            </p>
 
-                <h3>Qual é o papel da IA?</h3>
+        </section>
+
+
+        <!-- DEMONSTRAÇÃO -->
+        <section class="demo" id="demo">
+
+            <div class="demo-conteudo">
+
+                <span class="sobretitulo sobretitulo-claro">
+                    CONHEÇA A PLATAFORMA
+                </span>
+
+                <h2>
+                    Entender é o primeiro passo para transformar.
+                </h2>
 
                 <p>
-                    As respostas fornecidas no questionário são
-                    processadas pelo sistema de análise da Mentis.
-                    O objetivo é identificar padrões e indicadores
-                    relacionados ao bem-estar emocional e à sobrecarga
-                    mental, ajudando a incentivar ações preventivas.
+                    Conheça a experiência da Mentis e veja como as respostas
+                    do questionário são apresentadas em indicadores de
+                    bem-estar emocional.
                 </p>
+
+                <div class="demo-acoes">
+
+                    {% if usuario %}
+
+                        {% if ultimo_resultado_id %}
+
+                            <a
+                                class="botao botao-claro"
+                                href="{{ url_for('resultado', teste_id=ultimo_resultado_id) }}"
+                            >
+                                Ver meus resultados
+                                <span aria-hidden="true">→</span>
+                            </a>
+
+                        {% else %}
+
+                            <a
+                                class="botao botao-claro"
+                                href="{{ url_for('iniciar_teste') }}"
+                            >
+                                Conhecer o questionário
+                                <span aria-hidden="true">→</span>
+                            </a>
+
+                        {% endif %}
+
+                    {% else %}
+
+                        <a
+                            class="botao botao-claro"
+                            href="{{ url_for('login') }}"
+                        >
+                            Acessar a plataforma
+                            <span aria-hidden="true">→</span>
+                        </a>
+
+                    {% endif %}
+
+                </div>
 
             </div>
 
-            <div class="slide">
+            <div class="demo-visual" aria-hidden="true">
 
-                <h3>Quem acessa as respostas?</h3>
+                <div class="demo-janela">
 
-                <p>
-                    O acesso às respostas e aos resultados deve seguir
-                    as regras de privacidade e de proteção de dados
-                    implementadas pela plataforma. Os dados não devem
-                    ser apresentados como diagnóstico médico.
-                </p>
+                    <div class="demo-janela-topo">
+                        <div class="demo-circulos">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+
+                        <span>mentis</span>
+                    </div>
+
+                    <div class="demo-janela-corpo">
+
+                        <span class="demo-boas-vindas">BEM-VINDO À MENTIS</span>
+
+                        <div class="demo-linha demo-linha-longa"></div>
+                        <div class="demo-linha demo-linha-media"></div>
+
+                        <div class="demo-indicadores">
+
+                            <div class="demo-indicador">
+                                <span class="demo-indicador-icone">✳</span>
+                                <div class="demo-linha demo-linha-curta"></div>
+                                <div class="demo-linha demo-linha-pequena"></div>
+                            </div>
+
+                            <div class="demo-indicador">
+                                <span class="demo-indicador-icone">▥</span>
+                                <div class="demo-linha demo-linha-curta"></div>
+                                <div class="demo-linha demo-linha-pequena"></div>
+                            </div>
+
+                        </div>
+
+                        <div class="demo-grafico">
+                            <div class="grafico-barras">
+                                <span style="height: 38%"></span>
+                                <span style="height: 62%"></span>
+                                <span style="height: 48%"></span>
+                                <span style="height: 78%"></span>
+                                <span style="height: 57%"></span>
+                                <span style="height: 88%"></span>
+                                <span style="height: 70%"></span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="demo-selo">
+                    <span>MENTIS</span>
+                    <strong>Bem-estar em foco.</strong>
+                </div>
 
             </div>
 
-            <div class="slide">
+        </section>
 
-                <h3>A Mentis fornece um diagnóstico?</h3>
+
+        <!-- FAQ -->
+        <section class="faq secao" id="faq">
+
+            <div class="faq-intro">
+                <span class="sobretitulo">DÚVIDAS FREQUENTES</span>
+
+                <h2>
+                    Quer saber mais sobre a Mentis?
+                </h2>
 
                 <p>
-                    Não. A Mentis oferece indicadores relacionados
-                    ao bem-estar emocional. Os resultados não substituem
-                    uma avaliação realizada por um profissional
-                    de saúde mental.
+                    Reunimos algumas respostas para você entender melhor
+                    nossa proposta e como a plataforma funciona.
                 </p>
+            </div>
+
+            <div class="faq-lista">
+
+                <article class="faq-item">
+                    <h3>
+                        <button
+                            class="faq-pergunta"
+                            type="button"
+                            aria-expanded="false"
+                            aria-controls="faq-resposta-1"
+                        >
+                            <span>Como a Mentis funciona?</span>
+                            <span class="faq-sinal" aria-hidden="true">+</span>
+                        </button>
+                    </h3>
+
+                    <div class="faq-resposta" id="faq-resposta-1" hidden>
+                        <p>
+                            A plataforma utiliza questionários online periódicos.
+                            As respostas são processadas pelo sistema de análise
+                            da Mentis, que identifica indicadores relacionados
+                            ao bem-estar emocional e à sobrecarga mental.
+                        </p>
+                    </div>
+                </article>
+
+                <article class="faq-item">
+                    <h3>
+                        <button
+                            class="faq-pergunta"
+                            type="button"
+                            aria-expanded="false"
+                            aria-controls="faq-resposta-2"
+                        >
+                            <span>Quem pode utilizar a plataforma?</span>
+                            <span class="faq-sinal" aria-hidden="true">+</span>
+                        </button>
+                    </h3>
+
+                    <div class="faq-resposta" id="faq-resposta-2" hidden>
+                        <p>
+                            A Mentis foi pensada para auxiliar empresas e
+                            organizações a promover um ambiente de trabalho
+                            mais saudável e humanizado, incentivando o cuidado
+                            com o bem-estar de seus colaboradores.
+                        </p>
+                    </div>
+                </article>
+
+                <article class="faq-item">
+                    <h3>
+                        <button
+                            class="faq-pergunta"
+                            type="button"
+                            aria-expanded="false"
+                            aria-controls="faq-resposta-3"
+                        >
+                            <span>A Mentis fornece diagnósticos médicos?</span>
+                            <span class="faq-sinal" aria-hidden="true">+</span>
+                        </button>
+                    </h3>
+
+                    <div class="faq-resposta" id="faq-resposta-3" hidden>
+                        <p>
+                            Não. A Mentis oferece indicadores relacionados ao
+                            bem-estar emocional. Os resultados não substituem
+                            uma avaliação realizada por um profissional de
+                            saúde mental.
+                        </p>
+                    </div>
+                </article>
+
+                <article class="faq-item">
+                    <h3>
+                        <button
+                            class="faq-pergunta"
+                            type="button"
+                            aria-expanded="false"
+                            aria-controls="faq-resposta-4"
+                        >
+                            <span>Com que frequência os questionários são aplicados?</span>
+                            <span class="faq-sinal" aria-hidden="true">+</span>
+                        </button>
+                    </h3>
+
+                    <div class="faq-resposta" id="faq-resposta-4" hidden>
+                        <p>
+                            A proposta da Mentis utiliza questionários
+                            trimestrais, permitindo acompanhar indicadores
+                            relacionados ao bem-estar ao longo do tempo.
+                        </p>
+                    </div>
+                </article>
+
+                <article class="faq-item">
+                    <h3>
+                        <button
+                            class="faq-pergunta"
+                            type="button"
+                            aria-expanded="false"
+                            aria-controls="faq-resposta-5"
+                        >
+                            <span>Quem acessa as respostas e os resultados?</span>
+                            <span class="faq-sinal" aria-hidden="true">+</span>
+                        </button>
+                    </h3>
+
+                    <div class="faq-resposta" id="faq-resposta-5" hidden>
+                        <p>
+                            O acesso às respostas e aos resultados deve seguir
+                            as regras de privacidade e proteção de dados
+                            implementadas pela plataforma. As informações
+                            não devem ser tratadas como diagnóstico médico.
+                        </p>
+                    </div>
+                </article>
 
             </div>
 
-            <button
-                type="button"
-                onclick="nextSlide()"
-                aria-label="Próxima pergunta">
-                ❯
-            </button>
+        </section>
 
-        </div>
 
-    </section>
+        <!-- NOSSO TIME -->
+        <section class="time secao" id="time">
 
-<!-- NOSSO TIME -->
-<section id="time" class="time">
+            <div class="time-intro">
+                <span class="sobretitulo">QUEM FAZ ACONTECER</span>
 
-    <h2>Nosso time</h2>
+                <h2>
+                    Pessoas por trás da Mentis.
+                </h2>
 
-    <div class="cards">
+                <p>
+                    Um projeto construído com colaboração, tecnologia
+                    e diferentes habilidades.
+                </p>
+            </div>
 
-        <div class="card">
-            <div class="foto"></div>
-            <h3>Co-criador da Mentis, lead dev</h3>
-            <p>Principal desenvolvedor do Backend, spokesperson.</p>
-            <div class="nome-integrante">Guilherme Agostinho</div>
-        </div>
+            <div class="cards">
 
-        <div class="card">
-            <div class="foto"></div>
-            <h3>Co-criadora da Mentis, lead dev</h3>
-            <p>Principal desenvolvedora do Frontend, lead designer, spokesperson.</p>
-            <div class="nome-integrante">Luisa Feher</div>
-        </div>
+                <article class="card">
+                    <div class="foto" aria-hidden="true">GA</div>
 
-        <div class="card">
-            <div class="foto"></div>
-            <h3>Sub-designer</h3>
-            <p>Responsável pelos slides e textos.</p>
-            <div class="nome-integrante">Evelyn Tochio</div>
-        </div>
+                    <span class="card-funcao">CO-FUNDADOR</span>
 
-        <div class="card">
-            <div class="foto"></div>
-            <h3>Desenvolvimento</h3>
-            <p>Colaboração no desenvolvimento do sistema Mentis.</p>
-            <div class="nome-integrante">Yago Santana</div>
-        </div>
+                    <h3>Guilherme Agostinho</h3>
 
-        <div class="card">
-            <div class="foto"></div>
-            <h3>Desenvolvimento</h3>
-            <p>Colaboração no desenvolvimento do sistema Mentis.</p>
-            <div class="nome-integrante">Isabela Lima</div>
-        </div>
+                    <p>
+                        Desenvolvedor back-end e responsável pela estrutura
+                        principal do sistema.
+                    </p>
+                </article>
 
-    </div>
+                <article class="card">
+                    <div class="foto" aria-hidden="true">LF</div>
 
-</section>
+                    <span class="card-funcao">CO-FUNDADORA</span>
 
-</section>
+                    <h3>Luisa Feher</h3>
+
+                    <p>
+                        Desenvolvedora front-end, designer e responsável
+                        pela experiência visual da plataforma.
+                    </p>
+                </article>
+
+                <article class="card">
+                    <div class="foto" aria-hidden="true">ET</div>
+
+                    <span class="card-funcao">DESIGN E COMUNICAÇÃO</span>
+
+                    <h3>Evelyn Tochio</h3>
+
+                    <p>
+                        Colaboração na criação dos materiais visuais,
+                        apresentações e textos.
+                    </p>
+                </article>
+
+                <article class="card">
+                    <div class="foto" aria-hidden="true">YS</div>
+
+                    <span class="card-funcao">DESENVOLVIMENTO</span>
+
+                    <h3>Yago Santana</h3>
+
+                    <p>
+                        Colaboração no desenvolvimento do sistema Mentis.
+                    </p>
+                </article>
+
+                <article class="card">
+                    <div class="foto" aria-hidden="true">IL</div>
+
+                    <span class="card-funcao">DESENVOLVIMENTO</span>
+
+                    <h3>Isabela Lima</h3>
+
+                    <p>
+                        Colaboração no desenvolvimento do sistema Mentis.
+                    </p>
+                </article>
+
+            </div>
+
+        </section>
+
+    </main>
 
 
     <!-- FOOTER -->
     <footer class="footer">
 
-        <p>Alguma sugestão?</p>
+        <div class="footer-conteudo">
 
-        <a
-            target="_blank"
-            rel="noopener noreferrer"
-            href="https://docs.google.com/forms/d/e/1FAIpQLSdiIE0wrJNuVGTy-p5T9LtXMbHXtRA4h7XbXsh5T3tDMdDwOQ/viewform">
-            Preencha nosso formulário!
-        </a>
+            <div class="footer-marca">
+                <span class="footer-logo">mentis.</span>
+
+                <p>
+                    Tecnologia, bem-estar e cuidado no ambiente de trabalho.
+                </p>
+            </div>
+
+            <div class="footer-contato">
+                <span class="footer-titulo">FALE COM A GENTE</span>
+
+                <p>Tem alguma sugestão ou comentário?</p>
+
+                <a
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    href="https://docs.google.com/forms/d/e/1FAIpQLSdiIE0wrJNuVGTy-p5T9LtXMbHXtRA4h7XbXsh5T3tDMdDwOQ/viewform"
+                >
+                    Envie sua sugestão
+                    <span aria-hidden="true">→</span>
+                </a>
+            </div>
+
+        </div>
+
+        <div class="footer-base">
+            <span>© Mentis. Todos os direitos reservados.</span>
+            <a href="#hero">Voltar ao início ↑</a>
+        </div>
 
     </footer>
 
-    <!-- JAVASCRIPT -->
+
     <script
         defer
-        src="{{ url_for('static', filename='js/script.js') }}">
-    </script>
+        src="{{ url_for('static', filename='js/script.js') }}"
+    ></script>
 
 </body>
 </html>
