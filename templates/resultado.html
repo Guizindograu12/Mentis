@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-br">
 
@@ -21,98 +20,205 @@
 
 <body>
 
-    <!-- =====================================
-    CABEÇALHO
-    ===================================== -->
-
     {% include 'header.html' %}
 
     <main class="container">
 
-        <h1 class="titulo">
-            Relatório do Questionário Mentis
-        </h1>
+        <!-- TÍTULO -->
+        <header class="cabecalho-relatorio">
+            <div>
+                <span class="etiqueta">RELATÓRIO INDIVIDUAL</span>
 
-        <p class="subtitulo">
-            Relatório individual de indicadores de bem-estar emocional
-        </p>
+                <h1 class="titulo">
+                    Seu relatório de bem-estar
+                </h1>
 
+                <p class="subtitulo">
+                    Confira os indicadores apresentados a partir das suas respostas.
+                </p>
+            </div>
+        </header>
+
+        <!-- AVISO -->
         <div class="aviso">
-            Este relatório apresenta uma análise das respostas fornecidas
-            no questionário de bem-estar da Mentis. Os resultados são
-            informativos e não constituem diagnóstico psicológico ou médico.
+            <span class="aviso-icone">i</span>
+
+            <p>
+                Este relatório apresenta uma análise das respostas fornecidas
+                no questionário de bem-estar da Mentis. Os resultados são
+                informativos e não constituem diagnóstico psicológico ou médico.
+            </p>
         </div>
 
+        <!-- RESULTADO GERAL -->
         <section class="resumo">
 
-            <div
-                class="medidor"
-                style="--percentual: {{ relatorio.percentual_geral }}%;"
-                role="img"
-                aria-label="Resultado geral de {{ '%.2f'|format(relatorio.percentual_geral) }} por cento"
-            >
-
-                <span class="medidor-valor">
-                    {{ "%.0f"|format(relatorio.percentual_geral) }}%
+            <div class="resumo-cabecalho">
+                <span class="etiqueta">SEU RESULTADO GERAL</span>
+                <span class="resumo-descricao">
+                    Visão geral dos indicadores
                 </span>
-
             </div>
 
-            <div class="resumo-texto">
+            <div class="resumo-conteudo">
 
-                <h2>
-                    {% if relatorio.classificacao_geral == 'Muito Elevado' %}
-                        Indicadores muito elevados
-                    {% elif relatorio.classificacao_geral == 'Elevado' %}
-                        Indicadores elevados
-                    {% elif relatorio.classificacao_geral == 'Moderado' %}
-                        Indicadores moderados
-                    {% else %}
-                        Indicadores de menor intensidade
-                    {% endif %}
-                </h2>
+                <div
+                    class="medidor"
+                    style="--percentual: {{ relatorio.percentual_geral }}%;"
+                    role="img"
+                    aria-label="Resultado geral de {{ '%.2f'|format(relatorio.percentual_geral) }} por cento"
+                >
+                    <div class="medidor-centro">
+                        <span class="medidor-valor">
+                            {{ "%.0f"|format(relatorio.percentual_geral) }}%
+                        </span>
+                        <span class="medidor-legenda">resultado geral</span>
+                    </div>
+                </div>
 
-                <p>
-                    {{ relatorio.classificacao_geral }}
-                </p>
+                <div class="resumo-texto">
 
-            </div>
-
-        </section>
-
-        <hr class="linha">
-
-        <section
-            class="categorias"
-            aria-label="Resultados por categoria"
-        >
-
-            {% for categoria in relatorio.categorias %}
-
-                <div class="categoria">
-
-                    <strong
-                        class="percentual-categoria"
-                        data-percentual="{{ categoria.percentual }}"
-                    >0,00%</strong>
-
-                    de {{ categoria.categoria }} —
-
-                    <span class="valor">
-                        {{ categoria.classificacao }}
+                    <span class="resumo-pequeno-titulo">
+                        CLASSIFICAÇÃO
                     </span>
+
+                    <h2>
+                        {% if relatorio.classificacao_geral == 'Muito Elevado' %}
+                            Indicadores muito elevados
+                        {% elif relatorio.classificacao_geral == 'Elevado' %}
+                            Indicadores elevados
+                        {% elif relatorio.classificacao_geral == 'Moderado' %}
+                            Indicadores moderados
+                        {% else %}
+                            Indicadores de menor intensidade
+                        {% endif %}
+                    </h2>
+
+                    <span class="classificacao">
+                        {{ relatorio.classificacao_geral }}
+                    </span>
+
+                    <p>
+                        Este resultado reúne os indicadores apresentados
+                        pelo questionário e deve ser interpretado considerando
+                        seu contexto e suas experiências.
+                    </p>
 
                 </div>
 
-            {% endfor %}
-
+            </div>
         </section>
 
-        <hr class="linha">
+        <!-- CATEGORIAS -->
+        <section class="secao-categorias">
 
+            <div class="secao-cabecalho">
+                <div>
+                    <span class="etiqueta">SEUS INDICADORES</span>
+                    <h2>Resultados por categoria</h2>
+                    <p>
+                        Acompanhe os percentuais apresentados em cada área.
+                    </p>
+                </div>
+            </div>
+
+            <div
+                class="categorias"
+                aria-label="Resultados por categoria"
+            >
+
+                {% for categoria in relatorio.categorias %}
+
+    {% set categorias_positivas = [
+        'Equilíbrio Emocional',
+        'Foco e Atenção',
+        'Motivação e Produtividade',
+        'Organização Mental',
+        'Relacionamentos e Comunicação'
+    ] %}
+
+    {% set classificacao = categoria.classificacao|lower %}
+
+    {% if categoria.categoria in categorias_positivas %}
+
+        {% if classificacao == 'muito baixo' %}
+            {% set cor = 'nivel-critico' %}
+        {% elif classificacao == 'baixo' %}
+            {% set cor = 'nivel-atencao' %}
+        {% elif classificacao == 'moderado' %}
+            {% set cor = 'nivel-moderado' %}
+        {% else %}
+            {% set cor = 'nivel-bom' %}
+        {% endif %}
+
+    {% else %}
+
+        {% if classificacao == 'muito baixo' or classificacao == 'baixo' %}
+            {% set cor = 'nivel-bom' %}
+        {% elif classificacao == 'moderado' %}
+            {% set cor = 'nivel-moderado' %}
+        {% elif classificacao == 'elevado' %}
+            {% set cor = 'nivel-atencao' %}
+        {% else %}
+            {% set cor = 'nivel-critico' %}
+        {% endif %}
+
+    {% endif %}
+
+    <article class="categoria {{ cor }}">
+
+        <div class="categoria-topo">
+
+            <h3>{{ categoria.categoria }}</h3>
+
+            <strong
+                class="percentual-categoria"
+                data-percentual="{{ categoria.percentual }}"
+            >0,00%</strong>
+
+        </div>
+
+        <div
+            class="barra-progresso"
+            role="progressbar"
+            aria-label="{{ categoria.categoria }}"
+            aria-valuemin="0"
+            aria-valuemax="100"
+            aria-valuenow="{{ categoria.percentual }}"
+        >
+            <div
+                class="barra-progresso-preenchimento"
+                style="--percentual-categoria: {{ categoria.percentual }}%;"
+            ></div>
+        </div>
+
+        <div class="categoria-rodape">
+            <span>Classificação</span>
+
+            <span class="valor">
+                {{ categoria.classificacao }}
+            </span>
+        </div>
+
+    </article>
+
+{% endfor %}
+
+            </div>
+        </section>
+
+        <!-- ANÁLISE -->
         <section class="secao-analise">
 
-            <h2>Análise geral</h2>
+            <div class="secao-cabecalho">
+                <div>
+                    <span class="etiqueta">INTERPRETAÇÃO</span>
+                    <h2>Análise geral</h2>
+                    <p>
+                        Uma visão complementar dos resultados apresentados.
+                    </p>
+                </div>
+            </div>
 
             {% if relatorio.analise_personalizada is defined
                   and relatorio.analise_personalizada %}
@@ -173,42 +279,63 @@
 
             {% endif %}
 
+            <!-- ORIENTAÇÕES -->
             <div class="orientacoes">
 
-                <h3>Orientações gerais para o bem-estar</h3>
+                <div class="orientacoes-cabecalho">
+                    <span class="orientacoes-icone">✦</span>
+
+                    <div>
+                        <h3>Orientações gerais para o bem-estar</h3>
+                        <p>
+                            Pequenas atitudes que podem contribuir para
+                            uma rotina mais equilibrada.
+                        </p>
+                    </div>
+                </div>
 
                 <ul>
 
                     <li>
-                        <strong>Relaxamento:</strong>
-                        reserve momentos para pausas, respiração tranquila
-                        ou outras atividades que ajudem a aliviar a tensão.
+                        <strong>Relaxamento</strong>
+                        <span>
+                            Reserve momentos para pausas, respiração tranquila
+                            ou outras atividades que ajudem a aliviar a tensão.
+                        </span>
                     </li>
 
                     <li>
-                        <strong>Rotina de sono:</strong>
-                        procure manter horários regulares para dormir
-                        e acordar.
+                        <strong>Rotina de sono</strong>
+                        <span>
+                            Procure manter horários regulares para dormir
+                            e acordar.
+                        </span>
                     </li>
 
                     <li>
-                        <strong>Organização das atividades:</strong>
-                        divida tarefas em etapas menores e estabeleça
-                        prioridades realistas.
+                        <strong>Organização das atividades</strong>
+                        <span>
+                            Divida tarefas em etapas menores e estabeleça
+                            prioridades realistas.
+                        </span>
                     </li>
 
                     <li>
-                        <strong>Conexões sociais:</strong>
-                        mantenha contato com pessoas de confiança e
-                        converse sobre dificuldades quando se sentir
-                        à vontade.
+                        <strong>Conexões sociais</strong>
+                        <span>
+                            Mantenha contato com pessoas de confiança e
+                            converse sobre dificuldades quando se sentir
+                            à vontade.
+                        </span>
                     </li>
 
                     <li>
-                        <strong>Apoio profissional:</strong>
-                        se o sofrimento persistir ou prejudicar sua rotina,
-                        considere procurar um psicólogo ou outro
-                        profissional de saúde qualificado.
+                        <strong>Apoio profissional</strong>
+                        <span>
+                            Se o sofrimento persistir ou prejudicar sua rotina,
+                            considere procurar um psicólogo ou outro
+                            profissional de saúde qualificado.
+                        </span>
                     </li>
 
                 </ul>
@@ -223,17 +350,15 @@
 
         </section>
 
-        <!-- =====================================
-        AÇÕES DO RELATÓRIO
-        ===================================== -->
-
+        <!-- BOTÕES -->
         <div class="acoes">
 
             <a
-                class="botao"
+                class="botao botao-principal"
                 href="{{ url_for('teste') }}"
             >
                 Fazer novo teste
+                <span>→</span>
             </a>
 
             <a
@@ -244,10 +369,11 @@
             </a>
 
             <button
-                class="botao"
+                class="botao botao-imprimir"
                 type="button"
                 id="botaoImprimir"
             >
+                <span>↓</span>
                 Imprimir relatório
             </button>
 
