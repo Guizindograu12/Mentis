@@ -1,44 +1,30 @@
+
 <!DOCTYPE html>
 <html lang="pt-br">
 
 <head>
-
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0">
+    <title>Questionário - Mentis</title>
 
-    <title>Teste - Mentis</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/header.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/teste.css') }}">
-
 </head>
-
 
 <body>
 
+    {% include 'header.html' %}
 
-<!-- =====================================
-CABEÇALHO
-==================================== -->
+    <main class="container">
 
-  {% include 'header.html' %}
+        <!-- INTRODUÇÃO -->
 
+        <section class="introducao-teste">
 
+            <span class="etiqueta-teste">BEM-ESTAR E AUTOCONHECIMENTO</span>
 
-<!-- =========================
-     QUESTIONÁRIO
-========================= -->
-
-<div class="container">
-
-
-    <div class="introducao-teste">
-
-        <h1>Questionário Mentis</h1>
-
-        <div class="linha-divisoria"></div>
+            <h1>Questionário Mentis</h1>
 
             <p class="aviso-teste">
                 Você está prestes a iniciar o teste da Mentis! Antes de começar,
@@ -53,209 +39,202 @@ CABEÇALHO
                 que o resultado seja o mais próximo possível da sua realidade.
             </p>
 
-        </div>
+            <div class="aviso-diagnostico">
+                <span class="icone-info">i</span>
+                <p>
+                    Suas respostas oferecem indicadores informativos e não
+                    representam uma avaliação ou diagnóstico profissional.
+                </p>
+            </div>
 
-    <form id="formulario">
-
-
-        {% for pergunta in perguntas %}
-
-
-        <div class="pergunta">
-
-
-            <p>
-
-                {{ pergunta.texto }}
-
-            </p>
+        </section>
 
 
+        <!-- FORMULÁRIO -->
 
-            <!-- ESCALA -->
+        <form id="formulario">
 
-            <div class="likert">
+            <!-- PROGRESSO -->
 
+            <div class="progresso-container">
 
-                <!-- 1 -->
+                <div class="progresso-informacoes">
+                    <span>Progresso do questionário</span>
+                    <strong id="progressoTexto">0 de 0 respondidas</strong>
+                </div>
 
-                <label>
-
-                    <input
-                        type="radio"
-                        name="p{{ pergunta.id }}"
-                        value="1"
-                        required>
-
-                    <span></span>
-
-                </label>
-
-
-                <!-- 2 -->
-
-                <label>
-
-                    <input
-                        type="radio"
-                        name="p{{ pergunta.id }}"
-                        value="2">
-
-                    <span></span>
-
-                </label>
-
-
-                <!-- 3 -->
-
-                <label>
-
-                    <input
-                        type="radio"
-                        name="p{{ pergunta.id }}"
-                        value="3">
-
-                    <span></span>
-
-                </label>
-
-
-                <!-- 4 -->
-
-                <label>
-
-                    <input
-                        type="radio"
-                        name="p{{ pergunta.id }}"
-                        value="4">
-
-                    <span></span>
-
-                </label>
-
-
-                <!-- 5 -->
-
-                <label>
-
-                    <input
-                        type="radio"
-                        name="p{{ pergunta.id }}"
-                        value="5">
-
-                    <span></span>
-
-                </label>
-
-
-                <!-- 6 -->
-
-                <label>
-
-                    <input
-                        type="radio"
-                        name="p{{ pergunta.id }}"
-                        value="6">
-
-                    <span></span>
-
-                </label>
-
-
-                <!-- 7 -->
-
-                <label>
-
-                    <input
-                        type="radio"
-                        name="p{{ pergunta.id }}"
-                        value="7">
-
-                    <span></span>
-
-                </label>
-
+                <div
+                    class="progresso-barra"
+                    role="progressbar"
+                    aria-label="Progresso do questionário"
+                    aria-valuemin="0"
+                    aria-valuemax="100"
+                    aria-valuenow="0"
+                    id="progressoBarra"
+                >
+                    <div
+                        class="progresso-preenchimento"
+                        id="progressoPreenchimento"
+                    ></div>
+                </div>
 
             </div>
 
 
+            <!-- PERGUNTAS -->
 
-            <!-- NÚMEROS -->
+            {% for pergunta in perguntas %}
 
-            <div class="numeros">
+            <section class="pergunta">
 
-                <span>1</span>
+                <div class="pergunta-identificacao">
+                    <span class="numero-pergunta">
+                        {{ "%02d"|format(loop.index) }}
+                    </span>
+                    <span class="texto-identificacao">Pergunta</span>
+                </div>
 
-                <span>2</span>
+                <p class="texto-pergunta">
+                    {{ pergunta.texto }}
+                </p>
 
-                <span>3</span>
 
-                <span>4</span>
+                <!-- ESCALA -->
 
-                <span>5</span>
+                <div class="likert">
 
-                <span>6</span>
+                    {% for numero in range(1, 8) %}
 
-                <span>7</span>
+                    <label>
+
+                        <input
+                            type="radio"
+                            name="p{{ pergunta.id }}"
+                            value="{{ numero }}"
+                            aria-label="Opção {{ numero }}"
+                            {% if loop.first %}required{% endif %}
+                        >
+
+                        <span></span>
+
+                    </label>
+
+                    {% endfor %}
+
+                </div>
+
+
+                <!-- NÚMEROS -->
+
+                <div class="numeros">
+
+                    {% for numero in range(1, 8) %}
+                        <span>{{ numero }}</span>
+                    {% endfor %}
+
+                </div>
+
+
+                <!-- LEGENDA -->
+
+                <div class="legenda">
+
+                    <span>Discordo totalmente</span>
+
+                    <span>Concordo totalmente</span>
+
+                </div>
+
+            </section>
+
+            {% endfor %}
+
+
+            <!-- ENVIO -->
+
+            <div class="final-questionario">
+
+                <p>
+                    Revise suas respostas antes de finalizar.
+                </p>
+
+                <button
+                    type="submit"
+                    class="botao-enviar"
+                    id="botaoEnviar"
+                >
+                    Enviar respostas
+                    <span aria-hidden="true">→</span>
+                </button>
+
+                <p
+                    class="mensagem"
+                    id="mensagem"
+                    aria-live="polite"
+                >
+                    Enviando suas respostas...
+                </p>
 
             </div>
 
+        </form>
+
+    </main>
 
 
-            <!-- LEGENDA -->
+    <script>
+        const URL_ANALISAR = "{{ url_for('analisar') }}";
+        const URL_LOGIN = "{{ url_for('login') }}";
+    </script>
 
-            <div class="legenda">
+    <!-- ATUALIZAÇÃO DO PROGRESSO -->
 
-                <span>
-                    Discordo Totalmente
-                </span>
+    <script>
+        const perguntas = document.querySelectorAll(".pergunta");
+        const totalPerguntas = perguntas.length;
 
-                <span>
-                    Concordo Totalmente
-                </span>
+        const progressoTexto = document.getElementById("progressoTexto");
+        const progressoPreenchimento = document.getElementById("progressoPreenchimento");
+        const progressoBarra = document.getElementById("progressoBarra");
 
-            </div>
+        function atualizarProgresso() {
 
+            let respondidas = 0;
 
-        </div>
+            perguntas.forEach(pergunta => {
 
+                if (pergunta.querySelector("input:checked")) {
+                    respondidas++;
+                }
 
-        {% endfor %}
+            });
 
+            const percentual = totalPerguntas > 0
+                ? (respondidas / totalPerguntas) * 100
+                : 0;
 
+            progressoTexto.textContent =
+                `${respondidas} de ${totalPerguntas} respondidas`;
 
-        <!-- BOTÃO -->
+            progressoPreenchimento.style.width = `${percentual}%`;
 
-        <button
-            type="submit"
-            class="botao-enviar"
-            id="botaoEnviar">
+            progressoBarra.setAttribute(
+                "aria-valuenow",
+                Math.round(percentual)
+            );
 
-            Enviar Respostas
+        }
 
-        </button>
+        document.querySelectorAll(".likert input").forEach(input => {
 
+            input.addEventListener("change", atualizarProgresso);
 
-        <p
-            class="mensagem"
-            id="mensagem">
+        });
 
-            Enviando suas respostas...
+        atualizarProgresso();
+    </script>
 
-        </p>
+    <script src="{{ url_for('static', filename='js/teste.js') }}"></script>
 
-
-    </form>
-
-
-</div>
-
-<script>
-    const URL_ANALISAR = "{{ url_for('analisar') }}";
-    const URL_LOGIN = "{{ url_for('login') }}";
-</script>
-
-<script src="{{ url_for('static', filename='js/teste.js') }}"></script>
 </body>
-
 </html>
