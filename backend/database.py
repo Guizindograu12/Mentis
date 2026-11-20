@@ -1,3 +1,6 @@
+import re
+import unicodedata
+
 from flask_sqlalchemy import SQLAlchemy
 
 from sqlalchemy import (
@@ -89,6 +92,38 @@ def configuracao_pergunta(pergunta_id):
 
 
 # ==========================================
+# FUNÇÕES AUXILIARES
+# ==========================================
+
+def normalizar_nome_empresa(nome):
+    """
+    Deixa o nome da empresa num formato padrão para comparação:
+    sem acento, sem maiúsculas, sem pontuação e sem espaços repetidos.
+
+    Exemplo: "  Mentis Saúde S.A. " -> "mentis saude sa"
+
+    É assim que o sistema descobre que o funcionário que digitou
+    "mentis saude sa" trabalha na mesma empresa do RH "Mentis Saúde S.A.".
+    """
+
+    texto = unicodedata.normalize("NFKD", nome or "")
+
+    texto = "".join(
+        letra
+        for letra in texto
+        if not unicodedata.combining(letra)
+    )
+
+    texto = texto.lower()
+
+    texto = re.sub(r"[^a-z0-9 ]", "", texto)
+
+    texto = re.sub(r"\s+", " ", texto).strip()
+
+    return texto
+
+
+# ==========================================
 # MODELOS / TABELAS
 # ==========================================
 
@@ -150,6 +185,31 @@ class Usuario(db.Model):
     empresa = db.Column(
         db.String(200),
         nullable=True
+    )
+
+    # Nome da empresa "normalizado" (sem acento, maiúscula ou pontuação).
+    # Serve para ligar o funcionário à empresa certa.
+
+    empresa_chave = db.Column(
+        db.String(200),
+        nullable=True,
+        index=True
+    )
+
+    # Funcionário: id da conta Empresa/RH à qual ele pertence.
+    # Empresa/RH: fica vazio.
+    #
+    # Empresa/RH -> possui vários funcionários
+    # Funcionário -> pertence a uma empresa
+
+    empresa_id = db.Column(
+        db.Integer,
+        db.ForeignKey(
+            "usuarios.id",
+            ondelete="SET NULL"
+        ),
+        nullable=True,
+        index=True
     )
 
     # Usado somente por Empresa/RH (apenas números, 14 dígitos).
@@ -544,6 +604,140 @@ def criar_tabelas():
             """)
         )
 
+        # ----- usuarios (vínculo Funcionário -> Empresa/RH) -----
+
+        conexao.execute(
+            text("""
+                ALTER TABLE public.usuarios
+                ADD COLUMN IF NOT EXISTS empresa_chave
+                VARCHAR(200)
+            """)
+        )
+
+        conexao.execute(
+            text("""
+                ALTER TABLE public.usuarios
+                ADD COLUMN IF NOT EXISTS empresa_id
+                INTEGER REFERENCES public.usuarios (id)
+                ON DELETE SET NULL
+            """)
+        )
+
+        conexao.execute(
+            text("""
+                CREATE INDEX IF NOT EXISTS ix_usuarios_empresa_chave
+                ON public.usuarios (empresa_chave)
+            """)
+        )
+
+        conexao.execute(
+            text("""
+                CREATE INDEX IF NOT EXISTS ix_usuarios_empresa_id
+                ON public.usuarios (empresa_id)
+            """)
+        )
+
+    # Preenche o vínculo das contas que já existiam.
+    sincronizar_vinculos_empresas()
+
+    # Só pode existir uma conta Empresa/RH por empresa.
+    # Fica em um bloco separado: se já existirem duas contas de RH
+    # com a mesma empresa (testes antigos), o sistema não deixa de iniciar.
+
+    try:
+
+        with db.engine.begin() as conexao:
+
+            conexao.execute(
+                text("""
+                    CREATE UNIQUE INDEX IF NOT EXISTS
+                    uq_usuarios_empresa_rh_chave
+                    ON public.usuarios (empresa_chave)
+                    WHERE tipo_conta = 'empresa_rh'
+                """)
+            )
+
+    except Exception:
+
+        print(
+            "AVISO: não foi possível criar a regra de empresa única "
+            "(provavelmente há duas contas de RH com a mesma empresa). "
+            "O cadastro continuará bloqueando novas duplicadas."
+        )
+
+
+def sincronizar_vinculos_empresas():
+    """
+    Roda ao iniciar o sistema e pode rodar quantas vezes precisar.
+
+    1. Preenche empresa_chave das contas que já tinham o nome da empresa.
+    2. Liga cada funcionário ainda sem vínculo à conta Empresa/RH
+       que tenha a mesma empresa.
+    """
+
+    try:
+
+        usuarios = db.session.execute(
+            select(Usuario).where(
+                Usuario.empresa.isnot(None),
+                Usuario.empresa_chave.is_(None)
+            )
+        ).scalars().all()
+
+        for usuario in usuarios:
+
+            usuario.empresa_chave = (
+                normalizar_nome_empresa(usuario.empresa) or None
+            )
+
+        db.session.flush()
+
+        empresas_rh = {}
+
+        linhas = db.session.execute(
+            select(
+                Usuario.id,
+                Usuario.empresa_chave
+            ).where(
+                Usuario.tipo_conta == "empresa_rh",
+                Usuario.empresa_chave.isnot(None)
+            ).order_by(
+                Usuario.id
+            )
+        ).all()
+
+        for empresa_id, empresa_chave in linhas:
+
+            empresas_rh.setdefault(
+                empresa_chave,
+                empresa_id
+            )
+
+        soltos = db.session.execute(
+            select(Usuario).where(
+                Usuario.tipo_conta == "funcionario",
+                Usuario.empresa_id.is_(None),
+                Usuario.empresa_chave.isnot(None)
+            )
+        ).scalars().all()
+
+        for funcionario in soltos:
+
+            empresa_id = empresas_rh.get(
+                funcionario.empresa_chave
+            )
+
+            if empresa_id is not None:
+
+                funcionario.empresa_id = empresa_id
+
+        db.session.commit()
+
+    except Exception:
+
+        db.session.rollback()
+        raise
+
 
 # ==========================================
 # SINCRONIZAR PERGUNTAS
@@ -612,6 +806,25 @@ def sincronizar_perguntas(perguntas):
 # USUÁRIOS
 # ==========================================
 
+def buscar_empresa_rh_por_chave(empresa_chave):
+    """
+    Devolve o id da conta Empresa/RH que tem esse nome de empresa
+    (já normalizado), ou None se não existir.
+    """
+
+    if not empresa_chave:
+        return None
+
+    return db.session.execute(
+        select(Usuario.id).where(
+            Usuario.tipo_conta == "empresa_rh",
+            Usuario.empresa_chave == empresa_chave
+        ).order_by(
+            Usuario.id
+        )
+    ).scalars().first()
+
+
 def cadastrar_usuario(
     email,
     senha,
@@ -627,23 +840,59 @@ def cadastrar_usuario(
 
     Retorna (True, None) se deu certo,
     ou (False, "mensagem de erro") se não deu.
+
+    Regras do vínculo:
+    - Empresa/RH: só pode existir uma conta por empresa.
+    - Funcionário: a empresa informada precisa ter uma conta
+      Empresa/RH no Mentis; o funcionário fica ligado a ela.
     """
 
     if buscar_usuario_por_email(email) is not None:
 
         return False, "Este e-mail já está cadastrado."
 
-    if cnpj is not None:
+    empresa_chave = normalizar_nome_empresa(empresa)
 
-        cnpj_existente = db.session.execute(
-            select(Usuario.id).where(
-                Usuario.cnpj == cnpj
+    if not empresa_chave:
+
+        return False, "Informe um nome de empresa válido."
+
+    empresa_id = None
+
+    if tipo_conta == "empresa_rh":
+
+        if cnpj is not None:
+
+            cnpj_existente = db.session.execute(
+                select(Usuario.id).where(
+                    Usuario.cnpj == cnpj
+                )
+            ).first()
+
+            if cnpj_existente is not None:
+
+                return False, "Este CNPJ já está cadastrado."
+
+        if buscar_empresa_rh_por_chave(empresa_chave) is not None:
+
+            return False, (
+                "Já existe uma conta de Empresa / RH "
+                "cadastrada para essa empresa."
             )
-        ).first()
 
-        if cnpj_existente is not None:
+    else:
 
-            return False, "Este CNPJ já está cadastrado."
+        empresa_id = buscar_empresa_rh_por_chave(
+            empresa_chave
+        )
+
+        if empresa_id is None:
+
+            return False, (
+                "Não encontramos essa empresa no Mentis. "
+                "Confira o nome ou peça ao RH da sua empresa "
+                "para criar a conta de Empresa / RH primeiro."
+            )
 
     usuario = Usuario(
         email=email,
@@ -652,6 +901,8 @@ def cadastrar_usuario(
         nome=nome,
         sobrenome=sobrenome,
         empresa=empresa,
+        empresa_chave=empresa_chave,
+        empresa_id=empresa_id,
         data_nascimento=data_nascimento,
         cnpj=cnpj
     )
@@ -667,7 +918,7 @@ def cadastrar_usuario(
 
         db.session.rollback()
 
-        return False, "Este e-mail ou CNPJ já está cadastrado."
+        return False, "Este e-mail, CNPJ ou empresa já está cadastrado."
 
 
 def validar_usuario(email, senha):
@@ -691,6 +942,66 @@ def validar_usuario(email, senha):
         return usuario_id
 
     return None
+
+
+def buscar_tipo_conta(usuario_id):
+    """
+    Devolve "funcionario" ou "empresa_rh".
+    Devolve None se o usuário não existir mais.
+    """
+
+    return db.session.execute(
+        select(Usuario.tipo_conta).where(
+            Usuario.id == usuario_id
+        )
+    ).scalar_one_or_none()
+
+
+def buscar_dados_pessoais(usuario_id):
+    """
+    Dados do perfil da pessoa logada.
+    """
+
+    usuario = db.session.get(
+        Usuario,
+        usuario_id
+    )
+
+    if usuario is None:
+        return None
+
+    empresa_nome = usuario.empresa
+
+    if usuario.empresa_id is not None:
+
+        empresa_rh = db.session.get(
+            Usuario,
+            usuario.empresa_id
+        )
+
+        if empresa_rh is not None and empresa_rh.empresa:
+
+            empresa_nome = empresa_rh.empresa
+
+    return {
+
+        "nome": usuario.nome,
+
+        "sobrenome": usuario.sobrenome,
+
+        "email": usuario.email,
+
+        "tipo_conta": usuario.tipo_conta,
+
+        "empresa": empresa_nome,
+
+        "data_nascimento": (
+            usuario.data_nascimento.strftime("%d/%m/%Y")
+            if usuario.data_nascimento
+            else None
+        )
+
+    }
 
 
 def buscar_usuario_por_email(email):

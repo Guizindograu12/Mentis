@@ -30,6 +30,8 @@ from backend.database import (
     salvar_resultado,
     listar_perguntas,
     buscar_ultimo_resultado_usuario,
+    buscar_tipo_conta,
+    buscar_dados_pessoais,
     EmotionalCheckIn,
     Teste,
     Resposta,
@@ -46,6 +48,9 @@ from backend.validacoes import (
     validar_cadastro,
     TIPOS_CONTA
 )
+
+from backend.permissoes import exigir_conta
+from backend.rh import montar_painel_rh
 
 from backend.perguntas import PERGUNTAS
 from backend.analise import analisar_respostas
@@ -185,8 +190,38 @@ def dados_usuario():
 
     return {
         "usuario": session.get("usuario"),
-        "usuario_id": session.get("usuario_id")
+        "usuario_id": session.get("usuario_id"),
+        "tipo_conta": session.get("tipo_conta")
     }
+
+
+# ==========================================
+# SESSÃO E PÁGINA INICIAL POR TIPO DE CONTA
+# ==========================================
+
+def iniciar_sessao(usuario_id, email, tipo_conta):
+    """
+    Guarda na sessão quem entrou e qual é o tipo da conta
+    ("funcionario" ou "empresa_rh").
+    """
+
+    session.clear()
+
+    session["usuario_id"] = usuario_id
+    session["usuario"] = email
+    session["tipo_conta"] = tipo_conta
+
+
+def pagina_inicial_da_conta(tipo_conta):
+    """
+    Para onde a pessoa vai depois de entrar ou se cadastrar.
+    """
+
+    if tipo_conta == "empresa_rh":
+
+        return url_for("rh_painel")
+
+    return url_for("home")
 
 
 # ==========================================
@@ -211,15 +246,12 @@ def home():
 
 
 # ==========================================
-# INICIAR TESTE
+# INICIAR TESTE (somente Funcionário)
 # ==========================================
 
 @app.route("/iniciar-teste")
+@exigir_conta("funcionario")
 def iniciar_teste():
-
-    if "usuario_id" not in session:
-
-        return redirect(url_for("login"))
 
     try:
 
@@ -274,12 +306,20 @@ def entrar():
 
     if usuario_id is not None:
 
-        session.clear()
+        # O tipo vem do banco: a conta Empresa/RH vai para o painel
+        # de RH e a de Funcionário vai para a home, como antes.
 
-        session["usuario_id"] = usuario_id
-        session["usuario"] = email
+        tipo_conta = buscar_tipo_conta(usuario_id) or "funcionario"
 
-        return redirect(url_for("home"))
+        iniciar_sessao(
+            usuario_id,
+            email,
+            tipo_conta
+        )
+
+        return redirect(
+            pagina_inicial_da_conta(tipo_conta)
+        )
 
     return render_template(
         "login.html",
@@ -331,6 +371,7 @@ def cadastro():
 
     # ------------------------------------------
     # 2. SALVAR NO BANCO
+    # (o funcionário é ligado à empresa dele aqui dentro)
     # ------------------------------------------
 
     sucesso, erro = cadastrar_usuario(**dados)
@@ -354,24 +395,24 @@ def cadastro():
             "Não foi possível entrar na conta criada."
         )
 
-    session.clear()
+    iniciar_sessao(
+        usuario_id,
+        dados["email"],
+        tipo_conta
+    )
 
-    session["usuario_id"] = usuario_id
-    session["usuario"] = dados["email"]
-
-    return redirect(url_for("home"))
+    return redirect(
+        pagina_inicial_da_conta(tipo_conta)
+    )
 
 
 # ==========================================
-# TESTE
+# TESTE (somente Funcionário)
 # ==========================================
 
 @app.route("/teste")
+@exigir_conta("funcionario")
 def teste():
-
-    if "usuario_id" not in session:
-
-        return redirect(url_for("login"))
 
     try:
 
@@ -397,17 +438,12 @@ def teste():
 
 # ==========================================
 # ANALISAR, SALVAR E GERAR RESULTADO
+# (somente Funcionário)
 # ==========================================
 
 @app.route("/analisar", methods=["POST"])
+@exigir_conta("funcionario", resposta_json=True)
 def analisar():
-
-    if "usuario_id" not in session:
-
-        return jsonify({
-            "status": "erro",
-            "mensagem": "Você precisa estar logado."
-        }), 401
 
     usuario_id = session.get("usuario_id")
 
@@ -694,15 +730,15 @@ def analisar():
 
 
 # ==========================================
-# RESULTADO / RELATÓRIO
+# RESULTADO / RELATÓRIO (somente Funcionário)
 # ==========================================
 
 @app.route("/resultado/<int:teste_id>")
+@exigir_conta("funcionario")
 def resultado(teste_id):
 
-    if "usuario_id" not in session:
-
-        return redirect(url_for("login"))
+    # buscar_resultado só devolve o resultado se o teste
+    # pertencer a quem está logado.
 
     resultado_db = buscar_resultado(
         teste_id,
@@ -726,14 +762,12 @@ def resultado(teste_id):
 
 # ==========================================
 # PERFIL / PAINEL DE ACOMPANHAMENTO
+# (somente Funcionário)
 # ==========================================
 
 @app.route("/perfil")
+@exigir_conta("funcionario")
 def perfil():
-
-    if "usuario_id" not in session:
-
-        return redirect(url_for("login"))
 
     usuario_id = session["usuario_id"]
 
@@ -958,25 +992,22 @@ def perfil():
 
         moods=moods,
 
-        ultimo_teste=ultimo_teste
+        ultimo_teste=ultimo_teste,
+
+        # Nome, sobrenome, e-mail, empresa e data de nascimento
+        # (o perfil.html pode exibir quando quiser).
+        dados_pessoais=buscar_dados_pessoais(usuario_id)
 
     )
 
 
 # ==========================================
-# CHECK-IN EMOCIONAL
+# CHECK-IN EMOCIONAL (somente Funcionário)
 # ==========================================
 
 @app.route("/checkin-humor", methods=["POST"])
+@exigir_conta("funcionario", resposta_json=True)
 def checkin_humor():
-
-    if "usuario_id" not in session:
-
-        return jsonify({
-
-            "mensagem": "Você precisa estar logado."
-
-        }), 401
 
     dados = request.get_json(silent=True) or {}
 
@@ -1052,6 +1083,38 @@ def checkin_humor():
             "mensagem": "Não foi possível salvar o check-in."
 
         }), 500
+
+
+# ==========================================
+# PAINEL DE RH (somente Empresa/RH)
+# ==========================================
+
+@app.route("/rh")
+@exigir_conta("empresa_rh")
+def rh_painel():
+
+    try:
+
+        painel = montar_painel_rh(
+            session["usuario_id"]
+        )
+
+        return render_template(
+            "rh.html",
+            painel=painel
+        )
+
+    except Exception:
+
+        app.logger.exception(
+            "Erro ao montar o painel de RH."
+        )
+
+        return (
+            "Não foi possível carregar o painel de RH. "
+            "Tente novamente mais tarde.",
+            500
+        )
 
 
 # ==========================================
@@ -1140,6 +1203,7 @@ def recuperar_senha():
 
 # ==========================================
 # CONTA: PRIVACIDADE E SEGURANÇA
+# (valem para os dois tipos de conta)
 # ==========================================
 
 @app.route("/conta/alterar-senha", methods=["POST"])

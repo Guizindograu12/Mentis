@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel de RH - Mentis</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/header.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/rh.css') }}">
+</head>
+
+<body>
+
+    {% include 'header.html' %}
+
+    <main class="rh-pagina">
+
+        <!-- TOPO -->
+        <section class="rh-topo">
+            <div>
+                <p class="rh-etiqueta">Painel de RH</p>
+                <h1>{{ painel.empresa_nome }}</h1>
+                <p class="rh-subtitulo">
+                    CNPJ {{ painel.cnpj_formatado }} ·
+                    Acompanhamento do bem-estar emocional dos funcionários vinculados à empresa.
+                </p>
+            </div>
+
+            <a href="{{ url_for('logout') }}" class="rh-sair">Sair</a>
+        </section>
+
+        <!-- NÚMEROS PRINCIPAIS -->
+        <section class="rh-cartoes">
+
+            <div class="rh-cartao">
+                <span class="rh-cartao-titulo">Funcionários cadastrados</span>
+                <strong class="rh-cartao-valor">{{ painel.total_funcionarios }}</strong>
+            </div>
+
+            <div class="rh-cartao">
+                <span class="rh-cartao-titulo">Já fizeram o teste</span>
+                <strong class="rh-cartao-valor">{{ painel.com_teste }}</strong>
+            </div>
+
+            <div class="rh-cartao">
+                <span class="rh-cartao-titulo">Ainda não fizeram</span>
+                <strong class="rh-cartao-valor">{{ painel.sem_teste }}</strong>
+            </div>
+
+            <div class="rh-cartao">
+                <span class="rh-cartao-titulo">Pontuação média atual</span>
+                <strong class="rh-cartao-valor">
+                    {% if painel.media_geral is not none %}{{ painel.media_geral }}%{% else %}—{% endif %}
+                </strong>
+            </div>
+
+        </section>
+
+        {% if painel.total_funcionarios == 0 %}
+
+            <section class="rh-bloco rh-vazio-bloco">
+                <h2>Nenhum funcionário vinculado ainda</h2>
+                <p>
+                    Peça para os funcionários criarem a conta na aba <strong>Funcionário</strong>,
+                    informando como empresa: <strong>{{ painel.empresa_nome }}</strong>.
+                    Maiúsculas, acentos e pontuação não fazem diferença.
+                </p>
+            </section>
+
+        {% elif painel.com_teste == 0 %}
+
+            <section class="rh-bloco rh-vazio-bloco">
+                <h2>Nenhum teste realizado ainda</h2>
+                <p>
+                    Os indicadores aparecem aqui assim que os funcionários começarem
+                    a fazer o teste do Mentis.
+                </p>
+            </section>
+
+        {% else %}
+
+            <!-- PONTO DE ATENÇÃO -->
+            <section class="rh-alerta {% if painel.em_atencao > 0 %}rh-alerta-atencao{% endif %}">
+                {% if painel.em_atencao > 0 %}
+                    <strong>Ponto de atenção:</strong>
+                    {{ painel.em_atencao }} de {{ painel.com_teste }} funcionário(s) com teste
+                    ({{ painel.percentual_atencao }}%) estão nas faixas Elevado ou Muito Elevado
+                    no último teste.
+                    {% if painel.categorias_atencao %}
+                        As categorias com maior pontuação média são:
+                        {{ painel.categorias_atencao|join(', ') }}.
+                    {% endif %}
+                {% else %}
+                    <strong>Panorama:</strong>
+                    nenhum funcionário está nas faixas Elevado ou Muito Elevado no último teste.
+                {% endif %}
+            </section>
+
+            <div class="rh-duas-colunas">
+
+                <!-- DISTRIBUIÇÃO -->
+                <section class="rh-bloco">
+                    <h2>Distribuição das classificações</h2>
+                    <p class="rh-explicacao">Último teste de cada funcionário.</p>
+
+                    {% for item in painel.distribuicao %}
+                        <div class="rh-linha-barra">
+                            <span class="rh-linha-nome">{{ item.nome }}</span>
+                            <div class="rh-barra">
+                                <div class="rh-barra-preenchimento {{ item.classe }}" style="width: {{ item.percentual }}%"></div>
+                            </div>
+                            <span class="rh-linha-valor">{{ item.quantidade }} ({{ item.percentual }}%)</span>
+                        </div>
+                    {% endfor %}
+                </section>
+
+                <!-- CATEGORIAS -->
+                <section class="rh-bloco">
+                    <h2>Categorias avaliadas</h2>
+                    <p class="rh-explicacao">
+                        Pontuação média por categoria. Quanto maior, mais atenção a categoria pede.
+                    </p>
+
+                    {% for item in painel.categorias %}
+                        <div class="rh-linha-barra">
+                            <span class="rh-linha-nome">{{ item.nome }}</span>
+                            <div class="rh-barra">
+                                <div class="rh-barra-preenchimento" style="width: {{ item.percentual }}%"></div>
+                            </div>
+                            <span class="rh-linha-valor">{{ item.percentual }}%</span>
+                        </div>
+                    {% endfor %}
+                </section>
+
+            </div>
+
+            <!-- EVOLUÇÃO -->
+            <section class="rh-bloco">
+                <h2>Evolução mensal</h2>
+                <p class="rh-explicacao">
+                    Pontuação média dos testes realizados em cada mês (todos os testes dos funcionários).
+                </p>
+
+                {% for item in painel.evolucao %}
+                    <div class="rh-linha-barra">
+                        <span class="rh-linha-nome">{{ item.mes }}</span>
+                        <div class="rh-barra">
+                            <div class="rh-barra-preenchimento" style="width: {{ item.percentual }}%"></div>
+                        </div>
+                        <span class="rh-linha-valor">{{ item.percentual }}% · {{ item.quantidade }} teste(s)</span>
+                    </div>
+                {% endfor %}
+            </section>
+
+        {% endif %}
+
+        <!-- FUNCIONÁRIOS -->
+        {% if painel.total_funcionarios > 0 %}
+            <section class="rh-bloco">
+                <h2>Funcionários vinculados</h2>
+
+                <div class="rh-tabela-rolagem">
+                    <table class="rh-tabela">
+                        <thead>
+                            <tr>
+                                <th>Funcionário</th>
+                                <th>E-mail</th>
+                                <th>Testes</th>
+                                {% if painel.mostrar_individual %}
+                                    <th>Último teste</th>
+                                    <th>Resultado</th>
+                                    <th>Classificação</th>
+                                {% else %}
+                                    <th>Situação</th>
+                                {% endif %}
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for f in painel.funcionarios %}
+                                <tr>
+                                    <td>{{ f.nome_completo }}</td>
+                                    <td>{{ f.email }}</td>
+                                    <td>{{ f.total_testes }}</td>
+
+                                    {% if painel.mostrar_individual %}
+                                        {% if f.ultimo %}
+                                            <td>{{ f.ultimo.data }}</td>
+                                            <td>{{ f.ultimo.percentual }}%</td>
+                                            <td>
+                                                <span class="rh-selo {{ f.ultimo.classe }}">{{ f.ultimo.classificacao }}</span>
+                                            </td>
+                                        {% else %}
+                                            <td colspan="3" class="rh-sem-teste">Ainda não fez o teste</td>
+                                        {% endif %}
+                                    {% else %}
+                                        <td>
+                                            {% if f.ultimo %}Já participou{% else %}Ainda não fez o teste{% endif %}
+                                        </td>
+                                    {% endif %}
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        {% endif %}
+
+        <p class="rh-aviso">
+            Os resultados do Mentis são apenas indicativos e não substituem uma avaliação
+            profissional. Use estas informações para cuidar do ambiente de trabalho,
+            nunca para julgar ou penalizar pessoas.
+        </p>
+
+    </main>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
