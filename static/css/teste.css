@@ -675,3 +675,196 @@ body {
     margin-left: auto;
     margin-right: auto;
 }
+/* =========================================
+   ACESSIBILIDADE — QUESTIONÁRIO
+========================================= */
+
+/* MODO ESCURO */
+html[data-tema="escuro"] body {
+    background: #121827;
+    color: #e5eaf2;
+}
+
+html[data-tema="escuro"] .container,
+html[data-tema="escuro"] .pergunta {
+    background: #1e293b;
+    border-color: #3b4a60;
+}
+
+html[data-tema="escuro"] .introducao-teste h1,
+html[data-tema="escuro"] .pergunta .texto-pergunta {
+    color: #f1f5f9;
+}
+
+html[data-tema="escuro"] .aviso-teste,
+html[data-tema="escuro"] .texto-identificacao,
+html[data-tema="escuro"] .numeros span,
+html[data-tema="escuro"] .legenda,
+html[data-tema="escuro"] .final-questionario > p:first-child {
+    color: #c2ccda;
+}
+
+html[data-tema="escuro"] .etiqueta-teste,
+html[data-tema="escuro"] .numero-pergunta,
+html[data-tema="escuro"] .aviso-diagnostico {
+    background: #263449;
+    color: #dbeafe;
+    border-color: #40516a;
+}
+
+html[data-tema="escuro"] .aviso-diagnostico p {
+    color: #c2ccda;
+}
+
+html[data-tema="escuro"] .likert label span {
+    background: #1e293b;
+}
+
+html[data-tema="escuro"] .progresso-container {
+    background: rgba(30, 41, 59, 0.96);
+    border-color: #40516a;
+}
+
+html[data-tema="escuro"] .progresso-informacoes {
+    color: #c2ccda;
+}
+
+html[data-tema="escuro"] .progresso-informacoes strong {
+    color: #dbeafe;
+}
+
+html[data-tema="escuro"] .progresso-barra {
+    background: #40516a;
+}
+
+html[data-tema="escuro"] .final-questionario {
+    border-color: #40516a;
+}
+
+/* ALTO CONTRASTE */
+html[data-contraste="alto"] body {
+    background: #000;
+    color: #fff;
+}
+
+html[data-contraste="alto"] .container,
+html[data-contraste="alto"] .pergunta,
+html[data-contraste="alto"] .progresso-container,
+html[data-contraste="alto"] .aviso-diagnostico {
+    background: #000;
+    color: #fff;
+    border: 2px solid #fff;
+}
+
+html[data-contraste="alto"] .introducao-teste h1,
+html[data-contraste="alto"] .aviso-teste,
+html[data-contraste="alto"] .pergunta .texto-pergunta,
+html[data-contraste="alto"] .texto-identificacao,
+html[data-contraste="alto"] .numeros span,
+html[data-contraste="alto"] .legenda,
+html[data-contraste="alto"] .progresso-informacoes,
+html[data-contraste="alto"] .progresso-informacoes strong,
+html[data-contraste="alto"] .aviso-diagnostico p,
+html[data-contraste="alto"] .final-questionario > p:first-child {
+    color: #fff;
+}
+
+html[data-contraste="alto"] .etiqueta-teste,
+html[data-contraste="alto"] .numero-pergunta {
+    background: #000;
+    color: #ffd600;
+    border: 1px solid #ffd600;
+}
+
+html[data-contraste="alto"] .likert label span {
+    background: #000;
+    border-width: 3px;
+}
+
+html[data-contraste="alto"] .progresso-barra {
+    background: #444;
+    border: 1px solid #fff;
+}
+
+html[data-contraste="alto"] .progresso-preenchimento {
+    background: #ffd600;
+}
+
+html[data-contraste="alto"] .botao-enviar {
+    background: #ffd600;
+    color: #000;
+    border: 2px solid #ffd600;
+}
+
+html[data-contraste="alto"] .final-questionario {
+    border-color: #fff;
+}
+
+html[data-contraste="alto"] :focus-visible {
+    outline: 3px solid #ffd600;
+    outline-offset: 4px;
+}
+
+
+/* =========================================
+   MODO ESCURO — TELA DE TESTE
+========================================= */
+
+html[data-tema="escuro"] body {
+    background: #1e293b;
+    color: #f1f5f9;
+}
+
+html[data-tema="escuro"] .container,
+html[data-tema="escuro"] .pergunta {
+    background: #263449;
+    border-color: #40516a;
+}
+
+html[data-tema="escuro"] .introducao-teste h1,
+html[data-tema="escuro"] .pergunta .texto-pergunta {
+    color: #f8fafc;
+}
+
+html[data-tema="escuro"] .aviso-teste,
+html[data-tema="escuro"] .aviso-teste strong,
+html[data-tema="escuro"] .texto-identificacao,
+html[data-tema="escuro"] .legenda,
+html[data-tema="escuro"] .numeros span {
+    color: #cbd5e1;
+}
+
+html[data-tema="escuro"] .progresso-container,
+html[data-tema="escuro"] .aviso-diagnostico {
+    background: #334155;
+    border-color: #475569;
+}
+
+html[data-tema="escuro"] .progresso-informacoes,
+html[data-tema="escuro"] .aviso-diagnostico p {
+    color: #e2e8f0;
+}
+
+html[data-tema="escuro"] .numero-pergunta,
+html[data-tema="escuro"] .etiqueta-teste {
+    background: #3b4c67;
+    color: #dbeafe;
+}
+
+/* CÍRCULOS DA ESCALA */
+
+html[data-tema="escuro"] .likert label span {
+    background: #263449;
+}
+
+/* CÍRCULO SELECIONADO */
+
+html[data-tema="escuro"] .likert input:checked + span {
+    background: var(--cor-bolinha) !important;
+    border-color: var(--cor-bolinha);
+    box-shadow: 0 0 0 4px color-mix(
+        in srgb,
+        var(--cor-bolinha) 30%,
+        transparent
+    );
+}

@@ -1042,3 +1042,212 @@ body {
 .categoria .percentual-categoria {
     color: var(--cor-status);
 }
+
+/* =========================================
+   ACESSIBILIDADE — RELATÓRIO
+========================================= */
+
+/* MODO ESCURO */
+html[data-tema="escuro"] body {
+    background: #121827;
+    color: #e5eaf2;
+}
+
+html[data-tema="escuro"] .container,
+html[data-tema="escuro"] .categoria {
+    background: #1e293b;
+    border-color: #3b4a60;
+}
+
+html[data-tema="escuro"] .resumo {
+    background: linear-gradient(115deg, #26364d, #1e293b);
+    border-color: #3b4a60;
+}
+
+html[data-tema="escuro"] .aviso,
+html[data-tema="escuro"] .orientacoes,
+html[data-tema="escuro"] .analise-texto {
+    background: #263449;
+    border-color: #40516a;
+}
+
+html[data-tema="escuro"] .titulo,
+html[data-tema="escuro"] .resumo-texto h2,
+html[data-tema="escuro"] .secao-cabecalho h2,
+html[data-tema="escuro"] .categoria-topo h3,
+html[data-tema="escuro"] .analise-texto strong,
+html[data-tema="escuro"] .orientacoes h3 {
+    color: #f1f5f9;
+}
+
+html[data-tema="escuro"] .subtitulo,
+html[data-tema="escuro"] .aviso p,
+html[data-tema="escuro"] .resumo-texto p,
+html[data-tema="escuro"] .secao-cabecalho p,
+html[data-tema="escuro"] .analise-texto,
+html[data-tema="escuro"] .orientacoes li,
+html[data-tema="escuro"] .rodape-aviso {
+    color: #c2ccda;
+}
+
+html[data-tema="escuro"] .classificacao {
+    background: #344968;
+    color: #dbeafe;
+}
+
+html[data-tema="escuro"] .barra-progresso {
+    background: #3b4a60;
+}
+
+html[data-tema="escuro"] .botao-secundario,
+html[data-tema="escuro"] .botao-imprimir {
+    background: #263449;
+    border-color: #52647c;
+    color: #f1f5f9;
+}
+
+/* ALTO CONTRASTE */
+html[data-contraste="alto"] body {
+    background: #000;
+    color: #fff;
+}
+
+html[data-contraste="alto"] .container,
+html[data-contraste="alto"] .categoria,
+html[data-contraste="alto"] .resumo,
+html[data-contraste="alto"] .aviso,
+html[data-contraste="alto"] .orientacoes,
+html[data-contraste="alto"] .analise-texto {
+    background: #000;
+    color: #fff;
+    border: 2px solid #fff;
+}
+
+html[data-contraste="alto"] .titulo,
+html[data-contraste="alto"] .subtitulo,
+html[data-contraste="alto"] .aviso p,
+html[data-contraste="alto"] .resumo-texto h2,
+html[data-contraste="alto"] .resumo-texto p,
+html[data-contraste="alto"] .secao-cabecalho h2,
+html[data-contraste="alto"] .secao-cabecalho p,
+html[data-contraste="alto"] .categoria-topo h3,
+html[data-contraste="alto"] .analise-texto,
+html[data-contraste="alto"] .analise-texto strong,
+html[data-contraste="alto"] .orientacoes h3,
+html[data-contraste="alto"] .orientacoes li,
+html[data-contraste="alto"] .rodape-aviso {
+    color: #fff;
+}
+
+html[data-contraste="alto"] .classificacao {
+    background: #ffd600;
+    color: #000;
+    border: 1px solid #ffd600;
+}
+
+html[data-contraste="alto"] .botao {
+    background: #ffd600;
+    color: #000;
+    border: 2px solid #ffd600;
+}
+
+html[data-contraste="alto"] .botao-secundario,
+html[data-contraste="alto"] .botao-imprimir {
+    background: #000;
+    color: #ffd600;
+    border: 2px solid #ffd600;
+}
+
+html[data-contraste="alto"] :focus-visible {
+    outline: 3px solid #ffd600;
+    outline-offset: 4px;
+}
+
+
+/* =========================================
+   MODO ESCURO — TELA DE RESULTADOS
+========================================= */
+
+html[data-tema="escuro"] body {
+    background: #1e293b;
+    color: #f1f5f9;
+}
+
+html[data-tema="escuro"] .container,
+html[data-tema="escuro"] .categoria,
+html[data-tema="escuro"] .orientacoes {
+    background: #263449;
+    border-color: #40516a;
+}
+
+html[data-tema="escuro"] .resumo {
+    background: linear-gradient(115deg, #263449, #334155);
+    border-color: #40516a;
+}
+
+/* TEXTOS */
+
+html[data-tema="escuro"] .titulo,
+html[data-tema="escuro"] .resumo-texto h2,
+html[data-tema="escuro"] .secao-cabecalho h2,
+html[data-tema="escuro"] .categoria-topo h3 {
+    color: #f8fafc;
+}
+
+html[data-tema="escuro"] .subtitulo,
+html[data-tema="escuro"] .resumo-descricao,
+html[data-tema="escuro"] .resumo-texto p,
+html[data-tema="escuro"] .analise-texto,
+html[data-tema="escuro"] .secao-cabecalho p,
+html[data-tema="escuro"] .orientacoes p {
+    color: #cbd5e1;
+}
+
+html[data-tema="escuro"] .etiqueta,
+html[data-tema="escuro"] .resumo-pequeno-titulo {
+    color: #93c5fd;
+}
+
+/* AVISOS E ANÁLISE */
+
+html[data-tema="escuro"] .aviso,
+html[data-tema="escuro"] .analise-texto {
+    background: #334155;
+    border-color: #475569;
+}
+
+html[data-tema="escuro"] .aviso p,
+html[data-tema="escuro"] .analise-texto strong {
+    color: #e2e8f0;
+}
+
+/* MEDIDOR CIRCULAR */
+
+html[data-tema="escuro"] .medidor::before {
+    background: #263449;
+}
+
+html[data-tema="escuro"] .medidor-valor {
+    color: #ffffff;
+}
+
+html[data-tema="escuro"] .medidor-legenda {
+    color: #cbd5e1;
+}
+
+/* CLASSIFICAÇÃO */
+
+html[data-tema="escuro"] .classificacao {
+    background: #3b4c67;
+    color: #ffffff;
+}
+
+/* BARRAS */
+
+html[data-tema="escuro"] .barra-progresso {
+    background: #475569;
+}
+
+html[data-tema="escuro"] .categoria-rodape {
+    color: #cbd5e1;
+}

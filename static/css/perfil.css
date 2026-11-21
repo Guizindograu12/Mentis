@@ -673,3 +673,118 @@ body {
         animation-duration: 0.01ms !important;
     }
 }
+
+/* =========================================
+   ACESSIBILIDADE — PERFIL
+========================================= */
+
+/* MODO ESCURO */
+html[data-tema="escuro"] body {
+    background: #121827;
+    color: #e5eaf2;
+}
+
+html[data-tema="escuro"] .panel,
+html[data-tema="escuro"] .stat-card {
+    background: #1e293b;
+    border-color: #3b4a60;
+}
+
+html[data-tema="escuro"] .welcome h1,
+html[data-tema="escuro"] .section-title h2,
+html[data-tema="escuro"] .stat-card strong,
+html[data-tema="escuro"] .details-panel h3,
+html[data-tema="escuro"] .history-item strong {
+    color: #f1f5f9;
+}
+
+html[data-tema="escuro"] .welcome > p:last-child,
+html[data-tema="escuro"] .section-title p,
+html[data-tema="escuro"] .stat-card > span,
+html[data-tema="escuro"] .stat-card small,
+html[data-tema="escuro"] .category-description,
+html[data-tema="escuro"] .disclaimer {
+    color: #c2ccda;
+}
+
+html[data-tema="escuro"] .mood-option,
+html[data-tema="escuro"] .history-item,
+html[data-tema="escuro"] .empty {
+    background: #263449;
+    border-color: #40516a;
+    color: #f1f5f9;
+}
+
+html[data-tema="escuro"] .history-item strong {
+    color: #f1f5f9;
+}
+
+html[data-tema="escuro"] .history-item small {
+    color: #c2ccda;
+}
+
+html[data-tema="escuro"] .detail-controls label {
+    color: #e5eaf2;
+}
+
+html[data-tema="escuro"] .detail-controls select {
+    background: #263449;
+    color: #fff;
+    border-color: #52647c;
+}
+
+/* ALTO CONTRASTE */
+html[data-contraste="alto"] body {
+    background: #000;
+    color: #fff;
+}
+
+html[data-contraste="alto"] .panel,
+html[data-contraste="alto"] .stat-card,
+html[data-contraste="alto"] .mood-option,
+html[data-contraste="alto"] .history-item,
+html[data-contraste="alto"] .empty {
+    background: #000;
+    color: #fff;
+    border: 2px solid #fff;
+}
+
+html[data-contraste="alto"] .welcome h1,
+html[data-contraste="alto"] .welcome > p:last-child,
+html[data-contraste="alto"] .section-title h2,
+html[data-contraste="alto"] .section-title p,
+html[data-contraste="alto"] .stat-card > span,
+html[data-contraste="alto"] .stat-card strong,
+html[data-contraste="alto"] .stat-card small,
+html[data-contraste="alto"] .history-item strong,
+html[data-contraste="alto"] .history-item small,
+html[data-contraste="alto"] .category-description,
+html[data-contraste="alto"] .disclaimer,
+html[data-contraste="alto"] .details-panel h3,
+html[data-contraste="alto"] .detail-controls label {
+    color: #fff;
+}
+
+html[data-contraste="alto"] .mood-option.selecionado,
+html[data-contraste="alto"] .mood-option[aria-pressed="true"] {
+    background: #ffd600;
+    color: #000;
+    border: 2px solid #ffd600;
+}
+
+html[data-contraste="alto"] .detail-controls select {
+    background: #000;
+    color: #fff;
+    border: 2px solid #fff;
+}
+
+html[data-contraste="alto"] .primary-button {
+    background: #ffd600;
+    color: #000;
+    border: 2px solid #ffd600;
+}
+
+html[data-contraste="alto"] :focus-visible {
+    outline: 3px solid #ffd600;
+    outline-offset: 4px;
+}

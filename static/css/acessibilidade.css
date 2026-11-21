@@ -1,0 +1,199 @@
+
+/* =========================================
+   ACESSIBILIDADE GLOBAL — MENTIS
+========================================= */
+
+/* MODO ESCURO */
+html[data-tema="escuro"] body {
+    background: #121827 !important;
+    color: #e5eaf2;
+}
+
+/* Fundos dos cartões e painéis */
+html[data-tema="escuro"] .container,
+html[data-tema="escuro"] .dashboard,
+html[data-tema="escuro"] .panel,
+html[data-tema="escuro"] .stat-card,
+html[data-tema="escuro"] .categoria,
+html[data-tema="escuro"] .pergunta,
+html[data-tema="escuro"] .resumo,
+html[data-tema="escuro"] .orientacoes,
+html[data-tema="escuro"] .aviso,
+html[data-tema="escuro"] .analise-texto,
+html[data-tema="escuro"] .history-item,
+html[data-tema="escuro"] .mood-option,
+html[data-tema="escuro"] .empty,
+html[data-tema="escuro"] .progresso-container,
+html[data-tema="escuro"] .conta-painel {
+    background-color: #1e293b;
+    color: #e5eaf2;
+    border-color: #40516a;
+}
+
+/* Textos */
+html[data-tema="escuro"] .titulo,
+html[data-tema="escuro"] h1,
+html[data-tema="escuro"] h2,
+html[data-tema="escuro"] h3,
+html[data-tema="escuro"] .texto-pergunta,
+html[data-tema="escuro"] .welcome h1,
+html[data-tema="escuro"] .section-title h2,
+html[data-tema="escuro"] .stat-card strong,
+html[data-tema="escuro"] .history-item strong {
+    color: #f1f5f9;
+}
+
+html[data-tema="escuro"] p,
+html[data-tema="escuro"] small,
+html[data-tema="escuro"] label,
+html[data-tema="escuro"] .subtitulo,
+html[data-tema="escuro"] .legenda,
+html[data-tema="escuro"] .numeros span,
+html[data-tema="escuro"] .categoria-rodape {
+    color: #c2ccda;
+}
+
+/* Campos */
+html[data-tema="escuro"] input,
+html[data-tema="escuro"] select,
+html[data-tema="escuro"] textarea {
+    background: #263449;
+    color: #fff;
+    border-color: #52647c;
+}
+
+/* Cabeçalho e configurações */
+html[data-tema="escuro"] .header {
+    background: rgba(20, 29, 45, 0.96);
+}
+
+html[data-tema="escuro"] .conta-painel {
+    background: #1e293b;
+    color: #f1f5f9;
+}
+
+html[data-tema="escuro"] .conta-painel button,
+html[data-tema="escuro"] .conta-painel a {
+    color: #e5eaf2;
+}
+
+/* Questionário — bolinhas */
+html[data-tema="escuro"] .likert label span {
+    background: #1e293b;
+}
+
+/* Mantém a bolinha selecionada preenchida */
+html[data-tema="escuro"] .likert input:checked + span {
+    background: var(--cor-bolinha) !important;
+    border-color: var(--cor-bolinha);
+}
+
+/* Medidor dos resultados */
+html[data-tema="escuro"] .medidor::before {
+    background: #263449;
+}
+
+html[data-tema="escuro"] .medidor-valor {
+    color: #fff;
+}
+
+/* =========================================
+   ALTO CONTRASTE
+   Fica depois do modo escuro de propósito.
+========================================= */
+
+html[data-contraste="alto"] body {
+    background: #000 !important;
+    color: #fff !important;
+}
+
+/* Cartões e painéis */
+html[data-contraste="alto"] .container,
+html[data-contraste="alto"] .dashboard,
+html[data-contraste="alto"] .panel,
+html[data-contraste="alto"] .stat-card,
+html[data-contraste="alto"] .categoria,
+html[data-contraste="alto"] .pergunta,
+html[data-contraste="alto"] .resumo,
+html[data-contraste="alto"] .orientacoes,
+html[data-contraste="alto"] .aviso,
+html[data-contraste="alto"] .analise-texto,
+html[data-contraste="alto"] .history-item,
+html[data-contraste="alto"] .mood-option,
+html[data-contraste="alto"] .empty,
+html[data-contraste="alto"] .progresso-container,
+html[data-contraste="alto"] .conta-painel {
+    background: #000 !important;
+    color: #fff !important;
+    border: 2px solid #fff !important;
+    box-shadow: none;
+}
+
+/* Textos */
+html[data-contraste="alto"] body,
+html[data-contraste="alto"] h1,
+html[data-contraste="alto"] h2,
+html[data-contraste="alto"] h3,
+html[data-contraste="alto"] p,
+html[data-contraste="alto"] span,
+html[data-contraste="alto"] small,
+html[data-contraste="alto"] label,
+html[data-contraste="alto"] strong,
+html[data-contraste="alto"] a,
+html[data-contraste="alto"] .texto-pergunta {
+    color: #fff;
+}
+
+/* Campos */
+html[data-contraste="alto"] input,
+html[data-contraste="alto"] select,
+html[data-contraste="alto"] textarea {
+    background: #000 !important;
+    color: #fff !important;
+    border: 2px solid #fff !important;
+}
+
+/* Botões */
+html[data-contraste="alto"] button,
+html[data-contraste="alto"] .botao,
+html[data-contraste="alto"] .botao-enviar,
+html[data-contraste="alto"] .primary-button {
+    background: #ffd600 !important;
+    color: #000 !important;
+    border: 2px solid #ffd600 !important;
+}
+
+/* Botões de opção do questionário */
+html[data-contraste="alto"] .likert label span {
+    background: #000;
+    border-width: 3px;
+}
+
+/* Opção selecionada: destaque adicional */
+html[data-contraste="alto"] .likert input:checked + span {
+    box-shadow: 0 0 0 4px #ffd600;
+    outline: 2px solid #fff;
+    outline-offset: 5px;
+}
+
+/* Check-in selecionado */
+html[data-contraste="alto"] .mood-option.selecionado,
+html[data-contraste="alto"] .mood-option[aria-pressed="true"] {
+    background: #ffd600 !important;
+    color: #000 !important;
+}
+
+/* Medidor circular */
+html[data-contraste="alto"] .medidor::before {
+    background: #000;
+}
+
+html[data-contraste="alto"] .medidor-valor {
+    color: #fff;
+}
+
+/* Foco do teclado */
+html[data-contraste="alto"] :focus-visible {
+    outline: 3px solid #ffd600 !important;
+    outline-offset: 4px;
+}

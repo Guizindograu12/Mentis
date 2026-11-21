@@ -17,6 +17,8 @@
     --painel-suave: #8a8aa8;
     --painel-borda: #e0e0e8;
     --painel-borda-forte: #d7d7e2;
+    --conta-destaque-fundo: #e8e8f5;
+    --conta-destaque-texto: #191970;
 
     /* Cabeçalho */
     --header-fundo: rgba(217, 217, 217, 0.85);
@@ -80,6 +82,8 @@ html[data-contraste="alto"] {
     --destaque-luz: #ffd600;
     --botao-texto: #000000;
     --titulo-cor: #ffd600;
+    --conta-destaque-fundo: #ffd600;
+    --conta-destaque-texto: #000000;
 
     --painel-fundo: #000000;
     --painel-texto: #ffffff;
@@ -1298,4 +1302,105 @@ html[data-contraste="alto"] .header {
         margin: 0;
     }
 
+}
+
+
+/* =========================================
+   BOTÕES DOS TEMAS
+========================================= */
+
+.config-opcoes-tema {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    width: 100%;
+}
+
+.config-opcoes-tema .config-opcao {
+    min-width: 0;
+    padding: 12px 6px;
+    white-space: normal;
+    text-align: center;
+    line-height: 1.3;
+}
+
+@media (max-width: 360px) {
+    .config-opcoes-tema {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* =========================================
+   DESTAQUE DE MEU PERFIL E RESULTADOS
+========================================= */
+
+/* MODO CLARO */
+.conta-links > a {
+    background: #e8e8f5;
+    color: #191970;
+    font-weight: bold;
+    border-radius: 8px;
+    margin-bottom: 6px;
+}
+
+/* MODO ESCURO */
+html[data-tema="escuro"] .conta-links > a {
+    background: #34345c;
+    color: #eeeeff;
+}
+
+/* HOVER NO MODO CLARO E ESCURO */
+.conta-links > a:hover {
+    filter: brightness(0.96);
+}
+
+/* BOTÕES DAS OUTRAS OPÇÕES */
+.conta-links .conta-link-botao {
+    border-radius: 8px;
+    margin-bottom: 4px;
+}
+
+/* =========================================
+   ALTO CONTRASTE
+========================================= */
+
+/* Meu perfil e resultados: AMARELO COM TEXTO PRETO */
+html[data-contraste="alto"] .conta-links > a {
+    background: #ffd600;
+    color: #000000;
+    font-weight: bold;
+    border: 2px solid #ffd600;
+}
+
+/* Configurações e privacidade: PRETO COM TEXTO AMARELO */
+html[data-contraste="alto"] .conta-links .conta-link-botao {
+    background: #000000;
+    color: #ffd600;
+    border: 1px solid #ffd600;
+    border-radius: 8px;
+    margin-bottom: 6px;
+}
+
+/* HOVER NO ALTO CONTRASTE */
+html[data-contraste="alto"] .conta-links > a:hover {
+    background: #fff176;
+}
+
+html[data-contraste="alto"] .conta-links .conta-link-botao:hover {
+    background: #222222;
+    color: #ffffff;
+}
+
+/* CORREÇÃO DOS BOTÕES NO ALTO CONTRASTE */
+html[data-contraste="alto"] .conta-links button.conta-link-botao {
+    background: #000000 !important;
+    background-color: #000000 !important;
+    color: #ffd600 !important;
+    border: 1px solid #ffd600 !important;
+}
+
+/* Mantém o destaque amarelo apenas no perfil */
+html[data-contraste="alto"] .conta-links > a {
+    background: #ffd600 !important;
+    color: #000000 !important;
 }
