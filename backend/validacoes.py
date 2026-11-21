@@ -14,28 +14,38 @@ TAMANHO_MAXIMO_SENHA = 128
 
 TIPOS_CONTA = ("funcionario", "empresa_rh")
 
-# Domínios internos do Mentis (não precisam existir de verdade)
+# Domínio obrigatório por tipo de conta.
+# Funcionário NÃO tem domínio obrigatório: aceita qualquer e-mail válido.
+# Empresa/RH continua exigindo @mentisrh.com (domínio interno do Mentis,
+# não precisa existir de verdade).
 DOMINIOS_EMAIL = {
-    "funcionario": "mentis.com",
     "empresa_rh": "mentisrh.com"
 }
+
+# Formato geral de e-mail: nome@dominio.com
+PADRAO_EMAIL_GERAL = r"[a-z0-9._%+\-]+@[a-z0-9\-]+(\.[a-z0-9\-]+)+"
 
 
 # ==========================================
 # FUNÇÕES AUXILIARES
 # ==========================================
 
-def email_no_dominio(email, tipo_conta):
+def email_valido(email, tipo_conta):
     """
-    Confere se o e-mail tem o formato nome@dominio
-    com o domínio certo para o tipo de conta.
+    Confere se o e-mail tem um formato válido para o tipo de conta.
+
+    - Empresa/RH: precisa ser nome@mentisrh.com
+    - Funcionário: qualquer e-mail no formato nome@dominio.com
 
     O e-mail já deve vir em minúsculas.
     """
 
-    dominio = DOMINIOS_EMAIL[tipo_conta]
+    dominio = DOMINIOS_EMAIL.get(tipo_conta)
 
-    padrao = r"[a-z0-9._%+\-]+@" + re.escape(dominio)
+    if dominio is not None:
+        padrao = r"[a-z0-9._%+\-]+@" + re.escape(dominio)
+    else:
+        padrao = PADRAO_EMAIL_GERAL
 
     return re.fullmatch(padrao, email) is not None
 
@@ -198,11 +208,15 @@ def validar_cadastro(tipo_conta, form):
     # E-MAIL E SENHA (iguais para os dois tipos)
     # ------------------------------------------
 
-    if not email_no_dominio(email, tipo_conta):
+    if not email_valido(email, tipo_conta):
 
-        return None, (
-            f"O e-mail precisa terminar com @{DOMINIOS_EMAIL[tipo_conta]}."
-        )
+        if tipo_conta in DOMINIOS_EMAIL:
+
+            return None, (
+                f"O e-mail precisa terminar com @{DOMINIOS_EMAIL[tipo_conta]}."
+            )
+
+        return None, "Informe um e-mail válido."
 
     if len(email) > 320:
         return None, "O e-mail é muito longo."

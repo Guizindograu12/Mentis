@@ -10,8 +10,9 @@
     var IDADE_MINIMA = 14;
     var TAMANHO_MINIMO_SENHA = 8;
 
+    // Só Empresa/RH tem domínio obrigatório.
+    // Funcionário aceita qualquer e-mail válido.
     var DOMINIOS = {
-        funcionario: "mentis.com",
         empresa_rh: "mentisrh.com"
     };
 
@@ -206,10 +207,21 @@
         // VALIDAÇÃO AO ENVIAR
         // ------------------------------------------
 
-        function emailNoDominio(email, tipo) {
+        function emailValido(email, tipo) {
 
-            var dominio = DOMINIOS[tipo].replace(".", "\\.");
-            var padrao = new RegExp("^[a-z0-9._%+\\-]+@" + dominio + "$");
+            var padrao;
+
+            if (DOMINIOS[tipo]) {
+
+                // Empresa/RH: domínio obrigatório
+                var dominio = DOMINIOS[tipo].replace(".", "\\.");
+                padrao = new RegExp("^[a-z0-9._%+\\-]+@" + dominio + "$");
+
+            } else {
+
+                // Funcionário: qualquer e-mail no formato nome@dominio.com
+                padrao = /^[a-z0-9._%+\-]+@[a-z0-9\-]+(\.[a-z0-9\-]+)+$/;
+            }
 
             return padrao.test(email);
         }
@@ -244,8 +256,13 @@
                 }
             }
 
-            if (!emailNoDominio(email, tipo)) {
-                return "O e-mail precisa terminar com @" + DOMINIOS[tipo] + ".";
+            if (!emailValido(email, tipo)) {
+
+                if (DOMINIOS[tipo]) {
+                    return "O e-mail precisa terminar com @" + DOMINIOS[tipo] + ".";
+                }
+
+                return "Informe um e-mail válido.";
             }
 
             if (senha.length < TAMANHO_MINIMO_SENHA) {
@@ -320,7 +337,7 @@
             funcionario: {
                 titulo: "Entrar como Funcionário",
                 subtitulo: "Use o e-mail e a senha da sua conta.",
-                placeholder: "E-mail (@mentis.com)",
+                placeholder: "E-mail",
                 icone: ICONE_FUNCIONARIO
             },
 
