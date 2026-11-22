@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minha área - Mentis</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/header.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/funcionario.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/acessibilidade.css') }}">
+</head>
+
+<body>
+
+    {% include 'header.html' %}
+
+    {% set classe_status = {
+        'pendente': 'selo-pendente',
+        'em_andamento': 'selo-andamento',
+        'concluido': 'selo-concluido',
+        'enviado': 'selo-ok'
+    }[area.status] %}
+
+    <main class="func">
+
+        <div class="func-topo">
+            <div class="func-etiqueta">MINHA ÁREA</div>
+
+            <h1>
+                {% if area.nome %}
+                    Olá, {{ area.nome }}
+                {% else %}
+                    Sua área na Mentis
+                {% endif %}
+            </h1>
+
+            <p>
+                Veja a empresa à qual você está vinculado e acompanhe
+                o seu teste de bem-estar.
+            </p>
+        </div>
+
+        <div class="func-grade">
+
+            <!-- ========== EMPRESA ========== -->
+            <section class="func-card" aria-labelledby="titulo-empresa">
+
+                <h2 class="func-card-titulo" id="titulo-empresa">
+                    Sua empresa
+                </h2>
+
+                {% if area.empresa %}
+
+                    <div class="func-empresa">
+
+                        <div class="func-avatar" aria-hidden="true">
+                            {{ area.empresa.nome[:2]|upper }}
+                        </div>
+
+                        <div>
+                            <div class="func-empresa-nome">
+                                {{ area.empresa.nome }}
+                            </div>
+
+                            <div class="selo selo-ok">
+                                Você faz parte desta empresa
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <dl class="func-dados">
+
+                        <div>
+                            <dt>CNPJ</dt>
+                            <dd>{{ area.empresa.cnpj or "Não informado" }}</dd>
+                        </div>
+
+                        <div>
+                            <dt>Seu e-mail</dt>
+                            <dd>{{ area.email }}</dd>
+                        </div>
+
+                    </dl>
+
+                {% else %}
+
+                    <p class="func-aviso">
+                        Sua conta ainda não está vinculada a uma empresa
+                        cadastrada no Mentis. Você pode fazer o teste, mas
+                        nenhum RH vai receber o resultado.
+                    </p>
+
+                {% endif %}
+
+            </section>
+
+            <!-- ========== TESTE ========== -->
+            <section class="func-card" aria-labelledby="titulo-teste">
+
+                <h2 class="func-card-titulo" id="titulo-teste">
+                    Seu teste
+                </h2>
+
+                <div class="selo {{ classe_status }}">
+                    {{ area.status_rotulo }}
+                </div>
+
+                <p class="func-texto">
+                    {{ area.status_descricao }}
+                </p>
+
+                {% if area.ultimo %}
+
+                    <div class="func-ultimo">
+
+                        <div>
+                            <small>Último teste</small>
+                            <strong>{{ area.ultimo.data }}</strong>
+                        </div>
+
+                        <div>
+                            <small>Resultado geral</small>
+                            <strong>
+                                {{ area.ultimo.classificacao }}
+                                ({{ "%.0f"|format(area.ultimo.percentual) }}%)
+                            </strong>
+                        </div>
+
+                    </div>
+
+                {% endif %}
+
+                <div class="func-acoes">
+
+                    {% if area.status == 'em_andamento' %}
+
+                        <a class="botao botao-principal"
+                           href="{{ url_for('teste') }}">
+                            Continuar o teste
+                        </a>
+
+                        {% if area.ultimo %}
+                            <a class="botao botao-secundario"
+                               href="{{ url_for('resultado', teste_id=area.ultimo.teste_id) }}">
+                                Ver último resultado
+                            </a>
+                        {% endif %}
+
+                    {% elif area.ultimo %}
+
+                        <a class="botao botao-principal"
+                           href="{{ url_for('resultado', teste_id=area.ultimo.teste_id) }}">
+                            Ver meu último resultado
+                        </a>
+
+                        <a class="botao botao-secundario"
+                           href="{{ url_for('iniciar_teste') }}">
+                            Fazer um novo teste
+                        </a>
+
+                    {% else %}
+
+                        <a class="botao botao-principal"
+                           href="{{ url_for('iniciar_teste') }}">
+                            Iniciar o teste
+                        </a>
+
+                    {% endif %}
+
+                </div>
+
+                <p class="func-nota">
+                    Questionário de bem-estar emocional. Você responde
+                    cada pergunta em uma escala de 1 a 7.
+                </p>
+
+            </section>
+
+            <!-- ========== PASSOS ========== -->
+            <section class="func-card func-card-largo" aria-labelledby="titulo-passos">
+
+                <h2 class="func-card-titulo" id="titulo-passos">
+                    Como funciona
+                </h2>
+
+                <ol class="func-passos">
+
+                    <li class="passo passo-feito">
+                        <div class="passo-num" aria-hidden="true">1</div>
+                        <div>
+                            <strong>Entrar</strong>
+                            <small>
+                                {% if area.empresa %}
+                                    Você está na área da {{ area.empresa.nome }}.
+                                {% else %}
+                                    Você está na sua área.
+                                {% endif %}
+                            </small>
+                        </div>
+                    </li>
+
+                    <li class="passo {{ 'passo-feito' if area.ja_respondeu else 'passo-atual' }}"
+                        {% if not area.ja_respondeu %}aria-current="step"{% endif %}>
+                        <div class="passo-num" aria-hidden="true">2</div>
+                        <div>
+                            <strong>Responder o teste</strong>
+                            <small>
+                                {% if area.ja_respondeu %}
+                                    Você já respondeu {{ area.total_testes }}
+                                    {{ 'teste' if area.total_testes == 1 else 'testes' }}.
+                                {% else %}
+                                    Responda às perguntas do questionário.
+                                {% endif %}
+                            </small>
+                        </div>
+                    </li>
+
+                    <li class="passo {{ 'passo-feito' if area.enviado_ao_rh else '' }}">
+                        <div class="passo-num" aria-hidden="true">3</div>
+                        <div>
+                            <strong>Enviado ao RH</strong>
+                            <small>
+                                {% if area.enviado_ao_rh %}
+                                    O resultado está disponível para o RH.
+                                {% else %}
+                                    Ao concluir, o resultado vai para o RH da sua empresa.
+                                {% endif %}
+                            </small>
+                        </div>
+                    </li>
+
+                </ol>
+
+            </section>
+
+        </div>
+
+        <!-- ========== PRIVACIDADE ========== -->
+        <section class="func-privacidade" aria-labelledby="titulo-privacidade">
+
+            <h2 id="titulo-privacidade">Quem vê o seu resultado</h2>
+
+            <p>
+                Quando você conclui o teste, o resultado geral e o resultado
+                por categoria ficam disponíveis para o RH da sua empresa.
+                O RH não vê as suas respostas pergunta por pergunta.
+                Outros funcionários não têm acesso ao seu resultado.
+            </p>
+
+            <p>
+                Os resultados são indicadores de bem-estar e não substituem
+                um diagnóstico médico.
+            </p>
+
+            {% if area.ja_respondeu %}
+                <a class="func-link" href="{{ url_for('perfil') }}">
+                    Ver meu histórico completo
+                </a>
+            {% endif %}
+
+        </section>
+
+    </main>
+
+    <script src="{{ url_for('static', filename='js/header.js') }}"></script>
+
+</body>
+</html>

@@ -1,0 +1,83 @@
+{% extends 'rh_base.html' %}
+{% from 'rh_macros.html' import selo, iniciais, icone %}
+
+{% block titulo %}Histórico{% endblock %}
+
+{% block conteudo %}
+
+<div class="rh-topo">
+    <div>
+        <div class="rh-etiqueta">HISTÓRICO</div>
+        <h1 class="rh-titulo">Histórico de testes</h1>
+        <p class="rh-sub">Todos os testes já recebidos, do mais recente para o mais antigo.</p>
+    </div>
+</div>
+
+{% if not testes %}
+
+    <section class="rh-painel">
+        <div class="rh-estado-vazio">
+            <h2>Nenhum teste no histórico</h2>
+            <p>Quando os funcionários concluírem o teste, o histórico aparece aqui.</p>
+        </div>
+    </section>
+
+{% else %}
+
+    <section class="rh-painel" data-lista>
+
+        <div class="rh-ferramentas">
+            <div class="rh-busca">
+                {{ icone('busca') }}
+                <input type="search"
+                       data-busca
+                       placeholder="Buscar funcionário..."
+                       aria-label="Buscar funcionário por nome ou e-mail">
+            </div>
+            <div class="rh-nota-topo">Mostrando <span data-contador>{{ testes|length }} de {{ testes|length }}</span></div>
+        </div>
+
+        <div class="rh-tabela-wrap">
+            <table class="rh-tabela">
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Funcionário</th>
+                        <th>Resultado</th>
+                        <th>Status</th>
+                        <th><span class="rh-so-leitor">Relatório</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for t in testes %}
+                        <tr data-linha data-nome="{{ t.funcionario }} {{ t.email }}" data-status="{{ t.status }}">
+                            <td>{{ t.data }}</td>
+                            <td>
+                                <div class="rh-pessoa">
+                                    <div class="rh-avatar" aria-hidden="true">{{ iniciais(t.funcionario) }}</div>
+                                    <div>
+                                        <a class="rh-link-forte" href="{{ url_for('rh_funcionario', funcionario_id=t.funcionario_id) }}">{{ t.funcionario }}</a>
+                                        <small>{{ t.email }}</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>{{ selo(t.classificacao) }} <span class="rh-num">{{ '%.0f'|format(t.percentual) }}%</span></td>
+                            <td>{{ t.status }}</td>
+                            <td class="rh-acoes">
+                                <a class="rh-botao-link" href="{{ url_for('rh_resultado', teste_id=t.teste_id) }}">Abrir relatório</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="rh-vazio" data-vazio hidden>
+            Nenhum teste encontrado com essa busca.
+        </div>
+
+    </section>
+
+{% endif %}
+
+{% endblock %}

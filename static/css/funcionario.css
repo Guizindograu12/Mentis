@@ -1,0 +1,469 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap');
+
+body {
+    margin: 0;
+    background: var(--pagina-fundo, #ffffff);
+    color: var(--pagina-texto, #000000);
+    font-family: 'Inter', Arial, sans-serif;
+}
+
+.func,
+.func * {
+    box-sizing: border-box;
+}
+
+.func {
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: 130px 24px 80px;
+}
+
+
+/* =========================================
+   TOPO
+========================================= */
+
+.func-topo {
+    margin-bottom: 32px;
+}
+
+.func-etiqueta {
+    margin-bottom: 10px;
+    color: var(--titulo-cor);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.17em;
+}
+
+.func-topo h1 {
+    margin: 0;
+    color: var(--titulo-cor);
+    font-family: 'Poppins', sans-serif;
+    font-size: clamp(28px, 4vw, 38px);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+}
+
+.func-topo p {
+    max-width: 560px;
+    margin: 10px 0 0;
+    font-size: 15px;
+    line-height: 1.7;
+}
+
+
+/* =========================================
+   CARDS
+========================================= */
+
+.func-grade {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+}
+
+.func-card {
+    padding: 26px;
+    border: 1px solid var(--painel-borda);
+    border-radius: 14px;
+    background: var(--pagina-fundo-2);
+}
+
+.func-card-largo {
+    grid-column: 1 / -1;
+}
+
+.func-card-titulo {
+    margin: 0 0 18px;
+    color: var(--titulo-cor);
+    font-family: 'Poppins', sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.func-texto {
+    margin: 14px 0 0;
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+.func-nota {
+    margin: 18px 0 0;
+    color: var(--painel-suave);
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.func-aviso {
+    margin: 0;
+    padding: 14px 16px;
+    border-left: 4px solid var(--titulo-cor);
+    border-radius: 6px;
+    background: var(--pagina-fundo);
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+
+/* =========================================
+   EMPRESA
+========================================= */
+
+.func-empresa {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.func-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    background: var(--destaque);
+    color: var(--botao-texto);
+    font-family: 'Poppins', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.func-empresa-nome {
+    margin-bottom: 8px;
+    color: var(--pagina-texto);
+    font-size: 18px;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+}
+
+.func-dados {
+    margin: 22px 0 0;
+    padding-top: 18px;
+    border-top: 1px solid var(--painel-borda);
+}
+
+.func-dados > div {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 8px 0;
+}
+
+.func-dados dt {
+    color: var(--painel-suave);
+    font-size: 13px;
+}
+
+.func-dados dd {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: right;
+    overflow-wrap: anywhere;
+}
+
+
+/* =========================================
+   STATUS (SELOS)
+========================================= */
+
+.selo {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.selo-ok {
+    background: #dff5e6;
+    color: #14532d;
+}
+
+.selo-pendente {
+    background: #fff1cc;
+    color: #7a5200;
+}
+
+.selo-andamento {
+    background: #e1e8ff;
+    color: #1f3a8a;
+}
+
+.selo-concluido {
+    background: #e8e8f5;
+    color: #191970;
+}
+
+
+/* =========================================
+   ÚLTIMO TESTE
+========================================= */
+
+.func-ultimo {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 18px;
+}
+
+.func-ultimo > div {
+    padding: 12px 14px;
+    border: 1px solid var(--painel-borda);
+    border-radius: 10px;
+    background: var(--pagina-fundo);
+}
+
+.func-ultimo small {
+    display: block;
+    margin-bottom: 4px;
+    color: var(--painel-suave);
+    font-size: 11px;
+}
+
+.func-ultimo strong {
+    font-size: 14px;
+}
+
+
+/* =========================================
+   BOTÕES
+========================================= */
+
+.func-acoes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 22px;
+}
+
+.botao {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 46px;
+    padding: 0 22px;
+    border: 2px solid var(--destaque);
+    border-radius: 9px;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+    text-decoration: none;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.botao:hover {
+    transform: translateY(-2px);
+}
+
+.botao-principal {
+    background: var(--destaque);
+    color: var(--botao-texto);
+}
+
+.botao-principal:hover {
+    background: var(--destaque-hover);
+    border-color: var(--destaque-hover);
+}
+
+.botao-secundario {
+    background: transparent;
+    border-color: var(--titulo-cor);
+    color: var(--titulo-cor);
+}
+
+.botao-secundario:hover {
+    background: var(--destaque-claro);
+}
+
+.botao:focus-visible,
+.func-link:focus-visible {
+    outline: 3px solid var(--titulo-cor);
+    outline-offset: 3px;
+}
+
+
+/* =========================================
+   PASSOS
+========================================= */
+
+.func-passos {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.passo {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 16px;
+    border: 1px solid var(--painel-borda);
+    border-radius: 10px;
+    background: var(--pagina-fundo);
+}
+
+.passo-num {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 30px;
+    height: 30px;
+    border: 2px solid var(--painel-suave);
+    border-radius: 50%;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.passo-atual .passo-num {
+    border-color: var(--titulo-cor);
+    color: var(--titulo-cor);
+}
+
+.passo-feito .passo-num {
+    background: var(--destaque);
+    border-color: var(--destaque);
+    color: var(--botao-texto);
+}
+
+.passo strong {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 14px;
+}
+
+.passo small {
+    display: block;
+    color: var(--painel-suave);
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+
+/* =========================================
+   PRIVACIDADE
+========================================= */
+
+.func-privacidade {
+    margin-top: 20px;
+    padding: 24px 26px;
+    border: 1px dashed var(--painel-borda-forte);
+    border-radius: 14px;
+}
+
+.func-privacidade h2 {
+    margin: 0 0 10px;
+    color: var(--titulo-cor);
+    font-family: 'Poppins', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.func-privacidade p {
+    margin: 0 0 10px;
+    font-size: 13px;
+    line-height: 1.7;
+}
+
+.func-link {
+    display: inline-block;
+    margin-top: 6px;
+    color: var(--titulo-cor);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+
+/* =========================================
+   TELAS PEQUENAS
+========================================= */
+
+@media (max-width: 800px) {
+
+    .func {
+        padding: 110px 20px 60px;
+    }
+
+    .func-grade {
+        grid-template-columns: 1fr;
+    }
+
+    .func-passos {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+@media (max-width: 480px) {
+
+    .func-card {
+        padding: 20px;
+    }
+
+    .func-ultimo {
+        grid-template-columns: 1fr;
+    }
+
+    .func-acoes .botao {
+        width: 100%;
+    }
+
+}
+
+
+/* =========================================
+   TEMA ESCURO
+========================================= */
+
+html[data-tema="escuro"] .selo-ok {
+    background: #173d27;
+    color: #8be0ac;
+}
+
+html[data-tema="escuro"] .selo-pendente {
+    background: #433512;
+    color: #ffd98a;
+}
+
+html[data-tema="escuro"] .selo-andamento {
+    background: #1f2d5c;
+    color: #b9c9ff;
+}
+
+html[data-tema="escuro"] .selo-concluido {
+    background: #34345c;
+    color: #eeeeff;
+}
+
+
+/* =========================================
+   ALTO CONTRASTE
+========================================= */
+
+html[data-contraste="alto"] .selo {
+    background: #000000;
+    color: #ffffff;
+    border: 2px solid #ffffff;
+}
+
+html[data-contraste="alto"] .func-card,
+html[data-contraste="alto"] .passo,
+html[data-contraste="alto"] .func-ultimo > div {
+    border: 2px solid #ffffff;
+}
+
+html[data-contraste="alto"] .func-privacidade {
+    border: 2px dashed #ffffff;
+}
+
+html[data-contraste="alto"] .func-link {
+    color: #ffd600;
+    text-decoration: underline;
+}

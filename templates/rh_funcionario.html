@@ -1,0 +1,133 @@
+{% extends 'rh_base.html' %}
+{% from 'rh_macros.html' import selo, status_func, barra, barra_classe, coluna, iniciais %}
+
+{% block titulo %}{{ funcionario.nome }}{% endblock %}
+
+{% block conteudo %}
+
+<a class="rh-voltar" href="{{ url_for('rh_funcionarios') }}">← Funcionários</a>
+
+<section class="rh-painel rh-perfil">
+
+    <div class="rh-avatar rh-avatar-grande rh-avatar-xl" aria-hidden="true">{{ iniciais(funcionario.nome) }}</div>
+
+    <div class="rh-perfil-texto">
+        <h1 class="rh-titulo">{{ funcionario.nome }}</h1>
+        <p class="rh-sub">{{ funcionario.email }}</p>
+        <div class="rh-perfil-selos">
+            {{ status_func(funcionario.status, funcionario.status_rotulo) }}
+            {% if funcionario.cadastro %}
+                <small>Cadastrado em {{ funcionario.cadastro }}</small>
+            {% endif %}
+        </div>
+    </div>
+
+</section>
+
+{% if not funcionario.ultimo %}
+
+    <section class="rh-painel">
+        <div class="rh-estado-vazio">
+            <h2>Este funcionário ainda não fez o teste</h2>
+            <p>Quando ele concluir o teste, o resultado aparece aqui.</p>
+        </div>
+    </section>
+
+{% else %}
+
+    {% set ultimo = funcionario.ultimo %}
+
+    <div class="rh-kpis">
+
+        <div class="rh-kpi">
+            <div class="rh-kpi-rotulo">Testes realizados</div>
+            <div class="rh-kpi-valor">{{ funcionario.total_testes }}</div>
+            <div class="rh-kpi-dica">no total</div>
+        </div>
+
+        <div class="rh-kpi">
+            <div class="rh-kpi-rotulo">Último resultado</div>
+            <div class="rh-kpi-valor">{{ '%.0f'|format(ultimo.percentual) }}%</div>
+            <div class="rh-kpi-dica">{{ selo(ultimo.classificacao) }}</div>
+        </div>
+
+        <div class="rh-kpi">
+            <div class="rh-kpi-rotulo">Último teste</div>
+            <div class="rh-kpi-valor rh-kpi-valor-texto">{{ ultimo.data }}</div>
+            <div class="rh-kpi-dica">
+                <a class="rh-link-forte" href="{{ url_for('rh_resultado', teste_id=ultimo.teste_id) }}">Abrir relatório</a>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="rh-grade-2">
+
+        <section class="rh-painel">
+            <div class="rh-painel-topo">
+                <h2>Categorias do último teste</h2>
+            </div>
+            <div class="rh-painel-corpo">
+                {% for c in ultimo.categorias %}
+                    <div class="rh-dado">
+                        <div class="rh-dado-topo">
+                            <span>{{ c.nome }}</span>
+                            <span>{{ selo(c.classificacao) }} <strong>{{ '%.0f'|format(c.percentual) }}%</strong></span>
+                        </div>
+                        {{ barra_classe(c.percentual, c.classificacao) }}
+                    </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        {% if funcionario.testes|length > 1 %}
+            <section class="rh-painel">
+                <div class="rh-painel-topo">
+                    <h2>Evolução do resultado geral</h2>
+                </div>
+                <div class="rh-painel-corpo">
+                    <div class="rh-colunas">
+                        {% for t in funcionario.testes|reverse %}
+                            {{ coluna(t.percentual, t.data) }}
+                        {% endfor %}
+                    </div>
+                    <p class="rh-nota">Do teste mais antigo para o mais recente.</p>
+                </div>
+            </section>
+        {% endif %}
+
+    </div>
+
+    <section class="rh-painel">
+        <div class="rh-painel-topo">
+            <h2>Histórico de testes</h2>
+        </div>
+        <div class="rh-tabela-wrap">
+            <table class="rh-tabela">
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Resultado</th>
+                        <th>Status</th>
+                        <th><span class="rh-so-leitor">Ação</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for t in funcionario.testes %}
+                        <tr>
+                            <td>{{ t.data }}</td>
+                            <td>{{ selo(t.classificacao) }} <span class="rh-num">{{ '%.0f'|format(t.percentual) }}%</span></td>
+                            <td>{{ t.status }}</td>
+                            <td class="rh-acoes">
+                                <a class="rh-botao-link" href="{{ url_for('rh_resultado', teste_id=t.teste_id) }}">Ver relatório</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+{% endif %}
+
+{% endblock %}

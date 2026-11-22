@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block titulo %}Painel{% endblock %} - Mentis RH</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/header.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/rh.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/acessibilidade.css') }}">
+</head>
+
+<body>
+
+    {% include 'header.html' %}
+
+    {% from 'rh_macros.html' import icone, iniciais %}
+
+    <div class="rh-app">
+
+        <!-- ========== SIDEBAR ========== -->
+        <aside class="rh-lateral" aria-label="Menu do painel de RH">
+
+            <div class="rh-marca">
+                <div class="rh-avatar rh-avatar-grande" aria-hidden="true">{{ iniciais(empresa.nome) }}</div>
+                <div class="rh-marca-texto">
+                    <strong title="{{ empresa.nome }}">{{ empresa.nome }}</strong>
+                    <small>Empresa / RH</small>
+                </div>
+            </div>
+
+            <nav class="rh-nav" aria-label="Seções do painel">
+
+                <a href="{{ url_for('rh_painel') }}"
+                   class="{{ 'ativo' if pagina == 'dashboard' }}"
+                   {% if pagina == 'dashboard' %}aria-current="page"{% endif %}>
+                    {{ icone('dashboard') }} Dashboard
+                </a>
+
+                <a href="{{ url_for('rh_funcionarios') }}"
+                   class="{{ 'ativo' if pagina == 'funcionarios' }}"
+                   {% if pagina == 'funcionarios' %}aria-current="page"{% endif %}>
+                    {{ icone('funcionarios') }} Funcionários
+                </a>
+
+                <a href="{{ url_for('rh_testes') }}"
+                   class="{{ 'ativo' if pagina == 'testes' }}"
+                   {% if pagina == 'testes' %}aria-current="page"{% endif %}>
+                    {{ icone('testes') }} Testes
+                </a>
+
+                <a href="{{ url_for('rh_historico') }}"
+                   class="{{ 'ativo' if pagina == 'historico' }}"
+                   {% if pagina == 'historico' %}aria-current="page"{% endif %}>
+                    {{ icone('historico') }} Histórico
+                </a>
+
+                <a href="{{ url_for('rh_empresa') }}"
+                   class="{{ 'ativo' if pagina == 'empresa' }}"
+                   {% if pagina == 'empresa' %}aria-current="page"{% endif %}>
+                    {{ icone('empresa') }} Empresa
+                </a>
+
+            </nav>
+
+            <nav class="rh-nav rh-nav-fim" aria-label="Conta">
+                <a href="{{ url_for('logout') }}">
+                    {{ icone('sair') }} Sair
+                </a>
+            </nav>
+
+        </aside>
+
+        <!-- ========== CONTEÚDO DA PÁGINA ========== -->
+        <main class="rh-conteudo">
+            {% block conteudo %}{% endblock %}
+        </main>
+
+    </div>
+
+    <script src="{{ url_for('static', filename='js/header.js') }}"></script>
+
+    <!-- Busca e filtro das tabelas (Funcionários, Testes e Histórico) -->
+    <script>
+    (function () {
+
+        function normalizar(texto) {
+            return (texto || '')
+                .toLowerCase()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '');
+        }
+
+        document.querySelectorAll('[data-lista]').forEach(function (lista) {
+
+            var campoBusca = lista.querySelector('[data-busca]');
+            var linhas = Array.prototype.slice.call(lista.querySelectorAll('[data-linha]'));
+            var contador = lista.querySelector('[data-contador]');
+            var vazio = lista.querySelector('[data-vazio]');
+            var filtros = lista.querySelectorAll('input[data-filtro]');
+
+            function filtroAtual() {
+                var valor = '';
+                filtros.forEach(function (f) {
+                    if (f.checked) { valor = f.value; }
+                });
+                valor = normalizar(valor);
+                return (valor === 'todos' || valor === 'todas') ? '' : valor;
+            }
+
+            function aplicar() {
+
+                var termo = normalizar(campoBusca ? campoBusca.value : '');
+                var status = filtroAtual();
+                var visiveis = 0;
+
+                linhas.forEach(function (linha) {
+
+                    var nomeOk = normalizar(linha.dataset.nome).indexOf(termo) !== -1;
+                    var statusOk = !status || normalizar(linha.dataset.status) === status;
+                    var mostrar = nomeOk && statusOk;
+
+                    linha.hidden = !mostrar;
+
+                    if (mostrar) { visiveis += 1; }
+                });
+
+                if (contador) {
+                    contador.textContent = visiveis + ' de ' + linhas.length;
+                }
+
+                if (vazio) {
+                    vazio.hidden = visiveis !== 0;
+                }
+            }
+
+            if (campoBusca) {
+                campoBusca.addEventListener('input', aplicar);
+            }
+
+            filtros.forEach(function (f) {
+                f.addEventListener('change', aplicar);
+            });
+
+        });
+
+    })();
+    </script>
+
+</body>
+</html>

@@ -50,7 +50,7 @@ from backend.validacoes import (
 )
 
 from backend.permissoes import exigir_conta
-from backend.rh import montar_painel_rh
+from backend.rotas_painel import registrar_rotas_painel
 
 from backend.perguntas import PERGUNTAS
 from backend.analise import analisar_respostas
@@ -104,6 +104,15 @@ with app.app_context():
     criar_tabelas()
 
     sincronizar_perguntas(PERGUNTAS)
+
+
+# ==========================================
+# ROTAS DO PAINEL
+# (área do Funcionário e painel da Empresa/RH:
+#  /funcionario, /rh, /rh/funcionarios, /rh/testes etc.)
+# ==========================================
+
+registrar_rotas_painel(app)
 
 
 # ==========================================
@@ -214,14 +223,16 @@ def iniciar_sessao(usuario_id, email, tipo_conta):
 
 def pagina_inicial_da_conta(tipo_conta):
     """
-    Para onde a pessoa vai depois de entrar ou se cadastrar.
+    Para onde a pessoa vai depois de entrar ou se cadastrar:
+    - Empresa/RH: dashboard da empresa
+    - Funcionário: a área do funcionário
     """
 
     if tipo_conta == "empresa_rh":
 
         return url_for("rh_painel")
 
-    return url_for("home")
+    return url_for("funcionario_area")
 
 
 # ==========================================
@@ -307,7 +318,7 @@ def entrar():
     if usuario_id is not None:
 
         # O tipo vem do banco: a conta Empresa/RH vai para o painel
-        # de RH e a de Funcionário vai para a home, como antes.
+        # de RH e a de Funcionário vai para a área do funcionário.
 
         tipo_conta = buscar_tipo_conta(usuario_id) or "funcionario"
 
@@ -1083,38 +1094,6 @@ def checkin_humor():
             "mensagem": "Não foi possível salvar o check-in."
 
         }), 500
-
-
-# ==========================================
-# PAINEL DE RH (somente Empresa/RH)
-# ==========================================
-
-@app.route("/rh")
-@exigir_conta("empresa_rh")
-def rh_painel():
-
-    try:
-
-        painel = montar_painel_rh(
-            session["usuario_id"]
-        )
-
-        return render_template(
-            "rh.html",
-            painel=painel
-        )
-
-    except Exception:
-
-        app.logger.exception(
-            "Erro ao montar o painel de RH."
-        )
-
-        return (
-            "Não foi possível carregar o painel de RH. "
-            "Tente novamente mais tarde.",
-            500
-        )
 
 
 # ==========================================

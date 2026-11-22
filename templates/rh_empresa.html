@@ -1,0 +1,89 @@
+{% extends 'rh_base.html' %}
+
+{% block titulo %}Empresa{% endblock %}
+
+{% block conteudo %}
+
+<div class="rh-topo">
+    <div>
+        <div class="rh-etiqueta">EMPRESA</div>
+        <h1 class="rh-titulo">Perfil da empresa</h1>
+        <p class="rh-sub">Dados da conta Empresa / RH cadastrada no Mentis.</p>
+    </div>
+</div>
+
+<div class="rh-grade-2">
+
+    <section class="rh-painel">
+        <div class="rh-painel-topo">
+            <h2>Informações</h2>
+        </div>
+        <div class="rh-painel-corpo">
+
+            <div class="rh-empresa-topo">
+                <div class="rh-avatar rh-avatar-grande rh-avatar-xl" aria-hidden="true">{{ empresa.nome[:2]|upper }}</div>
+                <strong class="rh-empresa-nome">{{ empresa.nome }}</strong>
+            </div>
+
+            <dl class="rh-dados">
+                <div>
+                    <dt>CNPJ</dt>
+                    <dd>{{ empresa.cnpj or 'Não informado' }}</dd>
+                </div>
+                <div>
+                    <dt>E-mail de acesso</dt>
+                    <dd>{{ empresa.email }}</dd>
+                </div>
+                <div>
+                    <dt>Funcionários vinculados</dt>
+                    <dd>{{ empresa.total_funcionarios }}</dd>
+                </div>
+                {% if empresa.cadastro %}
+                    <div>
+                        <dt>Cadastro</dt>
+                        <dd>{{ empresa.cadastro }}</dd>
+                    </div>
+                {% endif %}
+            </dl>
+
+        </div>
+    </section>
+
+    <div>
+
+        <section class="rh-painel">
+            <div class="rh-painel-topo">
+                <h2>Como vincular funcionários</h2>
+            </div>
+            <div class="rh-painel-corpo">
+                <p class="rh-texto">
+                    Ao criar a conta na aba <strong>Funcionário</strong>, a pessoa
+                    informa o nome da empresa onde trabalha. Peça para ela digitar:
+                </p>
+                <p class="rh-destaque">{{ empresa.nome }}</p>
+                <p class="rh-nota">
+                    Maiúsculas, acentos e pontuação não fazem diferença. O funcionário
+                    só consegue se cadastrar se a empresa já tiver conta no Mentis.
+                </p>
+            </div>
+        </section>
+
+        <section class="rh-painel rh-painel-espaco">
+            <div class="rh-painel-topo">
+                <h2>O que o RH vê</h2>
+            </div>
+            <div class="rh-painel-corpo">
+                <p class="rh-texto">
+                    O painel mostra o resultado geral e por categoria dos testes dos
+                    funcionários vinculados à sua empresa. As respostas pergunta por
+                    pergunta e os check-ins de humor não são exibidos, e dados de
+                    outras empresas nunca aparecem aqui.
+                </p>
+            </div>
+        </section>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,94 @@
+{% extends 'rh_base.html' %}
+{% from 'rh_macros.html' import selo, iniciais, icone %}
+
+{% block titulo %}Testes{% endblock %}
+
+{% block conteudo %}
+
+<div class="rh-topo">
+    <div>
+        <div class="rh-etiqueta">TESTES</div>
+        <h1 class="rh-titulo">Testes recebidos</h1>
+        <p class="rh-sub">
+            O teste mais recente de cada funcionário. Para ver todos os testes
+            já feitos, abra o <a class="rh-link-forte" href="{{ url_for('rh_historico') }}">Histórico</a>.
+        </p>
+    </div>
+</div>
+
+{% if not testes %}
+
+    <section class="rh-painel">
+        <div class="rh-estado-vazio">
+            <h2>Nenhum teste recebido ainda</h2>
+            <p>Quando os funcionários concluírem o teste, os resultados aparecem aqui.</p>
+        </div>
+    </section>
+
+{% else %}
+
+    <section class="rh-painel" data-lista>
+
+        <div class="rh-ferramentas">
+            <div class="rh-busca">
+                {{ icone('busca') }}
+                <input type="search"
+                       data-busca
+                       placeholder="Buscar funcionário..."
+                       aria-label="Buscar funcionário por nome ou e-mail">
+            </div>
+            <div class="rh-nota-topo">Mostrando <span data-contador>{{ testes|length }} de {{ testes|length }}</span></div>
+        </div>
+
+        <div class="rh-tabela-wrap">
+            <table class="rh-tabela">
+                <thead>
+                    <tr>
+                        <th>Funcionário</th>
+                        <th>Data</th>
+                        <th>Status</th>
+                        <th>Resultado</th>
+                        <th>Categorias em destaque</th>
+                        <th><span class="rh-so-leitor">Ação</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for t in testes %}
+                        <tr data-linha data-nome="{{ t.funcionario }} {{ t.email }}" data-status="{{ t.status }}">
+                            <td>
+                                <div class="rh-pessoa">
+                                    <div class="rh-avatar" aria-hidden="true">{{ iniciais(t.funcionario) }}</div>
+                                    <div>
+                                        <a class="rh-link-forte" href="{{ url_for('rh_funcionario', funcionario_id=t.funcionario_id) }}">{{ t.funcionario }}</a>
+                                        <small>{{ t.email }}</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>{{ t.data }}</td>
+                            <td>{{ t.status }}</td>
+                            <td>{{ selo(t.classificacao) }} <span class="rh-num">{{ '%.0f'|format(t.percentual) }}%</span></td>
+                            <td>
+                                <div class="rh-chips-cat">
+                                    {% for c in t.categorias_mais_altas %}
+                                        <span class="rh-selo nivel-{{ c.nivel }}">{{ c.nome }} · {{ c.classificacao }}</span>
+                                    {% endfor %}
+                                </div>
+                            </td>
+                            <td class="rh-acoes">
+                                <a class="rh-botao-link" href="{{ url_for('rh_resultado', teste_id=t.teste_id) }}">Ver resultado</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="rh-vazio" data-vazio hidden>
+            Nenhum funcionário encontrado com essa busca.
+        </div>
+
+    </section>
+
+{% endif %}
+
+{% endblock %}

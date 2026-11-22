@@ -1,0 +1,125 @@
+{% extends 'rh_base.html' %}
+{% from 'rh_macros.html' import selo, status_func, iniciais, icone %}
+
+{% block titulo %}Funcionários{% endblock %}
+
+{% block conteudo %}
+
+<div class="rh-topo">
+    <div>
+        <div class="rh-etiqueta">EQUIPE</div>
+        <h1 class="rh-titulo">Funcionários</h1>
+        <p class="rh-sub">
+            {{ total }} {{ 'funcionário vinculado' if total == 1 else 'funcionários vinculados' }}
+            à {{ empresa.nome }}.
+        </p>
+    </div>
+</div>
+
+{% if total == 0 %}
+
+    <section class="rh-painel">
+        <div class="rh-estado-vazio">
+            <h2>Nenhum funcionário vinculado ainda</h2>
+            <p>
+                Peça para os funcionários criarem a conta na aba
+                <strong>Funcionário</strong>, informando como empresa:
+                <strong>{{ empresa.nome }}</strong>.
+                Maiúsculas, acentos e pontuação não fazem diferença.
+            </p>
+        </div>
+    </section>
+
+{% else %}
+
+    {% set ns = namespace(cadastro=false) %}
+    {% for f in funcionarios %}
+        {% if f.cadastro %}{% set ns.cadastro = true %}{% endif %}
+    {% endfor %}
+
+    <section class="rh-painel" data-lista>
+
+        <div class="rh-ferramentas">
+
+            <div class="rh-busca">
+                {{ icone('busca') }}
+                <input type="search"
+                       data-busca
+                       placeholder="Buscar funcionário..."
+                       aria-label="Buscar funcionário por nome ou e-mail">
+            </div>
+
+            <div class="rh-chips" role="radiogroup" aria-label="Filtrar por status">
+
+                <input class="rh-chip-input" type="radio" name="filtro" id="f-todos" value="todos" data-filtro checked>
+                <label class="rh-chip" for="f-todos">Todos <span class="rh-chip-n">{{ total }}</span></label>
+
+                <input class="rh-chip-input" type="radio" name="filtro" id="f-concluido" value="concluido" data-filtro>
+                <label class="rh-chip" for="f-concluido">Com teste concluído <span class="rh-chip-n">{{ com_teste }}</span></label>
+
+                <input class="rh-chip-input" type="radio" name="filtro" id="f-pendente" value="pendente" data-filtro>
+                <label class="rh-chip" for="f-pendente">Sem teste <span class="rh-chip-n">{{ sem_teste }}</span></label>
+
+            </div>
+
+        </div>
+
+        <div class="rh-tabela-wrap">
+            <table class="rh-tabela">
+                <thead>
+                    <tr>
+                        <th>Funcionário</th>
+                        <th>Status</th>
+                        <th>Último teste</th>
+                        <th>Resultado</th>
+                        <th>Testes</th>
+                        {% if ns.cadastro %}<th>Cadastro</th>{% endif %}
+                        <th><span class="rh-so-leitor">Ações</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for f in funcionarios %}
+                        <tr data-linha data-nome="{{ f.nome }} {{ f.email }}" data-status="{{ f.status }}">
+                            <td>
+                                <div class="rh-pessoa">
+                                    <div class="rh-avatar" aria-hidden="true">{{ iniciais(f.nome) }}</div>
+                                    <div>
+                                        <a class="rh-link-forte" href="{{ url_for('rh_funcionario', funcionario_id=f.id) }}">{{ f.nome }}</a>
+                                        <small>{{ f.email }}</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>{{ status_func(f.status, f.status_rotulo) }}</td>
+                            <td>{{ f.ultimo.data if f.ultimo else '—' }}</td>
+                            <td>
+                                {% if f.ultimo %}
+                                    {{ selo(f.ultimo.classificacao) }}
+                                    <span class="rh-num">{{ '%.0f'|format(f.ultimo.percentual) }}%</span>
+                                {% else %}
+                                    —
+                                {% endif %}
+                            </td>
+                            <td>{{ f.total_testes }}</td>
+                            {% if ns.cadastro %}<td>{{ f.cadastro or '—' }}</td>{% endif %}
+                            <td class="rh-acoes">
+                                <a class="rh-botao-link" href="{{ url_for('rh_funcionario', funcionario_id=f.id) }}">Detalhes</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="rh-vazio" data-vazio hidden>
+            Nenhum funcionário encontrado com esse filtro.
+        </div>
+
+        <div class="rh-rodape-tabela">
+            Mostrando <span data-contador>{{ total }} de {{ total }}</span>
+        </div>
+
+    </section>
+
+{% endif %}
+
+{% endblock %}

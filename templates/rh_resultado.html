@@ -1,0 +1,88 @@
+{% extends 'rh_base.html' %}
+{% from 'rh_macros.html' import selo, barra_classe, variacao, iniciais %}
+
+{% block titulo %}Resultado de {{ resultado.funcionario.nome }}{% endblock %}
+
+{% block conteudo %}
+
+<a class="rh-voltar" href="{{ url_for('rh_testes') }}">← Testes</a>
+
+<section class="rh-painel rh-perfil">
+
+    <div class="rh-avatar rh-avatar-grande rh-avatar-xl" aria-hidden="true">{{ iniciais(resultado.funcionario.nome) }}</div>
+
+    <div class="rh-perfil-texto">
+        <div class="rh-etiqueta">RESULTADO DO FUNCIONÁRIO</div>
+        <h1 class="rh-titulo">{{ resultado.funcionario.nome }}</h1>
+        <p class="rh-sub">{{ resultado.funcionario.email }}</p>
+        <div class="rh-perfil-selos">
+            <span class="rh-selo status-concluido">Recebido</span>
+            <small>Teste de {{ resultado.data }}</small>
+            <a class="rh-link-forte" href="{{ url_for('rh_funcionario', funcionario_id=resultado.funcionario.id) }}">Ver histórico do funcionário</a>
+        </div>
+    </div>
+
+</section>
+
+<div class="rh-grade-2">
+
+    <!-- ========== RESULTADO GERAL ========== -->
+    <section class="rh-painel">
+        <div class="rh-painel-topo">
+            <h2>Resultado geral</h2>
+        </div>
+        <div class="rh-painel-corpo">
+
+            <div class="rh-grande">
+                {{ '%.0f'|format(resultado.percentual) }}<span class="rh-grande-un">%</span>
+            </div>
+
+            <div class="rh-grande-selo">{{ selo(resultado.classificacao) }}</div>
+
+            {{ barra_classe(resultado.percentual, resultado.classificacao) }}
+
+            {% if resultado.anterior %}
+                <div class="rh-comparacao">
+                    <div>
+                        <small>Teste anterior ({{ resultado.anterior.data }})</small>
+                        <strong>{{ '%.0f'|format(resultado.anterior.percentual) }}% · {{ resultado.anterior.classificacao }}</strong>
+                    </div>
+                    <div>
+                        <small>Variação</small>
+                        <strong>{{ variacao(resultado.anterior.variacao) }}</strong>
+                    </div>
+                </div>
+            {% else %}
+                <p class="rh-nota">Este é o primeiro teste do funcionário.</p>
+            {% endif %}
+
+        </div>
+    </section>
+
+    <!-- ========== CATEGORIAS ========== -->
+    <section class="rh-painel">
+        <div class="rh-painel-topo">
+            <h2>Categorias analisadas</h2>
+        </div>
+        <div class="rh-painel-corpo">
+            {% for c in resultado.categorias %}
+                <div class="rh-dado">
+                    <div class="rh-dado-topo">
+                        <span>{{ c.nome }}</span>
+                        <span>{{ selo(c.classificacao) }} <strong>{{ '%.0f'|format(c.percentual) }}%</strong></span>
+                    </div>
+                    {{ barra_classe(c.percentual, c.classificacao) }}
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+
+</div>
+
+<p class="rh-aviso">
+    Os resultados do Mentis são apenas indicativos e não substituem uma avaliação
+    profissional. Use estas informações para cuidar do ambiente de trabalho,
+    nunca para julgar ou penalizar pessoas.
+</p>
+
+{% endblock %}

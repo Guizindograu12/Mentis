@@ -1,0 +1,78 @@
+{# Pequenos componentes reutilizados nas telas do RH #}
+
+{% macro icone(nome) -%}
+{% set tracos = {
+    'dashboard': '<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',
+    'funcionarios': '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8"/><path d="M18 14.4c2.2.7 3.5 2.6 3.5 5.6"/>',
+    'testes': '<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4h6v3H9z"/><path d="M9 12h6M9 16h4"/>',
+    'historico': '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+    'empresa': '<path d="M4 21V4a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v6h4a1 1 0 0 1 1 1v10z"/><path d="M8 8h3M8 12h3M8 16h3"/>',
+    'config': '<path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/>',
+    'sair': '<path d="M9 21H5a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h4"/><path d="M16 17l5-5-5-5M21 12H9"/>',
+    'busca': '<circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>'
+} -%}
+<svg class="rh-icone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{{ tracos[nome]|safe }}</svg>
+{%- endmacro %}
+
+
+{# Nome da classificação (já existente no Mentis) -> classe de cor #}
+{% macro nivel_classe(classificacao) -%}
+{{- {'Muito Baixo': 'muito-baixo', 'Baixo': 'baixo', 'Moderado': 'moderado', 'Elevado': 'elevado', 'Muito Elevado': 'muito-elevado'}.get(classificacao, 'neutro') -}}
+{%- endmacro %}
+
+
+{# Selo com a classificação: Muito Baixo, Baixo, Moderado, Elevado, Muito Elevado #}
+{% macro selo(classificacao) -%}
+<span class="rh-selo nivel-{{ nivel_classe(classificacao) }}">{{ classificacao }}</span>
+{%- endmacro %}
+
+
+{# Selo de status do funcionário (concluido / pendente) #}
+{% macro status_func(status, rotulo) -%}
+<span class="rh-selo status-{{ status }}">{{ rotulo }}</span>
+{%- endmacro %}
+
+
+{# Barra de 0 a 100%, colorida conforme o percentual #}
+{% macro barra(percentual) -%}
+{% set n = 'muito-baixo' if percentual <= 20 else 'baixo' if percentual <= 40 else 'moderado' if percentual <= 60 else 'elevado' if percentual <= 80 else 'muito-elevado' -%}
+<div class="rh-barra nivel-{{ n }}" role="img" aria-label="{{ '%.0f'|format(percentual) }}%"><div class="rh-barra-fill" style="width: {{ percentual }}%"></div></div>
+{%- endmacro %}
+
+
+{# Barra com largura própria e cor da classificação #}
+{% macro barra_classe(largura, classificacao) -%}
+<div class="rh-barra nivel-{{ nivel_classe(classificacao) }}" role="img" aria-label="{{ '%.0f'|format(largura) }}%"><div class="rh-barra-fill" style="width: {{ largura }}%"></div></div>
+{%- endmacro %}
+
+
+{# Coluna de gráfico vertical #}
+{% macro coluna(percentual, rotulo) -%}
+{% set n = 'muito-baixo' if percentual <= 20 else 'baixo' if percentual <= 40 else 'moderado' if percentual <= 60 else 'elevado' if percentual <= 80 else 'muito-elevado' -%}
+<div class="rh-coluna nivel-{{ n }}">
+    <div class="rh-coluna-valor">{{ '%.0f'|format(percentual) }}%</div>
+    <div class="rh-coluna-area"><div class="rh-coluna-barra" style="height: {{ percentual }}%"></div></div>
+    <div class="rh-coluna-rotulo">{{ rotulo }}</div>
+</div>
+{%- endmacro %}
+
+
+{# Variação em relação ao teste anterior (percentual maior = mais dificuldade) #}
+{% macro variacao(valor) -%}
+{% if valor is none -%}
+—
+{%- elif valor > 0 -%}
+<span class="rh-var rh-var-pior" title="Piora em relação ao teste anterior">▲ +{{ '%.1f'|format(valor) }} pts</span>
+{%- elif valor < 0 -%}
+<span class="rh-var rh-var-melhor" title="Melhora em relação ao teste anterior">▼ {{ '%.1f'|format(valor) }} pts</span>
+{%- else -%}
+<span class="rh-var">sem mudança</span>
+{%- endif %}
+{%- endmacro %}
+
+
+{# Iniciais do nome: "Maria Silva" -> MS #}
+{% macro iniciais(nome) -%}
+{% set partes = nome.split() -%}
+{{ ((partes[0][0] ~ (partes[-1][0] if partes|length > 1 else '')) if partes else '?')|upper }}
+{%- endmacro %}
