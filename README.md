@@ -17,4 +17,16 @@ Aspectos relacionados ao ambiente de trabalho.
 Os resultados são apresentados como indicadores e classificações, e não como diagnósticos.
 O sistema também foi pensado considerando situações relacionadas ao ambiente corporativo e à discussão sobre saúde mental no trabalho.
 
+# 3. Primeira ideia do projeto
+Nas primeiras etapas, o Mentis era principalmente uma ideia de plataforma.
+Nesse momento, o foco estava na definição do problema que o sistema tentaria solucionar e na criação de uma proposta que pudesse ser apresentada no projeto escolar.
+A ideia inicial envolvia:
+Uma página inicial;
+Uma apresentação do Mentis;
+Um questionário;
+Um sistema para armazenar respostas;
+Uma forma de apresentar os resultados;
+
+Nesse estágio, ainda não existia toda a estrutura de backend que existe atualmente.
+
 
