@@ -349,23 +349,43 @@
             }
         };
 
-        function mostrarTipoLogin(tipo) {
+        var tipoAtual = "funcionario";
+var cartao = areaLogin.querySelector(".cartao-cadastro");
 
-            var textos = TEXTOS[tipo];
+function mostrarTipoLogin(tipo) {
 
-            titulo.textContent = textos.titulo;
-            subtitulo.textContent = textos.subtitulo;
-            campoEmail.placeholder = textos.placeholder;
-            icone.innerHTML = textos.icone;
+    var textos = TEXTOS[tipo];
 
-            abas.forEach(function (aba) {
+    if (!textos || tipo === tipoAtual) {
+        return;
+    }
 
-                var ativa = aba.getAttribute("data-tipo") === tipo;
+    // Atualiza os textos e o ícone
+    titulo.textContent = textos.titulo;
+    subtitulo.textContent = textos.subtitulo;
+    campoEmail.placeholder = textos.placeholder;
+    icone.innerHTML = textos.icone;
 
-                aba.classList.toggle("ativa", ativa);
-                aba.setAttribute("aria-selected", ativa ? "true" : "false");
-            });
-        }
+    // Atualiza a aba selecionada
+    abas.forEach(function (aba) {
+
+        var ativa = aba.getAttribute("data-tipo") === tipo;
+
+        aba.classList.toggle("ativa", ativa);
+        aba.setAttribute("aria-selected", ativa ? "true" : "false");
+    });
+
+    // Reinicia a animação do cartão
+    if (cartao) {
+        cartao.classList.remove("animando-tipo");
+
+        void cartao.offsetWidth;
+
+        cartao.classList.add("animando-tipo");
+    }
+
+    tipoAtual = tipo;
+}
 
         abas.forEach(function (aba) {
 

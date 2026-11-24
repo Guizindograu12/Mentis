@@ -148,6 +148,7 @@ main {
     align-items: center;
     min-height: 690px;
     height: min(850px, 100vh);
+    margin-top: 0;
     padding: 150px max(7vw, calc((100vw - var(--largura-conteudo)) / 2));
     overflow: hidden;
     background: #15154d;

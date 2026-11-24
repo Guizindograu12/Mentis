@@ -1,3 +1,4 @@
+
 * {
     margin: 0;
     padding: 0;
@@ -6,24 +7,33 @@
 
 body {
     font-family: Arial, Helvetica, sans-serif;
-    background: white;
+    background: #f5f6fb;
     min-height: 100vh;
     overflow-x: hidden;
+    padding-top: 0;
 }
 
-/* CONTAINER PRINCIPAL */
+/* ========================================
+   CONTAINER PRINCIPAL
+======================================== */
+
 .container {
     width: 100%;
-    min-height: calc(100vh - 95px);
+    min-height: 100vh;
+    height: 100vh;
     display: flex;
     position: relative;
     align-items: stretch;
+    background: #f5f6fb;
 }
 
-/* LADO ESQUERDO */
+/* ========================================
+   LADO ESQUERDO
+======================================== */
+
 .left {
     width: 50%;
-    height: calc(100vh - 95px);
+    height: 100%;
     position: relative;
     overflow: hidden;
     background-image: url("../imagens/cerebro.png");
@@ -36,11 +46,15 @@ body {
     content: "";
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0.42);
+    background: linear-gradient(
+        135deg,
+        rgba(12, 12, 65, 0.78),
+        rgba(25, 25, 112, 0.48),
+        rgba(0, 0, 0, 0.25)
+    );
     z-index: 1;
 }
 
-/* CONTEÚDO ESQUERDO */
 .left-content {
     position: relative;
     z-index: 2;
@@ -50,7 +64,7 @@ body {
     flex-direction: column;
     justify-content: center;
     align-items: flex-start;
-    padding: 60px 10%;
+    padding: 60px 11%;
 }
 
 .left-text {
@@ -59,83 +73,100 @@ body {
 
 .left-text h2 {
     color: white;
-    font-size: 42px;
-    line-height: 1.15;
-    margin-bottom: 18px;
-    text-shadow: 0 3px 7px rgba(0, 0, 0, 0.85);
+    font-size: clamp(34px, 3.5vw, 48px);
+    line-height: 1.12;
+    margin-bottom: 22px;
+    font-weight: 700;
+    text-shadow: 0 3px 12px rgba(0, 0, 0, 0.35);
 }
 
 .left-text p {
-    color: white;
-    font-size: 19px;
-    line-height: 1.5;
-    margin-bottom: 30px;
-    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.85);
+    color: rgba(255, 255, 255, 0.92);
+    font-size: 18px;
+    line-height: 1.7;
+    margin-bottom: 32px;
+    max-width: 440px;
 }
 
-/* BOTÃO ENTRAR EM UMA CONTA */
 .account-button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 15px 25px;
-    border: none;
-    border-radius: 30px;
-    background: #1a1a6e;
+    padding: 15px 26px;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.13);
+    backdrop-filter: blur(8px);
     color: white;
-    font-size: 16px;
+    font-size: 15px;
     font-weight: bold;
     cursor: pointer;
     transition: 0.25s;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
 }
 
 .account-button:hover {
-    background: #2d2da0;
+    background: white;
+    color: #191970;
     transform: translateY(-2px);
 }
 
-/* DIVISOR */
+/* ========================================
+   DIVISOR
+======================================== */
+
 .toggle {
     position: absolute;
     z-index: 10;
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
-    width: 50px;
-    height: 50px;
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
     background: white;
-    color: #1a1a6e;
+    color: #191970;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 22px;
+    font-size: 21px;
     font-weight: bold;
-    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.20);
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.13);
 }
 
-/* LADO DIREITO */
+/* ========================================
+   LADO DIREITO
+======================================== */
+
 .right {
     width: 50%;
-    min-height: calc(100vh - 95px);
-    background: white;
+    min-height: 100vh;
+    background: #f5f6fb;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 50px;
+    padding: 105px 55px 35px;
 }
 
-/* FORMULÁRIO */
+/* ========================================
+   ÁREA DO FORMULÁRIO
+======================================== */
+
 .form-area {
     width: 100%;
-    max-width: 430px;
+    max-width: 440px;
+    padding: 38px;
+    background: #ffffff;
+    border: 1px solid #e9eaf2;
+    border-radius: 18px;
+    box-shadow: 0 12px 40px rgba(25, 25, 112, 0.07);
 }
 
 .form-area h1 {
-    color: #111;
-    font-size: 36px;
+    color: #191970;
+    font-size: 34px;
     margin-bottom: 10px;
+    font-weight: 700;
+    letter-spacing: -0.8px;
 }
 
 .facalog {
@@ -143,11 +174,15 @@ body {
 }
 
 .facalog p {
-    color: #555;
-    font-size: 16px;
+    color: #77788b;
+    font-size: 15px;
+    line-height: 1.5;
 }
 
-/* INPUTS */
+/* ========================================
+   INPUTS
+======================================== */
+
 .input {
     width: 100%;
     margin-bottom: 18px;
@@ -157,56 +192,91 @@ body {
     width: 100%;
     height: 52px;
     padding: 0 16px;
-    border: 1px solid #cccccc;
-    border-radius: 8px;
-    background: white;
-    color: #111;
-    font-size: 16px;
+    border: 1px solid #dfe0eb;
+    border-radius: 9px;
+    background: #fafaff;
+    color: #22223a;
+    font-size: 15px;
     outline: none;
+    transition: 0.2s;
+}
+
+.input input::placeholder {
+    color: #999aab;
 }
 
 .input input:focus {
-    border-color: #1a1a6e;
-    box-shadow: 0 0 0 3px rgba(26, 26, 110, 0.10);
+    border-color: #5555a8;
+    background: white;
+    box-shadow: 0 0 0 4px rgba(25, 25, 112, 0.08);
 }
 
-/* ESQUECI MINHA SENHA */
+/* ========================================
+   ESQUECI MINHA SENHA
+======================================== */
+
 .esqueci {
     display: block;
     width: 100%;
     text-align: right;
-    margin-top: -8px;
-    margin-bottom: 20px;
-    color: #1a1a6e;
+    margin-top: -5px;
+    margin-bottom: 22px;
+    color: #35358c;
     text-decoration: none;
-    font-size: 14px;
-    font-weight: bold;
+    font-size: 13px;
+    font-weight: 600;
 }
 
 .esqueci:hover {
     text-decoration: underline;
-    color: #2d2da0;
 }
 
-/* BOTÃO DO FORMULÁRIO */
+/* ========================================
+   BOTÕES
+======================================== */
+
 .entrar {
     width: 100%;
-    height: 52px;
+    min-height: 52px;
     border: none;
-    border-radius: 8px;
-    background: #1a1a6e;
+    border-radius: 9px;
+    background: #191970;
     color: white;
-    font-size: 17px;
+    font-size: 16px;
     font-weight: bold;
+    cursor: pointer;
+    transition: 0.25s;
+}
+
+.entrar:hover {
+    background: #30309a;
+    transform: translateY(-1px);
+    box-shadow: 0 5px 14px rgba(25, 25, 112, 0.18);
+}
+
+.voltar-login {
+    width: 100%;
+    margin-top: 12px;
+    padding: 13px;
+    border: 1px solid #dadaeb;
+    border-radius: 9px;
+    background: white;
+    color: #191970;
+    font-size: 14px;
+    font-weight: 600;
     cursor: pointer;
     transition: 0.2s;
 }
 
-.entrar:hover {
-    background: #2d2da0;
+.voltar-login:hover {
+    background: #f1f1fb;
+    border-color: #191970;
 }
 
-/* ÍCONES */
+/* ========================================
+   ÍCONES SOCIAIS
+======================================== */
+
 .social {
     display: flex;
     justify-content: center;
@@ -216,46 +286,73 @@ body {
 }
 
 .social img {
-    width: 42px;
-    height: 42px;
+    width: 40px;
+    height: 40px;
     object-fit: contain;
+    transition: transform 0.2s;
 }
 
-/* ERRO */
+.social img:hover {
+    transform: translateY(-3px);
+}
+
+/* ========================================
+   ERROS E MENSAGENS
+======================================== */
+
 .erro {
     width: 100%;
-    padding: 12px;
+    padding: 12px 14px;
     margin-bottom: 18px;
-    background: #ffe6e6;
-    border: 1px solid #ffb5b5;
-    border-radius: 8px;
+    background: #fff0f0;
+    border: 1px solid #ffd0d0;
+    border-radius: 9px;
     color: #a00000;
     font-size: 14px;
+    line-height: 1.5;
 }
 
-/* ESCONDER FORMULÁRIO */
+.mensagem-sucesso {
+    width: 100%;
+    padding: 12px 14px;
+    margin-bottom: 18px;
+    background: #effaf1;
+    border: 1px solid #c6e9cc;
+    border-radius: 9px;
+    color: #176b2c;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.aviso-demo {
+    margin-top: 10px;
+    color: #858598;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+/* ========================================
+   ESCONDER FORMULÁRIO
+======================================== */
+
 .escondido {
-    display: none;
+    display: none !important;
 }
 
-/* RESPONSIVIDADE */
-@media (max-width: 900px) {
-    .header {
-        height: auto;
-        min-height: 80px;
-        padding: 20px 25px;
-        flex-direction: column;
-        gap: 15px;
-    }
+.form-area.escondido {
+    display: none !important;
+}
 
-    .menu {
-        gap: 18px;
-        flex-wrap: wrap;
-        justify-content: center;
-    }
+/* ========================================
+   RESPONSIVIDADE - TABLET
+======================================== */
+
+@media (max-width: 900px) {
 
     .container {
         flex-direction: column;
+        height: auto;
+        min-height: 100vh;
     }
 
     .left,
@@ -264,19 +361,31 @@ body {
     }
 
     .left {
-    height: auto;
-    min-height: 500px;
+        height: auto;
+        min-height: 340px;
     }
 
     .left-content {
+        min-height: 340px;
         height: auto;
-        min-height: 500px;
-        padding: 50px 10%;
+        padding: 110px 9% 45px;
+    }
+
+    .left-text h2 {
+        font-size: 34px;
+    }
+
+    .left-text p {
+        font-size: 16px;
     }
 
     .right {
-        min-height: 500px;
-        padding: 50px 25px;
+        min-height: 550px;
+        padding: 105px 25px 45px;
+    }
+
+    .form-area {
+        max-width: 500px;
     }
 
     .toggle {
@@ -284,96 +393,142 @@ body {
     }
 }
 
+/* ========================================
+   RESPONSIVIDADE - CELULAR
+======================================== */
+
 @media (max-width: 600px) {
-    .menu a {
-        font-size: 14px;
-    }
 
-    .left-text h2 {
-        font-size: 30px;
-    }
-
-    .left-text p {
-        font-size: 16px;
-    }
-}
-
-/* CORREÇÃO DA ALTURA DA TELA DE LOGIN */
-
-body {
-    padding-top: 105px;
-}
-
-.container {
-    min-height: calc(100vh - 105px);
-    height: calc(100vh - 105px);
-}
-
-.left,
-.right {
-    height: 100%;
-    min-height: 0;
-}
-
-.left-content {
-    height: 100%;
-    min-height: 0;
-}
-
-/* Mantém o layout de celular funcionando */
-@media (max-width: 900px) {
     .container {
-        height: auto;
-        min-height: calc(100vh - 105px);
+        min-height: 100vh;
     }
 
-    .left,
-    .right {
-        height: auto;
-        min-height: 500px;
+    .left {
+        min-height: 290px;
     }
 
     .left-content {
-        height: auto;
+        min-height: 290px;
+        padding: 95px 25px 35px;
+    }
+
+    .left-text h2 {
+        font-size: 29px;
+    }
+
+    .left-text p {
+        font-size: 15px;
+        margin-bottom: 22px;
+    }
+
+    .right {
+        padding: 76px 18px 30px;
         min-height: 500px;
+    }
+
+    .form-area {
+        padding: 28px 22px;
+        border-radius: 14px;
+    }
+
+    .form-area h1 {
+        font-size: 29px;
     }
 }
 
+/* ========================================
+   TRANSIÇÃO ENTRE LOGIN, CADASTRO E RECUPERAÇÃO
+======================================== */
 
-/* RECUPERAÇÃO DEMONSTRATIVA DE SENHA */
-
-.aviso-demo {
-    margin-top: 8px;
-    color: #777;
-    font-size: 13px;
-    line-height: 1.5;
+.form-area.animando-saida {
+    animation: sairFormulario 0.25s ease forwards;
+    pointer-events: none;
 }
 
-.mensagem-sucesso {
-    width: 100%;
-    padding: 12px;
-    margin-bottom: 18px;
-    background: #e6f7e9;
-    border: 1px solid #a8ddb0;
-    border-radius: 8px;
-    color: #176b2c;
-    font-size: 14px;
-    line-height: 1.5;
+.form-area.animando-entrada {
+    animation: entrarFormulario 0.4s ease forwards;
 }
 
-.voltar-login {
-    width: 100%;
-    margin-top: 12px;
-    padding: 12px;
-    border: 1px solid #1a1a6e;
-    border-radius: 8px;
-    background: white;
-    color: #1a1a6e;
-    font-size: 15px;
-    cursor: pointer;
-    transition: 0.2s;
+@keyframes sairFormulario {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    to {
+        opacity: 0;
+        transform: translateY(-12px);
+    }
 }
 
-.voltar-login:hover {
-    background: #eeeeff;
+@keyframes entrarFormulario {
+    from {
+        opacity: 0;
+        transform: translateY(14px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ========================================
+   ANIMAÇÃO ENTRE FUNCIONÁRIO E EMPRESA/RH
+======================================== */
+
+.cartao-cadastro.animando-tipo {
+    animation: trocarTipoLogin 0.4s ease;
+}
+
+@keyframes trocarTipoLogin {
+    0% {
+        opacity: 0.5;
+        transform: translateY(8px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ========================================
+   HEADER TRANSLÚCIDO NA TELA DE LOGIN
+======================================== */
+
+body:has(.container) .header {
+    background: rgba(217, 217, 217, 0.72);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: 0 4px 22px rgba(20, 20, 70, 0.08);
+}
+
+/* MODO ESCURO */
+
+html[data-tema="escuro"] body:has(.container) .header {
+    background: rgba(20, 20, 36, 0.78);
+}
+
+/* ALTO CONTRASTE */
+
+html[data-contraste="alto"] body:has(.container) .header {
+    background: #000000;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border-bottom: 2px solid #ffd600;
+}
+
+/* ========================================
+   ACESSIBILIDADE: REDUZIR ANIMAÇÕES
+======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .form-area.animando-saida,
+    .form-area.animando-entrada,
+    .cartao-cadastro.animando-tipo {
+        animation: none !important;
+    }
 }

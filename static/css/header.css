@@ -1404,3 +1404,28 @@ html[data-contraste="alto"] .conta-links > a {
     background: #ffd600 !important;
     color: #000000 !important;
 }
+
+/* =========================================
+   HEADER TRANSLÚCIDO SOBRE A PÁGINA INICIAL
+========================================= */
+
+body:has(.hero) .header {
+    background: rgba(217, 217, 217, 0.72);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: 0 4px 22px rgba(20, 20, 70, 0.08);
+}
+
+/* Tema escuro */
+html[data-tema="escuro"] body:has(.hero) .header {
+    background: rgba(20, 20, 36, 0.78);
+}
+
+/* Alto contraste sempre prevalece */
+html[data-contraste="alto"] body:has(.hero) .header {
+    background: #000000;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border-bottom: 2px solid #ffd600;
+}

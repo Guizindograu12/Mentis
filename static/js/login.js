@@ -1,7 +1,51 @@
+
+function trocarTela(telaDestino) {
+    const telas = [
+        document.getElementById("login-area"),
+        document.getElementById("cadastro-area"),
+        document.getElementById("recuperacao-area")
+    ];
+
+    const telaAtual = telas.find(tela =>
+        tela && !tela.classList.contains("escondido")
+    );
+
+    if (!telaDestino || telaAtual === telaDestino) return;
+
+    // Evita cliques durante a animação
+    if (window.transicaoLoginAtiva) return;
+    window.transicaoLoginAtiva = true;
+
+    if (telaAtual) {
+        telaAtual.classList.add("animando-saida");
+
+        setTimeout(() => {
+            telaAtual.classList.add("escondido");
+            telaAtual.classList.remove("animando-saida");
+
+            telaDestino.classList.remove("escondido");
+            telaDestino.classList.add("animando-entrada");
+
+            setTimeout(() => {
+                telaDestino.classList.remove("animando-entrada");
+                window.transicaoLoginAtiva = false;
+            }, 400);
+
+        }, 220);
+
+    } else {
+        telaDestino.classList.remove("escondido");
+        telaDestino.classList.add("animando-entrada");
+
+        setTimeout(() => {
+            telaDestino.classList.remove("animando-entrada");
+            window.transicaoLoginAtiva = false;
+        }, 400);
+    }
+}
+
 function mostrarLogin() {
-    document.getElementById("cadastro-area").classList.add("escondido");
-    document.getElementById("recuperacao-area").classList.add("escondido");
-    document.getElementById("login-area").classList.remove("escondido");
+    trocarTela(document.getElementById("login-area"));
 
     document.getElementById("titulo-alternativo").textContent =
         "Não possui uma conta?";
@@ -15,9 +59,7 @@ function mostrarLogin() {
 }
 
 function mostrarCadastro() {
-    document.getElementById("login-area").classList.add("escondido");
-    document.getElementById("recuperacao-area").classList.add("escondido");
-    document.getElementById("cadastro-area").classList.remove("escondido");
+    trocarTela(document.getElementById("cadastro-area"));
 
     document.getElementById("titulo-alternativo").textContent =
         "Já possui uma conta?";
@@ -35,9 +77,7 @@ function mostrarRecuperacao(event) {
         event.preventDefault();
     }
 
-    document.getElementById("cadastro-area").classList.add("escondido");
-    document.getElementById("login-area").classList.add("escondido");
-    document.getElementById("recuperacao-area").classList.remove("escondido");
+    trocarTela(document.getElementById("recuperacao-area"));
 
     document.getElementById("titulo-alternativo").textContent =
         "Esqueceu sua senha?";
@@ -58,4 +98,3 @@ document.addEventListener("DOMContentLoaded", function () {
         mostrarRecuperacao();
     }
 });
-
