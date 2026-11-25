@@ -1,219 +1,434 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel de RH - Mentis</title>
+{% extends 'rh_base.html' %}
+{% from 'rh_macros.html' import icone, selo, barra, barra_classe, coluna, variacao, iniciais %}
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/header.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/rh.css') }}">
-</head>
+{% block titulo %}Dashboard{% endblock %}
 
-<body>
+{% block conteudo %}
 
-    {% include 'header.html' %}
+{% set total = painel.total_funcionarios %}
+{% set com_teste = painel.funcionarios_com_teste %}
+{% set pendentes = total - com_teste %}
+{% set adesao = (com_teste / total * 100) if total > 0 else 0 %}
 
-    <main class="rh-pagina">
+<!-- ========== FAIXA DE BOAS-VINDAS ========== -->
+<section class="rh-boasvindas">
 
-        <!-- TOPO -->
-        <section class="rh-topo">
-            <div>
-                <p class="rh-etiqueta">Painel de RH</p>
-                <h1>{{ painel.empresa_nome }}</h1>
-                <p class="rh-subtitulo">
-                    CNPJ {{ painel.cnpj_formatado }} ·
-                    Acompanhamento do bem-estar emocional dos funcionários vinculados à empresa.
-                </p>
-            </div>
-
-            <a href="{{ url_for('logout') }}" class="rh-sair">Sair</a>
-        </section>
-
-        <!-- NÚMEROS PRINCIPAIS -->
-        <section class="rh-cartoes">
-
-            <div class="rh-cartao">
-                <span class="rh-cartao-titulo">Funcionários cadastrados</span>
-                <strong class="rh-cartao-valor">{{ painel.total_funcionarios }}</strong>
-            </div>
-
-            <div class="rh-cartao">
-                <span class="rh-cartao-titulo">Já fizeram o teste</span>
-                <strong class="rh-cartao-valor">{{ painel.com_teste }}</strong>
-            </div>
-
-            <div class="rh-cartao">
-                <span class="rh-cartao-titulo">Ainda não fizeram</span>
-                <strong class="rh-cartao-valor">{{ painel.sem_teste }}</strong>
-            </div>
-
-            <div class="rh-cartao">
-                <span class="rh-cartao-titulo">Pontuação média atual</span>
-                <strong class="rh-cartao-valor">
-                    {% if painel.media_geral is not none %}{{ painel.media_geral }}%{% else %}—{% endif %}
-                </strong>
-            </div>
-
-        </section>
-
-        {% if painel.total_funcionarios == 0 %}
-
-            <section class="rh-bloco rh-vazio-bloco">
-                <h2>Nenhum funcionário vinculado ainda</h2>
-                <p>
-                    Peça para os funcionários criarem a conta na aba <strong>Funcionário</strong>,
-                    informando como empresa: <strong>{{ painel.empresa_nome }}</strong>.
-                    Maiúsculas, acentos e pontuação não fazem diferença.
-                </p>
-            </section>
-
-        {% elif painel.com_teste == 0 %}
-
-            <section class="rh-bloco rh-vazio-bloco">
-                <h2>Nenhum teste realizado ainda</h2>
-                <p>
-                    Os indicadores aparecem aqui assim que os funcionários começarem
-                    a fazer o teste do Mentis.
-                </p>
-            </section>
-
-        {% else %}
-
-            <!-- PONTO DE ATENÇÃO -->
-            <section class="rh-alerta {% if painel.em_atencao > 0 %}rh-alerta-atencao{% endif %}">
-                {% if painel.em_atencao > 0 %}
-                    <strong>Ponto de atenção:</strong>
-                    {{ painel.em_atencao }} de {{ painel.com_teste }} funcionário(s) com teste
-                    ({{ painel.percentual_atencao }}%) estão nas faixas Elevado ou Muito Elevado
-                    no último teste.
-                    {% if painel.categorias_atencao %}
-                        As categorias com maior pontuação média são:
-                        {{ painel.categorias_atencao|join(', ') }}.
-                    {% endif %}
-                {% else %}
-                    <strong>Panorama:</strong>
-                    nenhum funcionário está nas faixas Elevado ou Muito Elevado no último teste.
-                {% endif %}
-            </section>
-
-            <div class="rh-duas-colunas">
-
-                <!-- DISTRIBUIÇÃO -->
-                <section class="rh-bloco">
-                    <h2>Distribuição das classificações</h2>
-                    <p class="rh-explicacao">Último teste de cada funcionário.</p>
-
-                    {% for item in painel.distribuicao %}
-                        <div class="rh-linha-barra">
-                            <span class="rh-linha-nome">{{ item.nome }}</span>
-                            <div class="rh-barra">
-                                <div class="rh-barra-preenchimento {{ item.classe }}" style="width: {{ item.percentual }}%"></div>
-                            </div>
-                            <span class="rh-linha-valor">{{ item.quantidade }} ({{ item.percentual }}%)</span>
-                        </div>
-                    {% endfor %}
-                </section>
-
-                <!-- CATEGORIAS -->
-                <section class="rh-bloco">
-                    <h2>Categorias avaliadas</h2>
-                    <p class="rh-explicacao">
-                        Pontuação média por categoria. Quanto maior, mais atenção a categoria pede.
-                    </p>
-
-                    {% for item in painel.categorias %}
-                        <div class="rh-linha-barra">
-                            <span class="rh-linha-nome">{{ item.nome }}</span>
-                            <div class="rh-barra">
-                                <div class="rh-barra-preenchimento" style="width: {{ item.percentual }}%"></div>
-                            </div>
-                            <span class="rh-linha-valor">{{ item.percentual }}%</span>
-                        </div>
-                    {% endfor %}
-                </section>
-
-            </div>
-
-            <!-- EVOLUÇÃO -->
-            <section class="rh-bloco">
-                <h2>Evolução mensal</h2>
-                <p class="rh-explicacao">
-                    Pontuação média dos testes realizados em cada mês (todos os testes dos funcionários).
-                </p>
-
-                {% for item in painel.evolucao %}
-                    <div class="rh-linha-barra">
-                        <span class="rh-linha-nome">{{ item.mes }}</span>
-                        <div class="rh-barra">
-                            <div class="rh-barra-preenchimento" style="width: {{ item.percentual }}%"></div>
-                        </div>
-                        <span class="rh-linha-valor">{{ item.percentual }}% · {{ item.quantidade }} teste(s)</span>
-                    </div>
-                {% endfor %}
-            </section>
-
-        {% endif %}
-
-        <!-- FUNCIONÁRIOS -->
-        {% if painel.total_funcionarios > 0 %}
-            <section class="rh-bloco">
-                <h2>Funcionários vinculados</h2>
-
-                <div class="rh-tabela-rolagem">
-                    <table class="rh-tabela">
-                        <thead>
-                            <tr>
-                                <th>Funcionário</th>
-                                <th>E-mail</th>
-                                <th>Testes</th>
-                                {% if painel.mostrar_individual %}
-                                    <th>Último teste</th>
-                                    <th>Resultado</th>
-                                    <th>Classificação</th>
-                                {% else %}
-                                    <th>Situação</th>
-                                {% endif %}
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                            {% for f in painel.funcionarios %}
-                                <tr>
-                                    <td>{{ f.nome_completo }}</td>
-                                    <td>{{ f.email }}</td>
-                                    <td>{{ f.total_testes }}</td>
-
-                                    {% if painel.mostrar_individual %}
-                                        {% if f.ultimo %}
-                                            <td>{{ f.ultimo.data }}</td>
-                                            <td>{{ f.ultimo.percentual }}%</td>
-                                            <td>
-                                                <span class="rh-selo {{ f.ultimo.classe }}">{{ f.ultimo.classificacao }}</span>
-                                            </td>
-                                        {% else %}
-                                            <td colspan="3" class="rh-sem-teste">Ainda não fez o teste</td>
-                                        {% endif %}
-                                    {% else %}
-                                        <td>
-                                            {% if f.ultimo %}Já participou{% else %}Ainda não fez o teste{% endif %}
-                                        </td>
-                                    {% endif %}
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-        {% endif %}
-
-        <p class="rh-aviso">
-            Os resultados do Mentis são apenas indicativos e não substituem uma avaliação
-            profissional. Use estas informações para cuidar do ambiente de trabalho,
-            nunca para julgar ou penalizar pessoas.
+    <div class="rh-boasvindas-texto">
+        <div class="rh-etiqueta">VISÃO GERAL</div>
+        <h1 class="rh-titulo">Bem-estar na {{ empresa.nome }}</h1>
+        <p class="rh-sub">
+            Indicadores calculados a partir dos testes enviados pelos
+            funcionários vinculados à sua empresa.
         </p>
 
-    </main>
+        <div class="rh-boasvindas-acoes">
+            <a class="rh-botao rh-botao-claro" href="{{ url_for('rh_funcionarios') }}">
+                {{ icone('funcionarios') }} Ver funcionários
+            </a>
+            <a class="rh-botao rh-botao-contorno-claro" href="{{ url_for('rh_testes') }}">
+                Ver testes recebidos
+            </a>
+        </div>
+    </div>
 
-    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
-</body>
-</html>
+    {% if total > 0 %}
+        <div class="rh-adesao">
+            <div class="rh-anel"
+                 style="--p: {{ '%.0f'|format(adesao) }}"
+                 role="img"
+                 aria-label="Adesão de {{ '%.0f'|format(adesao) }}%">
+                <span class="rh-anel-fundo"></span>
+                <span class="rh-anel-aro"></span>
+                <span class="rh-anel-texto">
+                    <strong>{{ '%.0f'|format(adesao) }}%</strong>
+                    <small>adesão</small>
+                </span>
+            </div>
+            <p class="rh-adesao-texto">
+                <strong>{{ com_teste }} de {{ total }}</strong>
+                {{ 'funcionário já fez' if total == 1 else 'funcionários já fizeram' }} o teste.
+            </p>
+        </div>
+    {% endif %}
+
+</section>
+
+{% if total == 0 %}
+
+    <!-- ========== COMO COMEÇAR ========== -->
+    <div class="rh-passos">
+
+        <div class="rh-passo">
+            <div class="rh-passo-num">1</div>
+            <h3>Passe o nome da empresa</h3>
+            <p>
+                Peça para os funcionários criarem a conta na aba
+                <strong>Funcionário</strong> e informarem exatamente este nome:
+            </p>
+            <p class="rh-destaque">{{ empresa.nome }}</p>
+            <p>Maiúsculas, acentos e pontuação não fazem diferença.</p>
+        </div>
+
+        <div class="rh-passo">
+            <div class="rh-passo-num">2</div>
+            <h3>Eles fazem o teste</h3>
+            <p>
+                Cada funcionário responde ao questionário de bem-estar. O
+                resultado fica ligado à conta dele e, por consequência,
+                à sua empresa.
+            </p>
+        </div>
+
+        <div class="rh-passo">
+            <div class="rh-passo-num">3</div>
+            <h3>Acompanhe por aqui</h3>
+            <p>
+                Os indicadores, os sinais de atenção e a evolução aparecem
+                neste painel assim que os primeiros testes chegarem.
+            </p>
+        </div>
+
+    </div>
+
+    <!-- ========== O QUE VOCÊ VAI ACOMPANHAR ========== -->
+    <section class="rh-painel">
+        <div class="rh-painel-topo">
+            <h2>O que você vai acompanhar</h2>
+        </div>
+        <div class="rh-painel-corpo">
+            <div class="rh-previa">
+
+                <div class="rh-previa-item">
+                    <span class="rh-icone-caixa">{{ icone('grafico') }}</span>
+                    <div>
+                        <strong>Distribuição dos resultados</strong>
+                        <p>Quantas pessoas estão em cada nível, do Muito Baixo ao Muito Elevado.</p>
+                    </div>
+                </div>
+
+                <div class="rh-previa-item">
+                    <span class="rh-icone-caixa">{{ icone('alerta') }}</span>
+                    <div>
+                        <strong>Sinais de atenção</strong>
+                        <p>Funcionários com resultado alto ou com piora entre dois testes.</p>
+                    </div>
+                </div>
+
+                <div class="rh-previa-item">
+                    <span class="rh-icone-caixa">{{ icone('testes') }}</span>
+                    <div>
+                        <strong>Categorias</strong>
+                        <p>A média por categoria, das que mais preocupam para as que menos preocupam.</p>
+                    </div>
+                </div>
+
+                <div class="rh-previa-item">
+                    <span class="rh-icone-caixa">{{ icone('historico') }}</span>
+                    <div>
+                        <strong>Evolução por mês</strong>
+                        <p>A média de todos os testes feitos em cada mês.</p>
+                    </div>
+                </div>
+
+            </div>
+            <p class="rh-nota">Os resultados são indicadores de bem-estar e não substituem um diagnóstico.</p>
+        </div>
+    </section>
+
+{% else %}
+
+    <!-- ========== INDICADORES ========== -->
+    <div class="rh-kpis">
+
+        <div class="rh-kpi">
+            <div class="rh-kpi-topo">
+                <div class="rh-kpi-rotulo">Funcionários</div>
+                <span class="rh-icone-caixa">{{ icone('funcionarios') }}</span>
+            </div>
+            <div class="rh-kpi-valor">{{ total }}</div>
+            <div class="rh-kpi-dica">vinculados à empresa</div>
+        </div>
+
+        <div class="rh-kpi">
+            <div class="rh-kpi-topo">
+                <div class="rh-kpi-rotulo">Testes concluídos</div>
+                <span class="rh-icone-caixa">{{ icone('check') }}</span>
+            </div>
+            <div class="rh-kpi-valor">{{ com_teste }}</div>
+            <div class="rh-kpi-dica">{{ '%.0f'|format(com_teste / total * 100) }}% dos funcionários</div>
+        </div>
+
+        <div class="rh-kpi">
+            <div class="rh-kpi-topo">
+                <div class="rh-kpi-rotulo">Pendentes</div>
+                <span class="rh-icone-caixa">{{ icone('historico') }}</span>
+            </div>
+            <div class="rh-kpi-valor">{{ pendentes }}</div>
+            <div class="rh-kpi-dica">ainda sem nenhum teste</div>
+        </div>
+
+        <div class="rh-kpi">
+            <div class="rh-kpi-topo">
+                <div class="rh-kpi-rotulo">Testes recebidos</div>
+                <span class="rh-icone-caixa">{{ icone('testes') }}</span>
+            </div>
+            <div class="rh-kpi-valor">{{ painel.total_testes }}</div>
+            <div class="rh-kpi-dica">no total</div>
+        </div>
+
+        <div class="rh-kpi">
+            <div class="rh-kpi-topo">
+                <div class="rh-kpi-rotulo">Média geral</div>
+                <span class="rh-icone-caixa">{{ icone('grafico') }}</span>
+            </div>
+            {% if painel.media_geral is not none %}
+                {% set m = painel.media_geral %}
+                <div class="rh-kpi-valor">{{ '%.0f'|format(m) }}%</div>
+                <div class="rh-kpi-dica">
+                    {{ selo('Muito Baixo' if m <= 20 else 'Baixo' if m <= 40 else 'Moderado' if m <= 60 else 'Elevado' if m <= 80 else 'Muito Elevado') }}
+                    último teste de cada pessoa
+                </div>
+            {% else %}
+                <div class="rh-kpi-valor">—</div>
+                <div class="rh-kpi-dica">sem testes ainda</div>
+            {% endif %}
+        </div>
+
+    </div>
+
+    <!-- ========== ATALHOS ========== -->
+    <div class="rh-atalhos">
+
+        <a class="rh-atalho" href="{{ url_for('rh_funcionarios') }}">
+            <span class="rh-icone-caixa">{{ icone('funcionarios') }}</span>
+            <span class="rh-atalho-texto">
+                <strong>Funcionários</strong>
+                <small>Busque e filtre por nome e status</small>
+            </span>
+            <span class="rh-atalho-seta">{{ icone('seta') }}</span>
+        </a>
+
+        <a class="rh-atalho" href="{{ url_for('rh_testes') }}">
+            <span class="rh-icone-caixa">{{ icone('testes') }}</span>
+            <span class="rh-atalho-texto">
+                <strong>Testes</strong>
+                <small>O teste mais recente de cada funcionário</small>
+            </span>
+            <span class="rh-atalho-seta">{{ icone('seta') }}</span>
+        </a>
+
+        <a class="rh-atalho" href="{{ url_for('rh_historico') }}">
+            <span class="rh-icone-caixa">{{ icone('historico') }}</span>
+            <span class="rh-atalho-texto">
+                <strong>Histórico</strong>
+                <small>Todos os testes já feitos</small>
+            </span>
+            <span class="rh-atalho-seta">{{ icone('seta') }}</span>
+        </a>
+
+        <a class="rh-atalho" href="{{ url_for('rh_empresa') }}">
+            <span class="rh-icone-caixa">{{ icone('empresa') }}</span>
+            <span class="rh-atalho-texto">
+                <strong>Dados da empresa</strong>
+                <small>Nome e informações da conta</small>
+            </span>
+            <span class="rh-atalho-seta">{{ icone('seta') }}</span>
+        </a>
+
+    </div>
+
+    {% if com_teste > 0 %}
+
+        {% set ordem = ['Muito Baixo', 'Baixo', 'Moderado', 'Elevado', 'Muito Elevado'] %}
+        {% set contagem = {} %}
+        {% for d in painel.distribuicao %}
+            {% set _ = contagem.update({d.classificacao: d.quantidade}) %}
+        {% endfor %}
+
+        {% set atencao = painel.funcionarios|selectattr('nivel', 'in', ['alerta', 'atencao'])|list %}
+
+        <div class="rh-grade-2">
+
+            <!-- ========== DISTRIBUIÇÃO ========== -->
+            <section class="rh-painel">
+                <div class="rh-painel-topo">
+                    <h2>Distribuição dos resultados</h2>
+                </div>
+                <div class="rh-painel-corpo">
+                    {% for nome in ordem %}
+                        {% set q = contagem.get(nome, 0) %}
+                        <div class="rh-dado">
+                            <div class="rh-dado-topo">
+                                {{ selo(nome) }}
+                                <strong>{{ q }} {{ 'pessoa' if q == 1 else 'pessoas' }}</strong>
+                            </div>
+                            {{ barra_classe(q / com_teste * 100, nome) }}
+                        </div>
+                    {% endfor %}
+                    <p class="rh-nota">Considera o último teste de cada funcionário.</p>
+                </div>
+            </section>
+
+            <!-- ========== SINAIS DE ATENÇÃO ========== -->
+            <section class="rh-painel">
+                <div class="rh-painel-topo">
+                    <h2>Sinais de atenção</h2>
+                </div>
+                <div class="rh-painel-corpo">
+                    {% if atencao %}
+                        <ul class="rh-lista">
+                            {% for f in atencao[:6] %}
+                                <li>
+                                    <div class="rh-avatar" aria-hidden="true">{{ iniciais(f.nome) }}</div>
+                                    <div class="rh-lista-texto">
+                                        <a class="rh-link-forte" href="{{ url_for('rh_funcionario', funcionario_id=f.id) }}">{{ f.nome }}</a>
+                                        <small>
+                                            {{ '%.0f'|format(f.ultimo_percentual) }}% no último teste
+                                            {% if f.variacao is not none %}· {{ variacao(f.variacao) }}{% endif %}
+                                        </small>
+                                    </div>
+                                    {{ selo(f.ultima_classificacao) }}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="rh-nota">Nenhum funcionário em nível de atenção no momento.</p>
+                    {% endif %}
+                    <p class="rh-nota">
+                        Atenção a partir de {{ painel.limite_atencao }}% e alerta a partir de
+                        {{ painel.limite_alerta }}% no resultado geral. São indicadores,
+                        não diagnósticos.
+                    </p>
+                </div>
+            </section>
+
+        </div>
+
+        <div class="rh-grade-2">
+
+            <!-- ========== CATEGORIAS ========== -->
+            {% if painel.categorias %}
+                <section class="rh-painel">
+                    <div class="rh-painel-topo">
+                        <h2>Categorias (média)</h2>
+                    </div>
+                    <div class="rh-painel-corpo">
+                        {% for c in painel.categorias %}
+                            <div class="rh-dado">
+                                <div class="rh-dado-topo">
+                                    <span>{{ c.nome }}</span>
+                                    <strong>{{ '%.0f'|format(c.percentual) }}%</strong>
+                                </div>
+                                {{ barra(c.percentual) }}
+                            </div>
+                        {% endfor %}
+                        <p class="rh-nota">As categorias com maior percentual aparecem primeiro.</p>
+                    </div>
+                </section>
+            {% endif %}
+
+            <!-- ========== EVOLUÇÃO ========== -->
+            {% if painel.evolucao %}
+                <section class="rh-painel">
+                    <div class="rh-painel-topo">
+                        <h2>Evolução por mês</h2>
+                    </div>
+                    <div class="rh-painel-corpo">
+                        <div class="rh-colunas">
+                            {% for m in painel.evolucao %}
+                                {{ coluna(m.percentual, m.mes) }}
+                            {% endfor %}
+                        </div>
+                        <p class="rh-nota">Média de todos os testes feitos em cada mês.</p>
+                    </div>
+                </section>
+            {% endif %}
+
+        </div>
+
+    {% endif %}
+
+    <!-- ========== AGUARDANDO O PRIMEIRO TESTE ========== -->
+    {% set sem_teste = painel.funcionarios|selectattr('nivel', 'equalto', 'sem_teste')|list %}
+
+    {% if sem_teste %}
+        <section class="rh-painel rh-painel-espaco">
+            <div class="rh-painel-topo">
+                <h2>Aguardando o primeiro teste</h2>
+                <span class="rh-nota-topo">
+                    {{ sem_teste|length }} {{ 'pessoa' if sem_teste|length == 1 else 'pessoas' }}
+                </span>
+            </div>
+            <div class="rh-painel-corpo">
+                <ul class="rh-lista rh-lista-colunas">
+                    {% for f in sem_teste[:8] %}
+                        <li>
+                            <div class="rh-avatar" aria-hidden="true">{{ iniciais(f.nome) }}</div>
+                            <div class="rh-lista-texto">
+                                <a class="rh-link-forte" href="{{ url_for('rh_funcionario', funcionario_id=f.id) }}">{{ f.nome }}</a>
+                                <small>{{ f.email }}</small>
+                            </div>
+                            <span class="rh-selo status-pendente">Sem teste</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+                {% if sem_teste|length > 8 %}
+                    <p class="rh-nota">
+                        E mais {{ sem_teste|length - 8 }}.
+                        <a class="rh-link-forte" href="{{ url_for('rh_funcionarios') }}">Ver todos os funcionários</a>
+                    </p>
+                {% endif %}
+            </div>
+        </section>
+    {% endif %}
+
+    <!-- ========== ÚLTIMOS TESTES ========== -->
+    <section class="rh-painel">
+        <div class="rh-painel-topo">
+            <h2>Últimos testes recebidos</h2>
+            <a class="rh-link-forte" href="{{ url_for('rh_testes') }}">Ver todos</a>
+        </div>
+
+        {% if ultimos_envios %}
+            <div class="rh-tabela-wrap">
+                <table class="rh-tabela">
+                    <thead>
+                        <tr>
+                            <th>Funcionário</th>
+                            <th>Data</th>
+                            <th>Resultado</th>
+                            <th><span class="rh-so-leitor">Ação</span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for t in ultimos_envios %}
+                            <tr>
+                                <td>
+                                    <div class="rh-pessoa">
+                                        <div class="rh-avatar" aria-hidden="true">{{ iniciais(t.funcionario) }}</div>
+                                        <div>
+                                            <strong>{{ t.funcionario }}</strong>
+                                            <small>{{ t.email }}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>{{ t.data }}</td>
+                                <td>{{ selo(t.classificacao) }} <span class="rh-num">{{ '%.0f'|format(t.percentual) }}%</span></td>
+                                <td class="rh-acoes">
+                                    <a class="rh-botao-link" href="{{ url_for('rh_resultado', teste_id=t.teste_id) }}">Ver resultado</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="rh-painel-corpo">
+                <p class="rh-nota">Nenhum teste recebido ainda.</p>
+            </div>
+        {% endif %}
+    </section>
+
+{% endif %}
+
+{% endblock %}

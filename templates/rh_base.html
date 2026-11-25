@@ -31,6 +31,8 @@
 
             <nav class="rh-nav" aria-label="Seções do painel">
 
+                <span class="rh-nav-titulo">Principal</span>
+
                 <a href="{{ url_for('rh_painel') }}"
                    class="{{ 'ativo' if pagina == 'dashboard' }}"
                    {% if pagina == 'dashboard' %}aria-current="page"{% endif %}>
@@ -55,19 +57,33 @@
                     {{ icone('historico') }} Histórico
                 </a>
 
+                <span class="rh-nav-titulo">Empresa</span>
+
                 <a href="{{ url_for('rh_empresa') }}"
                    class="{{ 'ativo' if pagina == 'empresa' }}"
                    {% if pagina == 'empresa' %}aria-current="page"{% endif %}>
-                    {{ icone('empresa') }} Empresa
+                    {{ icone('empresa') }} Dados da empresa
                 </a>
 
             </nav>
 
-            <nav class="rh-nav rh-nav-fim" aria-label="Conta">
-                <a href="{{ url_for('logout') }}">
-                    {{ icone('sair') }} Sair
-                </a>
-            </nav>
+            <div class="rh-lateral-fim">
+
+                <div class="rh-lateral-card">
+                    <strong>Dados protegidos</strong>
+                    <p>
+                        Você só vê funcionários vinculados à sua empresa.
+                        Os resultados são indicadores, não diagnósticos.
+                    </p>
+                </div>
+
+                <nav class="rh-nav rh-nav-fim" aria-label="Conta">
+                    <a href="{{ url_for('logout') }}">
+                        {{ icone('sair') }} Sair
+                    </a>
+                </nav>
+
+            </div>
 
         </aside>
 
