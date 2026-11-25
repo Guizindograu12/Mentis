@@ -1,4 +1,9 @@
-<header class="header">
+{# Os links de navegação (Home, Sobre nós, Demo...) só aparecem para quem
+   NÃO está logado. Quem está logado só os vê na página inicial, onde eles
+   levam às seções da própria página. #}
+{% set mostrar_menu = (not usuario) or request.endpoint == 'home' %}
+
+<header class="header{% if not mostrar_menu %} header-sem-menu{% endif %}">
 
     <!-- LOGO -->
     <div class="logo">
@@ -167,9 +172,25 @@
             class="conta-links"
             aria-label="Opções da conta">
 
-            <a href="{{ url_for('perfil') }}">
-                Meu perfil e resultados
-            </a>
+            {% if tipo_conta == 'empresa_rh' %}
+
+                <!-- CONTA EMPRESA / RH -->
+                <a href="{{ url_for('rh_painel') }}">
+                    Área da empresa
+                </a>
+
+                <a href="{{ url_for('rh_funcionarios') }}">
+                    Avaliação dos funcionários
+                </a>
+
+            {% else %}
+
+                <!-- CONTA FUNCIONÁRIO -->
+                <a href="{{ url_for('perfil') }}">
+                    Meu perfil e resultados
+                </a>
+
+            {% endif %}
 
             <button
                 type="button"

@@ -1429,3 +1429,17 @@ html[data-contraste="alto"] body:has(.hero) .header {
     -webkit-backdrop-filter: none;
     border-bottom: 2px solid #ffd600;
 }
+
+
+/* =========================================
+   CABEÇALHO SEM MENU DE NAVEGAÇÃO
+   (quem está logado, fora da página inicial)
+   Os elementos continuam no HTML para o header.js
+   não quebrar; aqui eles só ficam escondidos.
+========================================= */
+
+.header.header-sem-menu .menu,
+.header.header-sem-menu .menu-toggle,
+.header.header-sem-menu .menu-overlay {
+    display: none !important;
+}
