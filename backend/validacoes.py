@@ -15,12 +15,11 @@ TAMANHO_MAXIMO_SENHA = 128
 TIPOS_CONTA = ("funcionario", "empresa_rh")
 
 # Domínio obrigatório por tipo de conta.
-# Funcionário NÃO tem domínio obrigatório: aceita qualquer e-mail válido.
-# Empresa/RH continua exigindo @mentisrh.com (domínio interno do Mentis,
-# não precisa existir de verdade).
-DOMINIOS_EMAIL = {
-    "empresa_rh": "mentisrh.com"
-}
+# Nenhum tipo exige domínio específico: Funcionário e Empresa/RH
+# aceitam qualquer e-mail válido.
+# Se um dia precisar voltar a exigir um domínio, basta adicionar aqui,
+# por exemplo: {"empresa_rh": "mentisrh.com"}
+DOMINIOS_EMAIL = {}
 
 # Formato geral de e-mail: nome@dominio.com
 PADRAO_EMAIL_GERAL = r"[a-z0-9._%+\-]+@[a-z0-9\-]+(\.[a-z0-9\-]+)+"
@@ -34,8 +33,9 @@ def email_valido(email, tipo_conta):
     """
     Confere se o e-mail tem um formato válido para o tipo de conta.
 
-    - Empresa/RH: precisa ser nome@mentisrh.com
-    - Funcionário: qualquer e-mail no formato nome@dominio.com
+    - Funcionário e Empresa/RH: qualquer e-mail no formato nome@dominio.com
+    - Se algum tipo de conta tiver domínio obrigatório em DOMINIOS_EMAIL,
+      o e-mail precisa terminar com esse domínio.
 
     O e-mail já deve vir em minúsculas.
     """

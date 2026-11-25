@@ -10,11 +10,11 @@
     var IDADE_MINIMA = 14;
     var TAMANHO_MINIMO_SENHA = 8;
 
-    // Só Empresa/RH tem domínio obrigatório.
-    // Funcionário aceita qualquer e-mail válido.
-    var DOMINIOS = {
-        empresa_rh: "mentisrh.com"
-    };
+    // Nenhum tipo de conta exige domínio específico no e-mail:
+    // Funcionário e Empresa/RH aceitam qualquer e-mail válido.
+    // Se um dia precisar exigir um domínio, adicione aqui,
+    // por exemplo: { empresa_rh: "mentisrh.com" }
+    var DOMINIOS = {};
 
 
     // ==========================================
@@ -213,13 +213,13 @@
 
             if (DOMINIOS[tipo]) {
 
-                // Empresa/RH: domínio obrigatório
+                // Tipo de conta com domínio obrigatório (hoje nenhum)
                 var dominio = DOMINIOS[tipo].replace(".", "\\.");
                 padrao = new RegExp("^[a-z0-9._%+\\-]+@" + dominio + "$");
 
             } else {
 
-                // Funcionário: qualquer e-mail no formato nome@dominio.com
+                // Qualquer e-mail no formato nome@dominio.com
                 padrao = /^[a-z0-9._%+\-]+@[a-z0-9\-]+(\.[a-z0-9\-]+)+$/;
             }
 
@@ -344,7 +344,7 @@
             empresa_rh: {
                 titulo: "Entrar como Empresa / RH",
                 subtitulo: "Use o e-mail e a senha da conta da empresa.",
-                placeholder: "E-mail (@mentisrh.com)",
+                placeholder: "E-mail",
                 icone: ICONE_EMPRESA
             }
         };
