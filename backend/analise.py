@@ -1,3 +1,58 @@
+# ==========================================
+# AJUSTE DE SENSIBILIDADE DO RESULTADO
+# ==========================================
+#
+# A média de muitas respostas tende a ficar no meio (perto de 50%),
+# porque quase ninguém responde só 1 ou só 7.
+#
+# Para o resultado variar mais, o percentual é "esticado" a partir
+# do centro (50%):
+#   - 50% continua 50%
+#   - 0% e 100% continuam 0% e 100%
+#   - a ordem entre as pessoas nunca muda
+#
+# Quanto MENOR o número, MAIS o resultado se afasta do centro.
+#   1.00 = sem ajuste (como era antes)
+#   0.75 = ajuste médio (padrão do resultado geral)
+#   0.60 = ajuste forte
+
+EXPOENTE_GERAL = 0.75
+
+# As categorias têm poucas perguntas (2 ou 3), então já variam
+# bastante sozinhas. Por isso o ajuste delas é mais leve.
+
+EXPOENTE_CATEGORIA = 0.90
+
+
+def ampliar_resultado(percentual, expoente):
+    """
+    Afasta o percentual do centro (50%), mantendo 0%, 50% e 100%.
+
+    Exemplo com expoente 0.75:
+    60% vira 65%, 70% vira 75% e 80% vira 84%.
+    """
+
+    if expoente <= 0:
+
+        raise ValueError(
+            "O expoente de ajuste precisa ser maior que zero."
+        )
+
+    # Distância do centro, de -1 (0%) até +1 (100%)
+    distancia = (percentual - 50) / 50
+
+    sinal = 1 if distancia >= 0 else -1
+
+    nova_distancia = sinal * (abs(distancia) ** expoente)
+
+    novo_percentual = 50 + 50 * nova_distancia
+
+    return round(
+        max(0.0, min(100.0, novo_percentual)),
+        2
+    )
+
+
 def calcular_percentual(respostas):
     """
     Calcula o percentual de dificuldade considerando:
@@ -11,6 +66,8 @@ def calcular_percentual(respostas):
 
     O resultado varia de 0 a 100.
     Quanto maior o percentual, maior a dificuldade indicada.
+
+    Este é o percentual "bruto", sem o ajuste de sensibilidade.
     """
 
     if not respostas:
@@ -120,10 +177,12 @@ def analisar_respostas(respostas_com_perguntas):
         )
 
     # Calcula o resultado geral considerando
-    # os pesos e a inversão de cada pergunta.
+    # os pesos e a inversão de cada pergunta
+    # e aplica o ajuste de sensibilidade.
 
-    percentual_geral = calcular_percentual(
-        respostas_com_perguntas
+    percentual_geral = ampliar_resultado(
+        calcular_percentual(respostas_com_perguntas),
+        EXPOENTE_GERAL
     )
 
     resultado = {
@@ -153,12 +212,14 @@ def analisar_respostas(respostas_com_perguntas):
 
         grupos[categoria].append(item)
 
-    # Calcula o percentual individual de cada categoria.
+    # Calcula o percentual individual de cada categoria,
+    # com o ajuste mais leve.
 
     for categoria in sorted(grupos):
 
-        percentual = calcular_percentual(
-            grupos[categoria]
+        percentual = ampliar_resultado(
+            calcular_percentual(grupos[categoria]),
+            EXPOENTE_CATEGORIA
         )
 
         resultado["categorias"].append({
