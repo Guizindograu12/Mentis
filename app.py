@@ -388,7 +388,41 @@ def cadastro():
         return resposta_erro(erro)
 
     # ------------------------------------------
-    # 2. SALVAR NO BANCO
+    # 2. FORMULÁRIO ENVIADO DUAS VEZES
+    #
+    # Se o e-mail já existe e a senha digitada é a mesma da
+    # conta, a conta acabou de ser criada por um envio anterior
+    # deste mesmo formulário (clique duplo, conexão lenta etc.).
+    # Nesse caso, a pessoa simplesmente entra na conta.
+    #
+    # Se a senha for diferente, segue o fluxo normal e
+    # mostra "Este e-mail já está cadastrado."
+    # ------------------------------------------
+
+    usuario_existente_id = validar_usuario(
+        dados["email"],
+        dados["senha"]
+    )
+
+    if usuario_existente_id is not None:
+
+        tipo_existente = (
+            buscar_tipo_conta(usuario_existente_id)
+            or "funcionario"
+        )
+
+        iniciar_sessao(
+            usuario_existente_id,
+            dados["email"],
+            tipo_existente
+        )
+
+        return redirect(
+            pagina_inicial_da_conta(tipo_existente)
+        )
+
+    # ------------------------------------------
+    # 3. SALVAR NO BANCO
     # (o funcionário é ligado à empresa dele aqui dentro)
     # ------------------------------------------
 
@@ -399,7 +433,7 @@ def cadastro():
         return resposta_erro(erro)
 
     # ------------------------------------------
-    # 3. ENTRAR NA CONTA CRIADA
+    # 4. ENTRAR NA CONTA CRIADA
     # ------------------------------------------
 
     usuario_id = validar_usuario(
