@@ -218,27 +218,44 @@ para a compreensão dos resultados.
         f"[MENTIS IA] Utilizando modelo Groq: {modelo}"
     )
 
-    resposta = cliente.chat.completions.create(
-        model=modelo,
-        messages=[
-            {
-                "role": "system",
-                "content": (
-                    "Você é o assistente de análise do Mentis. "
-                    "Siga rigorosamente as regras fornecidas "
-                    "e produza análises responsáveis, "
-                    "personalizadas e em português brasileiro. "
-                    "Utilize Markdown válido para a formatação."
-                )
-            },
-            {
-                "role": "user",
-                "content": prompt
-            }
-        ],
-        temperature=0.5,
-        max_completion_tokens=2500
-    )
+    try:
+        resposta = cliente.chat.completions.create(
+            model=modelo,
+            messages=[
+                {
+                    "role": "system",
+                    "content": (
+                        "Você é o assistente de análise do Mentis. "
+                        "Siga rigorosamente as regras fornecidas "
+                        "e produza análises responsáveis, "
+                        "personalizadas e em português brasileiro. "
+                        "Utilize Markdown válido para a formatação."
+                    )
+                },
+                {
+                    "role": "user",
+                    "content": prompt
+                }
+            ],
+            temperature=0.5,
+            max_completion_tokens=2500
+        )
+
+    except Exception as erro:
+        print(
+            f"[MENTIS IA] Erro na comunicação com a Groq: "
+            f"{type(erro).__name__}: {erro}"
+        )
+
+        causa = erro.__cause__ or erro.__context__
+
+        if causa:
+            print(
+                f"[MENTIS IA] Causa original: "
+                f"{type(causa).__name__}: {causa}"
+            )
+
+        raise
 
     texto = (
         resposta.choices[0].message.content or ""
