@@ -1,9 +1,69 @@
+
+import re
+
 import bleach
 import markdown
 
 from markupsafe import Markup
 
 from backend.database import buscar_analise_ia
+
+
+def colorir_tendencias(html):
+
+    tendencias = {
+        "aumento leve": "tendencia-aumento-leve",
+        "aumento": "tendencia-aumento",
+        "redução leve": "tendencia-reducao-leve",
+        "redução": "tendencia-reducao",
+        "estável": "tendencia-estavel"
+    }
+
+    padrao = re.compile(
+        r"<strong>\s*(Aumento leve|Aumento|Redução leve|Redução|Estável)\s*</strong>",
+        re.IGNORECASE
+    )
+
+    def substituir(match):
+
+        texto = match.group(1)
+        classe = tendencias[texto.casefold()]
+
+        return (
+            f'<span class="tendencia {classe}">'
+            f'{texto}'
+            f'</span>'
+        )
+
+    return padrao.sub(substituir, html)
+
+
+def colorir_classificacoes(html):
+
+    classificacoes = {
+        "muito elevado": "indicador-muito-elevado",
+        "elevado": "indicador-elevado",
+        "moderado": "indicador-moderado",
+        "baixo": "indicador-baixo"
+    }
+
+    padrao = re.compile(
+        r"\((Muito Elevado|Elevado|Moderado|Baixo)\)",
+        re.IGNORECASE
+    )
+
+    def substituir(match):
+
+        texto = match.group(1)
+        classe = classificacoes[texto.casefold()]
+
+        return (
+            f'(<span class="indicador-classificacao {classe}">'
+            f'{texto}'
+            f'</span>)'
+        )
+
+    return padrao.sub(substituir, html)
 
 
 def converter_analise_html(texto):
@@ -19,6 +79,9 @@ def converter_analise_html(texto):
         ]
     )
 
+    html = colorir_tendencias(html)
+    html = colorir_classificacoes(html)
+
     html_seguro = bleach.clean(
         html,
         tags=[
@@ -32,9 +95,12 @@ def converter_analise_html(texto):
             "h4",
             "blockquote",
             "br",
-            "hr"
+            "hr",
+            "span"
         ],
-        attributes={},
+        attributes={
+            "span": ["class"]
+        },
         strip=True
     )
 

@@ -1463,3 +1463,182 @@ html[data-contraste="alto"] .analise-texto blockquote {
     background: #000;
     border-left: 3px solid #ffd600;
 }
+
+
+/* =========================================
+   TENDÊNCIAS DA COMPARAÇÃO HISTÓRICA
+========================================= */
+
+.analise-texto .tendencia {
+    display: inline-block;
+    padding: 4px 10px;
+    margin: 2px 0;
+    border-radius: 20px;
+    font-size: 0.88em;
+    font-weight: 700;
+}
+
+/* Redução */
+
+.analise-texto .tendencia-reducao {
+    color: #167044;
+    background: #e0f4e9;
+}
+
+.analise-texto .tendencia-reducao-leve {
+    color: #167044;
+    background: #e0f4e9;
+}
+
+/* Aumento */
+
+.analise-texto .tendencia-aumento {
+    color: #b42332;
+    background: #fde8e9;
+}
+
+.analise-texto .tendencia-aumento-leve {
+    color: #a45b08;
+    background: #fff0d6;
+}
+
+/* Estabilidade */
+
+.analise-texto .tendencia-estavel {
+    color: #555f6d;
+    background: #e9edf2;
+}
+
+/* Organização das listas */
+
+.analise-texto ul {
+    padding-left: 22px;
+}
+
+.analise-texto li {
+    margin-bottom: 12px;
+    line-height: 1.7;
+}
+
+/* Modo escuro */
+
+body.modo-escuro .analise-texto .tendencia-reducao,
+body.modo-escuro .analise-texto .tendencia-reducao-leve {
+    color: #8ce0ad;
+    background: #173d2b;
+}
+
+body.modo-escuro .analise-texto .tendencia-aumento {
+    color: #ff9da5;
+    background: #4a2028;
+}
+
+body.modo-escuro .analise-texto .tendencia-aumento-leve {
+    color: #ffd08a;
+    background: #49351c;
+}
+
+body.modo-escuro .analise-texto .tendencia-estavel {
+    color: #d0d6df;
+    background: #343b46;
+}
+
+/* Alto contraste */
+
+body.alto-contraste .analise-texto .tendencia {
+    color: #ffffff;
+    background: #000000;
+    border: 1px solid currentColor;
+}
+
+/* Impressão */
+
+@media print {
+    .analise-texto .tendencia {
+        color: #000000 !important;
+        background: transparent !important;
+        border: 1px solid #555555;
+    }
+}
+
+
+/* =========================================
+   CLASSIFICAÇÕES DOS INDICADORES
+========================================= */
+
+.analise-texto .indicador-classificacao {
+    display: inline-block;
+    padding: 4px 10px;
+    margin: 2px 0;
+    border-radius: 20px;
+    font-size: 0.88em;
+    font-weight: 700;
+}
+
+/* Muito elevado */
+
+.analise-texto .indicador-muito-elevado {
+    color: #b42332;
+    background: #fde8e9;
+}
+
+/* Elevado */
+
+.analise-texto .indicador-elevado {
+    color: #a45b08;
+    background: #fff0d6;
+}
+
+/* Moderado */
+
+.analise-texto .indicador-moderado {
+    color: #8a6900;
+    background: #fff5c2;
+}
+
+/* Baixo */
+
+.analise-texto .indicador-baixo {
+    color: #167044;
+    background: #e0f4e9;
+}
+
+/* Modo escuro */
+
+body.modo-escuro .analise-texto .indicador-muito-elevado {
+    color: #ff9da5;
+    background: #4a2028;
+}
+
+body.modo-escuro .analise-texto .indicador-elevado {
+    color: #ffd08a;
+    background: #49351c;
+}
+
+body.modo-escuro .analise-texto .indicador-moderado {
+    color: #ffe58a;
+    background: #494018;
+}
+
+body.modo-escuro .analise-texto .indicador-baixo {
+    color: #8ce0ad;
+    background: #173d2b;
+}
+
+/* Alto contraste */
+
+body.alto-contraste .analise-texto .indicador-classificacao {
+    color: #ffffff;
+    background: #000000;
+    border: 1px solid currentColor;
+}
+
+/* Impressão */
+
+@media print {
+    .analise-texto .indicador-classificacao {
+        color: #000000 !important;
+        background: transparent !important;
+        border: 1px solid #555555;
+    }
+}
