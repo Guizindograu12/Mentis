@@ -58,6 +58,7 @@ from backend.validacoes import (
 
 from backend.permissoes import exigir_conta
 from backend.rotas_painel import registrar_rotas_painel
+from backend.recuperacao import registrar_rotas_recuperacao
 
 from backend.perguntas import PERGUNTAS
 from backend.analise import analisar_respostas
@@ -120,6 +121,14 @@ with app.app_context():
 # ==========================================
 
 registrar_rotas_painel(app)
+
+
+# ==========================================
+# ROTAS DA RECUPERAÇÃO DE SENHA
+# (envio do código por e-mail e troca da senha)
+# ==========================================
+
+registrar_rotas_recuperacao(app)
 
 
 # ==========================================
@@ -1269,80 +1278,6 @@ def checkin_humor():
 def obrigado():
 
     return render_template("obrigado.html")
-
-
-# ==========================================
-# RECUPERAÇÃO DE SENHA
-# ==========================================
-
-@app.route("/recuperar-senha", methods=["POST"])
-def recuperar_senha():
-
-    email = request.form.get(
-        "email",
-        ""
-    ).strip().lower()
-
-    nova_senha = request.form.get(
-        "nova_senha",
-        ""
-    )
-
-    confirmar_senha = request.form.get(
-        "confirmar_senha",
-        ""
-    )
-
-    def resposta_recuperacao(mensagem, sucesso=False):
-
-        return render_template(
-
-            "login.html",
-
-            recovery_mode=True,
-
-            erro=None if sucesso else mensagem,
-
-            sucesso=mensagem if sucesso else None
-
-        )
-
-    if not email or not nova_senha or not confirmar_senha:
-
-        return resposta_recuperacao(
-            "Preencha todos os campos."
-        )
-
-    if len(nova_senha) < 8:
-
-        return resposta_recuperacao(
-            "A senha precisa ter pelo menos 8 caracteres."
-        )
-
-    if nova_senha != confirmar_senha:
-
-        return resposta_recuperacao(
-            "As senhas não são iguais."
-        )
-
-    usuario = buscar_usuario_por_email(email)
-
-    if usuario is None:
-
-        return resposta_recuperacao(
-            "Não encontramos uma conta com esse e-mail."
-        )
-
-    if alterar_senha(email, nova_senha):
-
-        return resposta_recuperacao(
-            "Senha alterada! Agora você pode voltar ao login.",
-            sucesso=True
-        )
-
-    return resposta_recuperacao(
-        "Não foi possível alterar a senha. Tente novamente."
-    )
 
 
 # ==========================================
