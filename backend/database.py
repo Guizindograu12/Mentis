@@ -481,6 +481,45 @@ class ResultadoCategoria(db.Model):
         ),
     )
 
+class ResultadoAnaliseIA(db.Model):
+
+    __tablename__ = "resultado_analises_ia"
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+    resultado_id = db.Column(
+        db.Integer,
+        db.ForeignKey(
+            "resultados.id",
+            ondelete="CASCADE"
+        ),
+        nullable=False
+    )
+
+    texto = db.Column(
+        db.Text,
+        nullable=False
+    )
+
+    status = db.Column(
+        db.String(20),
+        nullable=False
+    )
+
+    erro = db.Column(
+        db.Text,
+        nullable=True
+    )
+
+    atualizado_em = db.Column(
+        db.DateTime(timezone=True),
+        nullable=False,
+        server_default=db.func.now(),
+        onupdate=db.func.now()
+    )
 
 class EmotionalCheckIn(db.Model):
 
@@ -517,6 +556,7 @@ class EmotionalCheckIn(db.Model):
 # BANCO DE DADOS
 # ==========================================
 
+
 def criar_tabelas():
 
     db.create_all()
@@ -544,7 +584,7 @@ def criar_tabelas():
             """)
         )
 
-        # ----- usuarios (cadastro Funcionário / Empresa-RH) -----
+        # ----- usuarios (Funcionário / Empresa-RH) -----
 
         conexao.execute(
             text("""
@@ -595,7 +635,6 @@ def criar_tabelas():
         )
 
         # Não permite dois cadastros com o mesmo CNPJ.
-        # (Vários usuários sem CNPJ são permitidos.)
 
         conexao.execute(
             text("""
@@ -604,7 +643,7 @@ def criar_tabelas():
             """)
         )
 
-        # ----- usuarios (vínculo Funcionário -> Empresa/RH) -----
+        # ----- vínculo Funcionário -> Empresa/RH -----
 
         conexao.execute(
             text("""
@@ -637,12 +676,23 @@ def criar_tabelas():
             """)
         )
 
+        # ----- análises personalizadas da IA -----
+
+        conexao.execute(
+            text("""
+                CREATE UNIQUE INDEX IF NOT EXISTS
+                uq_resultado_analises_ia_resultado
+                ON public.resultado_analises_ia (resultado_id)
+            """)
+        )
+
     # Preenche o vínculo das contas que já existiam.
+
     sincronizar_vinculos_empresas()
 
     # Só pode existir uma conta Empresa/RH por empresa.
-    # Fica em um bloco separado: se já existirem duas contas de RH
-    # com a mesma empresa (testes antigos), o sistema não deixa de iniciar.
+    # Fica em um bloco separado para não impedir o sistema
+    # de iniciar caso existam duplicidades antigas.
 
     try:
 
@@ -664,6 +714,7 @@ def criar_tabelas():
             "(provavelmente há duas contas de RH com a mesma empresa). "
             "O cadastro continuará bloqueando novas duplicadas."
         )
+
 
 
 def sincronizar_vinculos_empresas():
@@ -1278,3 +1329,43 @@ def buscar_ultimo_resultado_usuario(usuario_id):
     return db.session.execute(
         consulta
     ).scalar_one_or_none()
+
+def buscar_analise_ia(resultado_id):
+
+    return db.session.execute(
+        select(ResultadoAnaliseIA).where(
+            ResultadoAnaliseIA.resultado_id == resultado_id
+        )
+    ).scalar_one_or_none()
+
+
+def salvar_analise_ia(
+    resultado_id,
+    texto,
+    status,
+    erro=None
+):
+
+    analise = buscar_analise_ia(resultado_id)
+
+    if analise is None:
+
+        analise = ResultadoAnaliseIA(
+            resultado_id=resultado_id,
+            texto=texto,
+            status=status,
+            erro=erro
+        )
+
+        db.session.add(analise)
+
+    else:
+
+        analise.texto = texto
+        analise.status = status
+        analise.erro = erro
+        analise.atualizado_em = db.func.now()
+
+    db.session.flush()
+
+    return analise

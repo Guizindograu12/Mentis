@@ -36,7 +36,14 @@ from backend.database import (
     Teste,
     Resposta,
     Pergunta,
-    Resultado
+    Resultado,
+    buscar_analise_ia,
+    salvar_analise_ia
+)
+
+from backend.ia import (
+    gerar_analise_personalizada,
+    gerar_analise_generica
 )
 
 from backend.conta import (
@@ -467,9 +474,7 @@ def analisar():
             "mensagem": "Nenhuma resposta válida foi enviada."
         }), 400
 
-    ids_selecionados = session.get(
-        "perguntas_teste_ids"
-    )
+    ids_selecionados = session.get("perguntas_teste_ids")
 
     if (
         not isinstance(ids_selecionados, list)
@@ -489,14 +494,7 @@ def analisar():
 
     for chave in respostas:
 
-        if not isinstance(chave, str):
-
-            return jsonify({
-                "status": "erro",
-                "mensagem": "Foi enviada uma pergunta inválida."
-            }), 400
-
-        if not chave.startswith("p"):
+        if not isinstance(chave, str) or not chave.startswith("p"):
 
             return jsonify({
                 "status": "erro",
@@ -504,7 +502,6 @@ def analisar():
             }), 400
 
         try:
-
             pergunta_id = int(chave[1:])
 
         except (ValueError, TypeError):
@@ -547,18 +544,8 @@ def analisar():
         )
 
         # ------------------------------------------
-        # 3. BUSCAR RESPOSTAS E DADOS DAS PERGUNTAS
+        # 3. BUSCAR RESPOSTAS E PERGUNTAS
         # ------------------------------------------
-        #
-        # Aqui selecionamos diretamente as colunas
-        # da pergunta, incluindo peso e invertida.
-        #
-        # Assim, não precisamos acessar:
-        # pergunta.peso
-        # pergunta.invertida
-        #
-        # Isso evita o problema anterior com atributos
-        # ausentes no objeto Pergunta.
 
         linhas = db.session.execute(
             select(
@@ -592,9 +579,6 @@ def analisar():
             peso = linha[4]
             invertida = linha[5]
 
-            # Valores padrão caso algum registro antigo
-            # esteja sem configuração de peso ou inversão.
-
             if peso is None:
                 peso = 1.00
 
@@ -604,21 +588,16 @@ def analisar():
             respostas_com_perguntas.append({
 
                 "pergunta_id": pergunta_id,
-
                 "texto": texto,
-
                 "categoria": categoria,
-
                 "resposta": resposta_valor,
-
                 "peso": float(peso),
-
                 "invertida": bool(invertida)
 
             })
 
         # ------------------------------------------
-        # 4. VALIDAR RECUPERAÇÃO DAS RESPOSTAS
+        # 4. VALIDAR RESPOSTAS
         # ------------------------------------------
 
         if len(respostas_com_perguntas) != QUANTIDADE_PERGUNTAS:
@@ -628,7 +607,7 @@ def analisar():
             )
 
         # ------------------------------------------
-        # 5. ANALISAR RESPOSTAS
+        # 5. CALCULAR RESULTADO
         # ------------------------------------------
 
         analise = analisar_respostas(
@@ -636,7 +615,7 @@ def analisar():
         )
 
         # ------------------------------------------
-        # 6. SALVAR RESULTADO
+        # 6. SALVAR RESULTADO NO BANCO
         # ------------------------------------------
 
         resultado_db = salvar_resultado(
@@ -646,24 +625,175 @@ def analisar():
 
         db.session.commit()
 
-        # ------------------------------------------
-        # 7. GUARDAR IDENTIFICADORES
-        # ------------------------------------------
-
+        # Guardar os IDs depois do commit.
         teste_id = teste_db.id
         resultado_id = resultado_db.id
 
         # ------------------------------------------
-        # 8. LIMPAR PERGUNTAS DA SESSÃO
+        # 7. LIMPAR PERGUNTAS DA SESSÃO
         # ------------------------------------------
-        #
-        # Ao iniciar outro teste, serão sorteadas
-        # 25 novas perguntas.
 
         session.pop(
             "perguntas_teste_ids",
             None
         )
+
+        # ------------------------------------------
+        # 8. GERAR ANÁLISE PERSONALIZADA COM IA
+        # ------------------------------------------
+
+        try:
+
+            # Verifica se já existe uma análise salva.
+            analise_existente = buscar_analise_ia(
+                resultado_id
+            )
+
+            if analise_existente is None:
+
+                # ----------------------------------
+                # HISTÓRICO DOS TESTES ANTERIORES
+                # ----------------------------------
+
+                historico_linhas = db.session.execute(
+                    select(
+                        Resultado,
+                        Teste.data_teste
+                    )
+                    .join(
+                        Teste,
+                        Resultado.teste_id == Teste.id
+                    )
+                    .where(
+                        Teste.usuario_id == usuario_id,
+                        Teste.id != teste_id
+                    )
+                    .order_by(
+                        Teste.data_teste.desc(),
+                        Resultado.id.desc()
+                    )
+                    .limit(5)
+                ).all()
+
+                historico = []
+
+                for resultado_anterior, data_teste in historico_linhas:
+
+                    categorias_anteriores = [
+
+                        {
+                            "categoria": categoria.categoria,
+                            "percentual": float(categoria.percentual),
+                            "classificacao": categoria.classificacao
+                        }
+
+                        for categoria in resultado_anterior.categorias
+
+                    ]
+
+                    historico.append({
+
+                        "data": (
+                            data_teste.strftime("%d/%m/%Y")
+                            if data_teste
+                            else "Data indisponível"
+                        ),
+
+                        "percentual_geral": float(
+                            resultado_anterior.percentual_geral
+                        ),
+
+                        "classificacao_geral": (
+                            resultado_anterior.classificacao_geral
+                        ),
+
+                        "categorias": categorias_anteriores
+
+                    })
+
+                # Deixar o histórico em ordem cronológica.
+                historico.reverse()
+
+                # ----------------------------------
+                # DADOS DO RESULTADO ATUAL
+                # ----------------------------------
+
+                analise_atual = {
+
+                    "percentual_geral": float(
+                        resultado_db.percentual_geral
+                    ),
+
+                    "classificacao_geral": (
+                        resultado_db.classificacao_geral
+                    ),
+
+                    "categorias": [
+
+                        {
+                            "categoria": categoria.categoria,
+                            "percentual": float(categoria.percentual),
+                            "classificacao": categoria.classificacao
+                        }
+
+                        for categoria in resultado_db.categorias
+
+                    ]
+
+                }
+
+                # ----------------------------------
+                # TENTAR GERAR ANÁLISE COM GROQ
+                # ----------------------------------
+
+                try:
+
+                    texto_ia = gerar_analise_personalizada(
+                        respostas_com_perguntas,
+                        analise_atual,
+                        historico
+                    )
+
+                    status_ia = "gerada"
+                    erro_ia = None
+
+                except Exception as erro:
+
+                    app.logger.exception(
+                        "Não foi possível gerar a análise com Groq."
+                    )
+
+                    # Se a IA falhar, utiliza uma análise genérica.
+                    texto_ia = gerar_analise_generica(
+                        analise_atual
+                    )
+
+                    status_ia = "generica"
+
+                    erro_ia = str(erro)[:1000]
+
+                # ----------------------------------
+                # SALVAR ANÁLISE NO BANCO
+                # ----------------------------------
+
+                salvar_analise_ia(
+                    resultado_id,
+                    texto_ia,
+                    status_ia,
+                    erro_ia
+                )
+
+                db.session.commit()
+
+        except Exception:
+
+            # A análise não pode impedir que o resultado
+            # do questionário seja exibido.
+            db.session.rollback()
+
+            app.logger.exception(
+                "Erro ao salvar a análise personalizada."
+            )
 
         # ------------------------------------------
         # 9. REGISTRO NO TERMINAL
@@ -673,8 +803,8 @@ def analisar():
         print("===================================")
         print("NOVO TESTE REALIZADO")
         print("Teste ID:", teste_id)
+        print("Resultado ID:", resultado_id)
         print("Usuário ID:", usuario_id)
-        print("E-mail:", session.get("usuario"))
         print(
             "Quantidade de perguntas:",
             len(respostas_com_perguntas)
@@ -691,7 +821,7 @@ def analisar():
         print()
 
         # ------------------------------------------
-        # 10. RESPOSTA PARA O JAVASCRIPT
+        # 10. RESPONDER AO JAVASCRIPT
         # ------------------------------------------
 
         return jsonify({
@@ -738,6 +868,7 @@ def analisar():
             "mensagem": "Não foi possível processar o teste."
 
         }), 500
+
 
 
 # ==========================================

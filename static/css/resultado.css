@@ -476,6 +476,8 @@ body {
     text-align: left;
     white-space: normal;
     overflow-wrap: break-word;
+    white-space: pre-line;
+    line-height: 1.8;
 }
 
 .analise-texto p {
@@ -1250,4 +1252,214 @@ html[data-tema="escuro"] .barra-progresso {
 
 html[data-tema="escuro"] .categoria-rodape {
     color: #cbd5e1;
+}
+
+/* =========================================
+   ANÁLISE PERSONALIZADA FORMATADA
+========================================= */
+
+.analise-texto {
+    color: #43566b;
+    font-size: 14px;
+    line-height: 1.85;
+    white-space: normal;
+}
+
+.analise-texto h2,
+.analise-texto h3 {
+    color: #191970;
+    margin: 24px 0 12px;
+    font-size: 17px;
+}
+
+.analise-texto h2:first-child,
+.analise-texto h3:first-child {
+    margin-top: 0;
+}
+
+.analise-texto p {
+    margin: 0 0 16px;
+}
+
+.analise-texto strong {
+    color: #193f70;
+    font-weight: 700;
+}
+
+.analise-texto ul,
+.analise-texto ol {
+    padding-left: 25px;
+    margin: 10px 0 20px;
+}
+
+.analise-texto li {
+    padding-left: 5px;
+    margin-bottom: 9px;
+}
+
+.analise-texto li::marker {
+    color: #4778ad;
+    font-weight: 700;
+}
+
+.analise-texto blockquote {
+    margin: 18px 0;
+    padding: 12px 17px;
+    background: #edf3fa;
+    border-left: 3px solid #4778ad;
+    border-radius: 6px;
+}
+
+/* Modo escuro */
+
+html[data-tema="escuro"] .analise-texto h2,
+html[data-tema="escuro"] .analise-texto h3,
+html[data-tema="escuro"] .analise-texto strong {
+    color: #93c5fd;
+}
+
+html[data-tema="escuro"] .analise-texto blockquote {
+    background: #263449;
+    border-color: #60a5fa;
+}
+
+/* Alto contraste */
+
+html[data-contraste="alto"] .analise-texto h2,
+html[data-contraste="alto"] .analise-texto h3,
+html[data-contraste="alto"] .analise-texto strong,
+html[data-contraste="alto"] .analise-texto li::marker {
+    color: #ffd600;
+}
+
+html[data-contraste="alto"] .analise-texto blockquote {
+    background: #000;
+    border: 2px solid #ffd600;
+}
+
+
+/* =========================================
+   ANÁLISE PERSONALIZADA — FORMATAÇÃO
+========================================= */
+
+.analise-texto {
+    white-space: normal;
+    line-height: 1.8;
+    color: #43566b;
+}
+
+/* Títulos das seções da IA */
+.analise-texto h3 {
+    margin: 25px 0 12px;
+    padding-bottom: 9px;
+
+    color: #234d7b;
+    font-size: 17px;
+    font-weight: 700;
+
+    border-bottom: 1px solid #dce6f1;
+}
+
+.analise-texto h3:first-child {
+    margin-top: 0;
+}
+
+/* Subtítulos */
+.analise-texto h4 {
+    margin: 18px 0 8px;
+
+    color: #315d88;
+    font-size: 15px;
+}
+
+/* Negritos */
+.analise-texto strong {
+    color: #234d7b;
+    font-weight: 700;
+}
+
+/* Parágrafos */
+.analise-texto p {
+    margin: 0 0 15px;
+    line-height: 1.85;
+}
+
+/* Listas */
+.analise-texto ul,
+.analise-texto ol {
+    padding-left: 25px;
+    margin: 12px 0 20px;
+}
+
+.analise-texto li {
+    padding-left: 5px;
+    margin-bottom: 9px;
+    line-height: 1.8;
+}
+
+.analise-texto li::marker {
+    color: #527caf;
+    font-weight: 700;
+}
+
+/* Destaques em citações */
+.analise-texto blockquote {
+    margin: 16px 0;
+    padding: 12px 17px;
+
+    background: #edf3fa;
+    border-left: 3px solid #527caf;
+    border-radius: 0 8px 8px 0;
+
+    color: #536b85;
+}
+
+/* =========================================
+   ANÁLISE — MODO ESCURO
+========================================= */
+
+html[data-tema="escuro"] .analise-texto h3 {
+    color: #93c5fd;
+    border-color: #475569;
+}
+
+html[data-tema="escuro"] .analise-texto h4,
+html[data-tema="escuro"] .analise-texto strong {
+    color: #bfdbfe;
+}
+
+html[data-tema="escuro"] .analise-texto li::marker {
+    color: #93c5fd;
+}
+
+html[data-tema="escuro"] .analise-texto blockquote {
+    background: #263449;
+    border-left-color: #93c5fd;
+    color: #dbeafe;
+}
+
+/* =========================================
+   ANÁLISE — ALTO CONTRASTE
+========================================= */
+
+html[data-contraste="alto"] .analise-texto h3,
+html[data-contraste="alto"] .analise-texto h4,
+html[data-contraste="alto"] .analise-texto strong,
+html[data-contraste="alto"] .analise-texto p,
+html[data-contraste="alto"] .analise-texto li,
+html[data-contraste="alto"] .analise-texto blockquote {
+    color: #fff;
+}
+
+html[data-contraste="alto"] .analise-texto h3 {
+    border-color: #fff;
+}
+
+html[data-contraste="alto"] .analise-texto li::marker {
+    color: #ffd600;
+}
+
+html[data-contraste="alto"] .analise-texto blockquote {
+    background: #000;
+    border-left: 3px solid #ffd600;
 }
