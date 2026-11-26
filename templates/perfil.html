@@ -237,7 +237,7 @@
                     href="{{ url_for('resultado', teste_id=teste.teste_id) }}">
 
                     <span>
-                        <strong>Teste #{{ teste.teste_id }}</strong>
+                        <strong>Teste #{{ loop.revindex }}</strong>
 
                         <small>{{ teste.data_label }}</small>
                     </span>
