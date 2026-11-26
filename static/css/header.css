@@ -1,50 +1,46 @@
 /* =========================================
-   VARIÁVEIS DE COR (PADRÃO = VISUAL ATUAL)
-   As configurações do site só trocam estes valores.
+   1. VARIÁVEIS DE CORES
 ========================================= */
 
 :root {
-    /* Cor principal */
     --destaque: #191970;
     --destaque-hover: #2b2bb3;
     --destaque-claro: #e8e8f5;
     --destaque-luz: #b8b8ff;
     --botao-texto: #ffffff;
 
-    /* Painéis laterais */
     --painel-fundo: #f4f4f8;
     --painel-texto: var(--destaque);
     --painel-suave: #8a8aa8;
     --painel-borda: #e0e0e8;
     --painel-borda-forte: #d7d7e2;
+
     --conta-destaque-fundo: #e8e8f5;
     --conta-destaque-texto: #191970;
 
-    /* Cabeçalho */
     --header-fundo: rgba(217, 217, 217, 0.85);
     --header-texto: #000000;
 
-    /* Títulos e destaques em texto */
     --titulo-cor: var(--destaque);
 
-    /* Seções da página inicial */
     --pagina-fundo: #ffffff;
     --pagina-fundo-2: #ececf5;
     --pagina-texto: #000000;
+
     --time-fundo: #fffafb;
     --time-titulo-fundo: #ffffff;
     --footer-fundo: #0f2a5a;
 
-    /* Interruptor desligado */
     --switch-off: #9a9ab0;
 
-    /* Mensagens de erro e sucesso */
     --erro-cor: #b00020;
     --erro-sobre: #ffffff;
     --ok-cor: #176b2c;
 }
 
-/* TEMA ESCURO */
+/* =========================================
+   2. TEMA ESCURO
+========================================= */
 
 html[data-tema="escuro"] {
     --destaque-claro: #2a2a48;
@@ -62,6 +58,7 @@ html[data-tema="escuro"] {
     --pagina-fundo: #121220;
     --pagina-fundo-2: #1b1b30;
     --pagina-texto: #e8e8f5;
+
     --time-fundo: #121220;
     --time-titulo-fundo: #1b1b30;
     --footer-fundo: #0a0a18;
@@ -73,7 +70,9 @@ html[data-tema="escuro"] {
     --ok-cor: #7ee0a0;
 }
 
-/* ALTO CONTRASTE (vem depois do tema escuro, por isso vence) */
+/* =========================================
+   3. ALTO CONTRASTE
+========================================= */
 
 html[data-contraste="alto"] {
     --destaque: #ffd600;
@@ -81,7 +80,9 @@ html[data-contraste="alto"] {
     --destaque-claro: #222222;
     --destaque-luz: #ffd600;
     --botao-texto: #000000;
+
     --titulo-cor: #ffd600;
+
     --conta-destaque-fundo: #ffd600;
     --conta-destaque-texto: #000000;
 
@@ -97,6 +98,7 @@ html[data-contraste="alto"] {
     --pagina-fundo: #000000;
     --pagina-fundo-2: #000000;
     --pagina-texto: #ffffff;
+
     --time-fundo: #000000;
     --time-titulo-fundo: #000000;
     --footer-fundo: #000000;
@@ -108,320 +110,130 @@ html[data-contraste="alto"] {
     --ok-cor: #7dff9b;
 }
 
-/* HEADER COMPARTILHADO */
+/* =========================================
+   4. HEADER GERAL
+========================================= */
 
 .header {
     position: fixed;
     top: 0;
     left: 0;
+
     width: 100%;
-    min-height: 105px;
+    min-height: 86px;
+    box-sizing: border-box;
+
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between;
     gap: 25px;
-    padding: 18px 50px;
+
+    padding: 14px max(5vw, calc((100vw - 1250px) / 2));
+
     background: var(--header-fundo);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+
+    border-bottom: 1px solid rgba(30, 30, 90, 0.08);
+    box-shadow: 0 4px 22px rgba(20, 20, 70, 0.04);
+
     z-index: 1000;
+}
+
+.header .logo {
+    flex-shrink: 0;
 }
 
 .header .logo img {
     display: block;
-    width: 130px;
+    width: 125px;
     height: auto;
 }
 
+/* =========================================
+   5. NAVEGAÇÃO
+========================================= */
+
 .header .menu {
     display: flex;
-    gap: 30px;
     align-items: center;
+    gap: 0;
 }
 
-.header .menu > a {
+.menu-navegacao {
+    display: flex;
+    align-items: center;
+    gap: clamp(18px, 2.5vw, 34px);
+}
+
+.header .menu-navegacao > a {
+    position: relative;
+
     color: var(--header-texto);
+    font-size: 13px;
+    font-weight: 600;
+
     text-decoration: none;
     white-space: nowrap;
+
+    transition: color 0.2s ease;
 }
 
-.header .menu > a:hover {
+.header .menu-navegacao > a:hover {
     color: var(--titulo-cor);
 }
 
-/* CONTA E LOGIN */
+.header .menu-navegacao > a::after {
+    content: "";
 
-.header .login {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    background: transparent;
-    padding: 0;
-}
+    position: absolute;
+    right: 0;
+    bottom: -7px;
+    left: 0;
 
-.header .login .btn,
-.header .login .btn-sair {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 12px 24px;
-    border: none;
-    border-radius: 30px;
+    height: 2px;
+    border-radius: 2px;
+
     background: var(--destaque);
-    color: var(--botao-texto);
-    text-decoration: none;
-    font-weight: bold;
-    transition: background 0.3s;
+
+    transform: scaleX(0);
+    transform-origin: right;
+
+    transition: transform 0.2s ease;
 }
 
-.header .login .btn:hover,
-.header .login .btn-sair:hover {
-    background: var(--destaque-hover);
+.header .menu-navegacao > a:hover::after,
+.header .menu-navegacao > a:focus-visible::after {
+    transform: scaleX(1);
+    transform-origin: left;
 }
 
-.header .conta {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 10px 15px;
-    border-radius: 20px;
-    background: #eeeeee;
-    color: #1a1a6e;
-    font-size: 14px;
-    font-weight: bold;
-    max-width: 220px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    text-decoration: none;
-    cursor: pointer;
-}
-
-/* BOTÕES MOBILE: ESCONDIDOS NO COMPUTADOR */
-
-.menu-toggle,
-.menu-close,
-.sidebar-top,
-.menu-overlay {
+.menu-subtitulo {
     display: none;
 }
 
-/* SIDEBAR NO MOBILE */
-
-@media (max-width: 800px) {
-
-    .header {
-        min-height: 82px;
-        height: 82px;
-        padding: 12px 20px;
-        flex-direction: row;
-        justify-content: space-between;
-        gap: 12px;
-    }
-
-    .header .logo img {
-        width: 105px;
-    }
-
-    .menu-toggle {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        gap: 5px;
-        width: 46px;
-        height: 46px;
-        padding: 10px;
-        border: none;
-        border-radius: 10px;
-        background: var(--destaque);
-        cursor: pointer;
-        flex-shrink: 0;
-    }
-
-    .menu-toggle span {
-        display: block;
-        width: 24px;
-        height: 2px;
-        border-radius: 2px;
-        background: var(--botao-texto);
-    }
-
-    .header .menu {
-        position: fixed;
-        top: 0;
-        right: 0;
-        width: min(300px, 85vw);
-        height: 100vh;
-        height: 100dvh;
-        padding: 25px 22px;
-        display: flex;
-        flex-direction: column;
-        align-items: stretch;
-        justify-content: flex-start;
-        gap: 0;
-        overflow-y: auto;
-        background: var(--painel-fundo);
-        box-shadow: -8px 0 25px rgba(0, 0, 0, 0.15);
-        z-index: 1002;
-        transform: translateX(110%);
-        visibility: hidden;
-        pointer-events: none;
-        transition: transform 0.3s ease, visibility 0.3s ease;
-    }
-
-    .header .menu.menu-aberto {
-        transform: translateX(0);
-        visibility: visible;
-        pointer-events: auto;
-    }
-
-    .sidebar-top {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 25px;
-        padding-bottom: 18px;
-        border-bottom: 1px solid var(--painel-borda-forte);
-        color: var(--painel-texto);
-        font-size: 22px;
-        font-weight: bold;
-    }
-
-    .menu-close {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 38px;
-        height: 38px;
-        border: none;
-        border-radius: 8px;
-        background: var(--destaque);
-        color: var(--botao-texto);
-        font-size: 28px;
-        cursor: pointer;
-    }
-
-    .header .menu > a {
-        display: block;
-        padding: 16px 8px;
-        border-bottom: 1px solid var(--painel-borda);
-        color: var(--painel-texto);
-        font-size: 16px;
-        white-space: normal;
-    }
-
-    .header .menu > a:hover {
-        background: var(--destaque-claro);
-    }
-
-    .header .login {
-        display: flex;
-        flex-direction: column;
-        align-items: stretch;
-        gap: 12px;
-        margin-top: 25px;
-    }
-
-    .header .conta {
-        max-width: 100%;
-        padding: 12px;
-        white-space: normal;
-        overflow-wrap: anywhere;
-        text-align: center;
-    }
-
-    .header .login .btn,
-    .header .login .btn-sair {
-        width: 100%;
-        min-height: 44px;
-    }
-
-    .menu-overlay {
-        display: block;
-        position: fixed;
-        inset: 0;
-        background: rgba(0, 0, 0, 0.45);
-        z-index: 1001;
-        opacity: 0;
-        visibility: hidden;
-        pointer-events: none;
-        transition: opacity 0.3s ease, visibility 0.3s ease;
-    }
-
-    .menu-overlay.overlay-visivel {
-        opacity: 1;
-        visibility: visible;
-        pointer-events: auto;
-    }
-
-    body.menu-bloqueado {
-        overflow: hidden;
-    }
-}
-
-/* ACESSIBILIDADE: REDUZIR ANIMAÇÕES */
-
-@media (prefers-reduced-motion: reduce) {
-    .header .menu,
-    .menu-overlay {
-        transition: none;
-    }
-}
-
-
-/* CORREÇÃO DO MENU HAMBÚRGUER */
-@media (max-width: 800px) {
-    .header {
-        flex-direction: row !important;
-        justify-content: space-between;
-    }
-
-    .header .menu-toggle {
-        display: flex !important;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 5px;
-        width: 46px;
-        height: 46px;
-        flex-shrink: 0;
-        position: relative;
-        z-index: 1003;
-        background: var(--destaque);
-        border: none;
-        border-radius: 10px;
-        cursor: pointer;
-    }
-
-    .header .menu-toggle span {
-        display: block;
-        width: 24px;
-        height: 2px;
-        background: var(--botao-texto);
-    }
-}
-
-
 /* =========================================
-   ÍCONE DA CONTA E PAINEL LATERAL
+   6. BOTÃO DO PERFIL — DESKTOP
 ========================================= */
-
-/* ÍCONE DA PESSOA NO CABEÇALHO */
 
 .header .btn-conta {
     display: flex;
     align-items: center;
     justify-content: center;
+
     flex-shrink: 0;
-    width: 46px;
-    height: 46px;
+
+    width: 43px;
+    height: 43px;
     padding: 0;
-    border: none;
+    margin: 0;
+
+    border: 1px solid var(--painel-borda);
     border-radius: 50%;
+
     background: transparent;
     color: var(--titulo-cor);
+
     cursor: pointer;
     transition: background 0.3s;
 }
@@ -433,9 +245,24 @@ html[data-contraste="alto"] {
 
 .header .btn-conta svg {
     display: block;
+    width: 28px;
+    height: 28px;
 }
 
-/* HEADER DESKTOP: LOGO, MENU CENTRALIZADO E LOGIN NAS EXTREMIDADES */
+/* =========================================
+   7. ELEMENTOS DO MOBILE
+========================================= */
+
+.menu-toggle,
+.menu-close,
+.sidebar-top,
+.menu-overlay {
+    display: none;
+}
+
+/* =========================================
+   8. HEADER DESKTOP
+========================================= */
 
 @media (min-width: 801px) {
 
@@ -443,69 +270,504 @@ html[data-contraste="alto"] {
         display: grid;
         grid-template-columns: 1fr auto 1fr;
         align-items: center;
-        box-sizing: border-box;
-        padding-left: clamp(30px, 5.5vw, 110px);
-        padding-right: clamp(30px, 5.5vw, 110px);
+
+        padding-left: clamp(30px, 5vw, 100px);
+        padding-right: clamp(30px, 5vw, 100px);
     }
 
-    /* Logo à esquerda */
     .header .logo {
         grid-column: 1;
         justify-self: start;
     }
 
-    /* Links no centro da tela */
     .header .menu {
+        position: static;
         grid-column: 2;
         justify-self: center;
+
         display: flex;
         align-items: center;
-        gap: clamp(20px, 2vw, 36px);
+
+        width: auto;
+        height: auto;
+        padding: 0;
         margin: 0;
+
+        background: transparent;
+        box-shadow: none;
+
+        transform: none;
+        visibility: visible;
+        pointer-events: auto;
     }
 
-    /* Login independente do menu, à direita */
-    .header .menu .login {
-        position: absolute;
-        top: 50%;
-        right: clamp(30px, 5.5vw, 110px);
-        transform: translateY(-50%);
-        margin: 0;
+    .header .menu-navegacao {
+        flex-direction: row;
+        justify-content: center;
     }
 
-    /* Ícone da conta à direita quando estiver logado */
     .header .btn-conta {
         grid-column: 3;
         justify-self: end;
+        display: flex !important;
     }
 
+    .menu-conta-mobile,
+    .menu-subtitulo,
+    .menu-toggle,
+    .sidebar-top,
+    .menu-close,
+    .menu-overlay {
+        display: none !important;
+    }
 }
 
-/* Celular: o ícone fica ao lado do hambúrguer */
+/* =========================================
+   9. HEADER TRANSLÚCIDO NA HOME
+========================================= */
+
+body:has(.hero) .header {
+    background: rgba(217, 217, 217, 0.72);
+
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+
+    border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: 0 4px 22px rgba(20, 20, 70, 0.08);
+}
+
+html[data-tema="escuro"] body:has(.hero) .header {
+    background: rgba(20, 20, 36, 0.78);
+}
+
+html[data-contraste="alto"] body:has(.hero) .header {
+    background: #000000;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border-bottom: 2px solid #ffd600;
+}
+
+/* =========================================
+   10. SIDEBAR MOBILE
+========================================= */
+
+.menu-conta-mobile {
+    display: none;
+}
+
 @media (max-width: 800px) {
 
-    .header .btn-conta {
-        order: 1;
-        margin-left: auto;
+    .header {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+
+        width: 100%;
+        height: 76px;
+        min-height: 76px;
+
+        gap: 12px;
+        padding: 10px 20px;
     }
+
+    .header .logo {
+        margin-right: auto;
+    }
+
+    .header .logo img {
+        width: 105px;
+    }
+
+    /* O botão de perfil desktop não aparece no mobile.
+       O acesso ao perfil fica dentro da sidebar. */
+
+    .header .btn-conta {
+        display: none !important;
+    }
+
+    /* Hambúrguer */
 
     .header .menu-toggle {
         order: 2;
+
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+
+        width: 43px;
+        height: 43px;
+        padding: 10px;
+
+        flex-shrink: 0;
+
+        position: relative;
+        z-index: 1001;
+
+        border: none;
+        border-radius: 9px;
+
+        background: var(--destaque);
+        cursor: pointer;
     }
 
+    .header .menu-toggle span {
+        display: block;
+        width: 24px;
+        height: 2px;
+
+        border-radius: 2px;
+        background: var(--botao-texto);
+    }
+
+    /* Sidebar */
+
+    .header .menu {
+        position: fixed;
+        top: 0;
+        right: 0;
+
+        width: min(340px, 88vw);
+        height: 100vh;
+        height: 100dvh;
+
+        box-sizing: border-box;
+
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        justify-content: flex-start;
+
+        gap: 0;
+        padding: 22px 20px 30px;
+
+        overflow-x: hidden;
+        overflow-y: auto;
+
+        background: var(--painel-fundo);
+        box-shadow: -8px 0 25px rgba(0, 0, 0, 0.15);
+
+        z-index: 1005;
+
+        transform: translateX(110%);
+        visibility: hidden;
+        pointer-events: none;
+
+        transition:
+            transform 0.3s ease,
+            visibility 0.3s ease;
+    }
+
+    .header .menu.menu-aberto {
+        transform: translateX(0);
+        visibility: visible;
+        pointer-events: auto;
+    }
+
+    /* Topo */
+
+    .sidebar-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        width: 100%;
+        flex-shrink: 0;
+
+        margin-bottom: 20px;
+        padding-bottom: 18px;
+
+        border-bottom: 1px solid var(--painel-borda-forte);
+
+        color: var(--painel-texto);
+        font-size: 22px;
+        font-weight: bold;
+    }
+
+    .menu-close {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        width: 38px;
+        height: 38px;
+
+        border: none;
+        border-radius: 8px;
+
+        background: var(--destaque);
+        color: var(--botao-texto);
+
+        font-size: 28px;
+        cursor: pointer;
+    }
+
+    /* Navegação */
+
+    .menu-navegacao {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+
+        width: 100%;
+    }
+
+    .menu-subtitulo {
+        display: block;
+
+        margin: 10px 8px 5px;
+
+        color: var(--painel-suave);
+        font-size: 11px;
+        font-weight: bold;
+        letter-spacing: 1px;
+    }
+
+    .header .menu .menu-navegacao > a {
+        display: block;
+        padding: 13px 8px;
+
+        border-bottom: 1px solid var(--painel-borda);
+
+        color: var(--painel-texto);
+        font-size: 15px;
+
+        text-decoration: none;
+        white-space: normal;
+    }
+
+    .header .menu .menu-navegacao > a::after {
+        display: none;
+    }
+
+    .header .menu .menu-navegacao > a:hover {
+        background: var(--destaque-claro);
+    }
+
+    /* Minha conta dentro da sidebar */
+
+    .menu-conta-mobile {
+        display: flex;
+        flex-direction: column;
+
+        width: 100%;
+        flex-shrink: 0;
+
+        margin-top: 12px;
+    }
+
+    .menu-conta-divisor {
+        width: 100%;
+        height: 1px;
+
+        margin: 10px 0 22px;
+
+        background: var(--painel-borda);
+    }
+
+    .menu-conta-titulo {
+        margin: 0 8px 8px;
+
+        color: var(--painel-texto);
+        font-size: 17px;
+        font-weight: bold;
+    }
+
+    .menu-conta-email {
+        margin: 0 8px 16px;
+
+        color: var(--painel-suave);
+        font-size: 12px;
+
+        overflow-wrap: anywhere;
+    }
+
+    .menu-conta-links {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .menu-conta-links > a,
+    .menu-conta-links > button {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+
+        width: 100%;
+        box-sizing: border-box;
+
+        padding: 13px 8px;
+
+        border: none;
+        border-bottom: 1px solid var(--painel-borda);
+        border-radius: 0;
+
+        background: transparent;
+        color: var(--painel-texto);
+
+        font-family: inherit;
+        font-size: 14px;
+        font-weight: normal;
+
+        text-align: left;
+        text-decoration: none;
+
+        cursor: pointer;
+    }
+
+    .menu-conta-links > a:hover,
+    .menu-conta-links > button:hover {
+        background: var(--destaque-claro);
+    }
+
+    .menu-conta-icone {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        width: 20px;
+        flex-shrink: 0;
+
+        font-size: 18px;
+    }
+
+    .menu-conta-sair {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+
+        margin-top: 20px;
+        padding: 12px 8px;
+
+        color: var(--erro-cor);
+        font-size: 14px;
+        text-decoration: none;
+    }
+
+    /* Overlay */
+
+    .menu-overlay {
+        display: block;
+
+        position: fixed;
+        inset: 0;
+
+        background: rgba(0, 0, 0, 0.45);
+
+        z-index: 1001;
+
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+
+        transition:
+            opacity 0.3s ease,
+            visibility 0.3s ease;
+    }
+
+    .menu-overlay.overlay-visivel {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+    }
+
+    body.menu-bloqueado {
+        overflow: hidden;
+    }
+
+    /* Não exibe o painel desktop da conta no mobile */
+
+    #painel-conta,
+    #conta-overlay {
+        display: none !important;
+    }
+
+    /* Painéis secundários são integrados à sidebar pelo JS */
+
+    .header .menu > .conta-painel {
+        position: static;
+        inset: auto;
+
+        width: 100%;
+        height: auto;
+        min-height: 0;
+        max-height: none;
+
+        box-sizing: border-box;
+
+        display: none;
+        flex-direction: column;
+
+        padding: 0;
+        margin: 0;
+
+        overflow: visible;
+
+        background: transparent;
+        box-shadow: none;
+
+        transform: none;
+        visibility: visible;
+        pointer-events: auto;
+
+        z-index: auto;
+    }
+
+    .header .menu > .conta-painel.conta-aberta {
+        display: flex;
+    }
+
+    /* Quando configurações ou privacidade estão abertas */
+
+    .header .menu.menu-painel-secundario > .sidebar-top,
+    .header .menu.menu-painel-secundario > .menu-navegacao,
+    .header .menu.menu-painel-secundario > .menu-conta-mobile {
+        display: none !important;
+    }
+
+    .header .menu > .conta-painel .conta-painel-topo {
+        position: sticky;
+        top: 0;
+
+        background: var(--painel-fundo);
+        z-index: 2;
+    }
+
+    .header .menu > .conta-painel .config-grupo {
+        width: 100%;
+    }
+
+    .header .menu > .conta-painel .config-item {
+        box-sizing: border-box;
+    }
+
+    .header .menu > .conta-painel .priv-campo input {
+        max-width: 100%;
+    }
 }
 
-/* FUNDO ESCURO DO PAINEL */
+/* =========================================
+   11. OVERLAY DA CONTA DESKTOP
+========================================= */
 
 .conta-overlay {
     position: fixed;
     inset: 0;
+
     background: rgba(0, 0, 0, 0.45);
+
     z-index: 1100;
+
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
-    transition: opacity 0.3s ease, visibility 0.3s ease;
+
+    transition:
+        opacity 0.3s ease,
+        visibility 0.3s ease;
 }
 
 .conta-overlay.conta-overlay-visivel {
@@ -514,26 +776,40 @@ html[data-contraste="alto"] {
     pointer-events: auto;
 }
 
-/* PAINEL LATERAL */
+/* =========================================
+   12. PAINÉIS LATERAIS
+========================================= */
 
 .conta-painel {
     position: fixed;
     top: 0;
     right: 0;
+
     width: min(340px, 88vw);
     height: 100vh;
     height: 100dvh;
+
+    box-sizing: border-box;
+
     display: flex;
     flex-direction: column;
+
     padding: 25px 22px;
+
     overflow-y: auto;
+
     background: var(--painel-fundo);
     box-shadow: -8px 0 25px rgba(0, 0, 0, 0.15);
+
     z-index: 1101;
+
     transform: translateX(110%);
     visibility: hidden;
     pointer-events: none;
-    transition: transform 0.3s ease, visibility 0.3s ease;
+
+    transition:
+        transform 0.3s ease,
+        visibility 0.3s ease;
 }
 
 .conta-painel.conta-aberta {
@@ -542,31 +818,59 @@ html[data-contraste="alto"] {
     pointer-events: auto;
 }
 
-/* Topo do painel */
+body.conta-bloqueado {
+    overflow: hidden;
+}
+
+.config-painel {
+    z-index: 1102;
+}
+
+/* =========================================
+   13. TOPO DOS PAINÉIS
+========================================= */
 
 .conta-painel-topo {
     display: flex;
     align-items: center;
     justify-content: space-between;
+
     margin-bottom: 20px;
     padding-bottom: 18px;
+
     border-bottom: 1px solid var(--painel-borda-forte);
+
     color: var(--painel-texto);
     font-size: 22px;
     font-weight: bold;
+}
+
+.conta-painel-topo span {
+    flex: 1;
+    padding: 0 12px;
+}
+
+#painel-privacidade .conta-painel-topo span {
+    font-size: 17px;
+    line-height: 1.2;
 }
 
 .conta-fechar {
     display: flex;
     align-items: center;
     justify-content: center;
+
     flex-shrink: 0;
+
     width: 38px;
     height: 38px;
+
     border: none;
     border-radius: 8px;
+
     background: var(--destaque);
     color: var(--botao-texto);
+
     font-size: 28px;
     cursor: pointer;
 }
@@ -575,17 +879,19 @@ html[data-contraste="alto"] {
     background: var(--destaque-hover);
 }
 
-/* E-mail */
+/* =========================================
+   14. CONTA: E-MAIL E LINKS
+========================================= */
 
 .conta-email {
     margin-bottom: 20px;
+
     color: var(--painel-texto);
     font-size: 14px;
     font-weight: bold;
+
     overflow-wrap: anywhere;
 }
-
-/* Links */
 
 .conta-links {
     display: flex;
@@ -595,15 +901,28 @@ html[data-contraste="alto"] {
 .conta-links a,
 .conta-link-desativado {
     display: block;
+
     padding: 16px 8px;
+
     border-bottom: 1px solid var(--painel-borda);
+    border-radius: 8px;
+
     color: var(--painel-texto);
     font-size: 16px;
     text-decoration: none;
 }
 
+.conta-links > a {
+    margin-bottom: 6px;
+
+    background: var(--conta-destaque-fundo);
+    color: var(--conta-destaque-texto);
+
+    font-weight: bold;
+}
+
 .conta-links a:hover {
-    background: var(--destaque-claro);
+    filter: brightness(0.96);
 }
 
 .conta-link-desativado {
@@ -616,62 +935,24 @@ html[data-contraste="alto"] {
     font-size: 12px;
 }
 
-/* Botão Sair, no fim do painel */
-
-.conta-sair {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 44px;
-    margin-top: auto;
-    padding: 12px 24px;
-    border-radius: 30px;
-    background: var(--destaque);
-    color: var(--botao-texto);
-    font-weight: bold;
-    text-decoration: none;
-    transition: background 0.3s;
-}
-
-.conta-sair:hover {
-    background: var(--destaque-hover);
-}
-
-/* Impede a rolagem da página com o painel aberto */
-
-body.conta-bloqueado {
-    overflow: hidden;
-}
-
-/* ACESSIBILIDADE: REDUZIR ANIMAÇÕES */
-
-@media (prefers-reduced-motion: reduce) {
-
-    .conta-painel,
-    .conta-overlay {
-        transition: none;
-    }
-
-}
-
-
-/* =========================================
-   PAINÉIS SECUNDÁRIOS (CONFIGURAÇÕES E PRIVACIDADE)
-========================================= */
-
-/* Botões do painel da conta que abrem os painéis secundários */
-
 .conta-links .conta-link-botao {
     display: block;
+
     width: 100%;
+    margin-bottom: 4px;
     padding: 16px 8px;
+
     border: none;
     border-bottom: 1px solid var(--painel-borda);
+    border-radius: 8px;
+
     background: transparent;
     color: var(--painel-texto);
+
     font-family: inherit;
     font-size: 16px;
     text-align: left;
+
     cursor: pointer;
 }
 
@@ -680,29 +961,43 @@ body.conta-bloqueado {
     background: var(--destaque-claro);
 }
 
-/* Os painéis secundários ficam por cima do painel da conta */
+/* =========================================
+   15. BOTÃO SAIR
+========================================= */
 
-.config-painel {
-    z-index: 1102;
+.conta-sair {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 44px;
+    margin-top: auto;
+    padding: 12px 24px;
+
+    border-radius: 30px;
+
+    background: var(--destaque);
+    color: var(--botao-texto);
+
+    font-weight: bold;
+    text-decoration: none;
+
+    transition: background 0.3s;
 }
 
-.config-painel .conta-painel-topo span {
-    flex: 1;
-    padding: 0 12px;
+.conta-sair:hover {
+    background: var(--destaque-hover);
 }
 
-/* Título mais curto no painel de privacidade (o texto é longo) */
-
-#painel-privacidade .conta-painel-topo span {
-    font-size: 17px;
-    line-height: 1.2;
-}
-
-/* Grupos e itens */
+/* =========================================
+   16. CONFIGURAÇÕES
+========================================= */
 
 .config-grupo h3 {
     margin: 22px 0 6px;
+
     color: var(--painel-suave);
+
     font-size: 13px;
     font-weight: bold;
     letter-spacing: 0.05em;
@@ -713,8 +1008,10 @@ body.conta-bloqueado {
     display: flex;
     align-items: center;
     justify-content: space-between;
+
     gap: 12px;
     padding: 14px 8px;
+
     border-bottom: 1px solid var(--painel-borda);
 }
 
@@ -722,6 +1019,7 @@ body.conta-bloqueado {
     display: flex;
     flex-direction: column;
     gap: 3px;
+
     color: var(--painel-texto);
 }
 
@@ -735,8 +1033,6 @@ body.conta-bloqueado {
     font-size: 13px;
 }
 
-/* Item com botões embaixo do texto */
-
 .config-item-coluna {
     flex-direction: column;
     align-items: stretch;
@@ -747,19 +1043,25 @@ body.conta-bloqueado {
     gap: 8px;
 }
 
-/* Botões de escolha (fonte e tema) */
-
 .config-opcao {
     flex: 1;
+
     padding: 10px 6px;
+
     border: 2px solid var(--titulo-cor);
     border-radius: 8px;
+
     background: transparent;
     color: var(--painel-texto);
+
     font-family: inherit;
     font-size: 13px;
+
     cursor: pointer;
-    transition: background 0.2s, color 0.2s;
+
+    transition:
+        background 0.2s,
+        color 0.2s;
 }
 
 .config-opcao:hover,
@@ -772,30 +1074,61 @@ body.conta-bloqueado {
     color: var(--painel-fundo);
 }
 
-/* Interruptores (contraste, animações e dislexia) */
+.config-opcoes-tema {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+
+    gap: 8px;
+    width: 100%;
+}
+
+.config-opcoes-tema .config-opcao {
+    min-width: 0;
+    padding: 12px 6px;
+
+    white-space: normal;
+    text-align: center;
+    line-height: 1.3;
+}
+
+@media (max-width: 360px) {
+    .config-opcoes-tema {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Interruptores */
 
 .config-switch {
     position: relative;
     flex-shrink: 0;
+
     width: 46px;
     height: 26px;
     padding: 0;
+
     border: none;
     border-radius: 13px;
+
     background: var(--switch-off);
+
     cursor: pointer;
     transition: background 0.2s;
 }
 
 .config-switch::after {
     content: "";
+
     position: absolute;
     top: 3px;
     left: 3px;
+
     width: 20px;
     height: 20px;
+
     border-radius: 50%;
     background: #ffffff;
+
     transition: transform 0.2s;
 }
 
@@ -813,18 +1146,22 @@ body.conta-bloqueado {
     outline-offset: 2px;
 }
 
-/* Botão "Restaurar padrão" */
+/* Restaurar padrão */
 
 .config-restaurar {
     width: 100%;
     margin-top: 24px;
     padding: 12px;
+
     border: 2px solid var(--titulo-cor);
     border-radius: 30px;
+
     background: transparent;
     color: var(--painel-texto);
+
     font-family: inherit;
     font-size: 14px;
+
     cursor: pointer;
 }
 
@@ -833,32 +1170,28 @@ body.conta-bloqueado {
     background: var(--destaque-claro);
 }
 
-
 /* =========================================
-   PRIVACIDADE E SEGURANÇA
+   17. PRIVACIDADE E SEGURANÇA
 ========================================= */
-
-/* Textos explicativos */
 
 .priv-texto {
     margin: 8px 8px 14px;
+
     color: var(--painel-suave);
+
     font-size: 13px;
     line-height: 1.5;
 }
-
-/* Áreas com botões */
 
 .priv-acoes {
     padding: 0 8px;
 }
 
-/* Formulários */
-
 .priv-form {
     display: flex;
     flex-direction: column;
     gap: 12px;
+
     padding: 12px 8px 4px;
 }
 
@@ -880,11 +1213,16 @@ body.conta-bloqueado {
 .priv-campo input {
     width: 100%;
     height: 44px;
+    box-sizing: border-box;
+
     padding: 0 12px;
+
     border: 1px solid var(--painel-suave);
     border-radius: 8px;
+
     background: var(--pagina-fundo);
     color: var(--painel-texto);
+
     font-family: inherit;
     font-size: 16px;
 }
@@ -894,12 +1232,14 @@ body.conta-bloqueado {
     outline-offset: 1px;
 }
 
-/* Mensagens de erro e de sucesso */
+/* Mensagens */
 
 .priv-mensagem {
     padding: 10px 12px;
+
     border-left: 4px solid transparent;
     border-radius: 6px;
+
     font-size: 13px;
     line-height: 1.4;
 }
@@ -926,18 +1266,24 @@ body.conta-bloqueado {
     display: flex;
     align-items: center;
     justify-content: center;
+
     width: 100%;
     min-height: 44px;
     padding: 10px 16px;
+
     border: 2px solid var(--destaque);
     border-radius: 30px;
+
     background: var(--destaque);
     color: var(--botao-texto);
+
     font-family: inherit;
     font-size: 14px;
     font-weight: bold;
     text-decoration: none;
+
     cursor: pointer;
+
     transition: background 0.2s;
 }
 
@@ -985,14 +1331,9 @@ body.conta-bloqueado {
     opacity: 0.9;
 }
 
-
 /* =========================================
-   TAMANHO DA FONTE (ZOOM DA PÁGINA)
+   18. TAMANHO DA FONTE
 ========================================= */
-
-/* Aplica o zoom no conteúdo da página.
-   O cabeçalho e os painéis laterais ficam de fora
-   para não saírem do lugar. */
 
 html[data-fonte="grande"] body > :not(script):not(header):not(.conta-painel):not(.conta-overlay) {
     zoom: 1.15;
@@ -1002,11 +1343,8 @@ html[data-fonte="muito-grande"] body > :not(script):not(header):not(.conta-paine
     zoom: 1.3;
 }
 
-
 /* =========================================
-   CORES DA PÁGINA INICIAL (TEMA E CONTRASTE)
-   O "html" na frente dá prioridade sobre o style.css,
-   que é carregado depois deste arquivo.
+   19. CORES DA PÁGINA INICIAL
 ========================================= */
 
 html .sobre {
@@ -1052,33 +1390,36 @@ html .footer {
     background: var(--footer-fundo);
 }
 
-
 /* =========================================
-   TEMA ESCURO: AJUSTES EXTRAS
+   20. AJUSTES DO TEMA ESCURO
 ========================================= */
-
-/* Logo clara sobre o cabeçalho escuro */
 
 html[data-tema="escuro"] .header .logo img,
 html[data-contraste="alto"] .header .logo img {
     filter: brightness(0) invert(1);
 }
 
-/* Contorno nos botões, para aparecerem no fundo escuro */
-
 html[data-tema="escuro"] .conta-fechar,
 html[data-tema="escuro"] .conta-sair,
 html[data-tema="escuro"] .menu-toggle,
 html[data-tema="escuro"] .menu-close,
-html[data-tema="escuro"] .header .login .btn,
 html[data-tema="escuro"] .carrossel button,
 html[data-tema="escuro"] .priv-botao:not(.priv-botao-contorno):not(.priv-botao-perigo):not(.priv-botao-perigo-cheio) {
     outline: 1px solid var(--titulo-cor);
 }
 
+html[data-tema="escuro"] .header {
+    border-bottom-color: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 4px 22px rgba(0, 0, 0, 0.15);
+}
+
+html[data-tema="escuro"] .conta-links > a {
+    background: #34345c;
+    color: #eeeeff;
+}
 
 /* =========================================
-   ALTO CONTRASTE: AJUSTES EXTRAS
+   21. ALTO CONTRASTE
 ========================================= */
 
 html[data-contraste="alto"] .hero::after {
@@ -1091,7 +1432,7 @@ html[data-contraste="alto"] .card {
     outline-offset: -1px;
 }
 
-html[data-contraste="alto"] .header .menu > a,
+html[data-contraste="alto"] .header .menu-navegacao > a,
 html[data-contraste="alto"] .footer a {
     text-decoration: underline;
 }
@@ -1101,10 +1442,65 @@ html[data-contraste="alto"] :focus-visible {
     outline-offset: 2px;
 }
 
+html[data-contraste="alto"] .conta-links > a {
+    background: #ffd600 !important;
+    color: #000000 !important;
+    font-weight: bold;
+    border: 2px solid #ffd600;
+}
+
+html[data-contraste="alto"] .conta-links .conta-link-botao {
+    background: #000000 !important;
+    color: #ffd600 !important;
+    border: 1px solid #ffd600 !important;
+    border-radius: 8px;
+    margin-bottom: 6px;
+}
+
+html[data-contraste="alto"] .conta-links > a:hover {
+    background: #fff176 !important;
+}
+
+html[data-contraste="alto"] .conta-links .conta-link-botao:hover {
+    background: #222222 !important;
+    color: #ffffff !important;
+}
+
+html[data-contraste="alto"] .header {
+    border-bottom: 2px solid #ffd600;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+}
+
+html[data-contraste="alto"] .header .btn-conta {
+    color: #ffd600;
+    border-color: #ffd600;
+}
+
+html[data-contraste="alto"] .header .btn-conta:hover {
+    background: #222222;
+}
+
+@media (max-width: 800px) {
+    html[data-contraste="alto"] .menu-conta-links > a,
+    html[data-contraste="alto"] .menu-conta-links > button {
+        color: #ffd600;
+        border-color: #ffd600;
+    }
+}
 
 /* =========================================
-   REDUZIR ANIMAÇÕES
+   22. REDUZIR ANIMAÇÕES
 ========================================= */
+
+@media (prefers-reduced-motion: reduce) {
+    .header .menu,
+    .menu-overlay,
+    .conta-painel,
+    .conta-overlay {
+        transition: none;
+    }
+}
 
 html[data-animacoes="reduzidas"] {
     scroll-behavior: auto !important;
@@ -1118,14 +1514,20 @@ html[data-animacoes="reduzidas"] *::after {
     scroll-behavior: auto !important;
 }
 
-
 /* =========================================
-   FONTE PARA DISLEXIA
+   23. FONTE PARA DISLEXIA
 ========================================= */
 
 html[data-dislexia="ligada"] body,
 html[data-dislexia="ligada"] body * {
-    font-family: "Comic Sans MS", "Comic Sans", "Trebuchet MS", Verdana, Arial, sans-serif !important;
+    font-family:
+        "Comic Sans MS",
+        "Comic Sans",
+        "Trebuchet MS",
+        Verdana,
+        Arial,
+        sans-serif !important;
+
     letter-spacing: 0.03em;
     word-spacing: 0.1em;
 }
@@ -1135,311 +1537,82 @@ html[data-dislexia="ligada"] p {
 }
 
 /* =========================================
-   NOVO VISUAL DO CABEÇALHO MENTIS
+   CORREÇÃO DO LOGIN NO DESKTOP
 ========================================= */
 
-.header {
-    min-height: 86px;
-    padding: 14px max(5vw, calc((100vw - 1250px) / 2));
-    background: var(--header-fundo, rgba(255, 255, 255, 0.92));
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-    border-bottom: 1px solid rgba(30, 30, 90, 0.08);
-    box-shadow: 0 4px 22px rgba(20, 20, 70, 0.04);
-}
-
-.header .logo img {
-    width: 125px;
-}
-
-.header .menu {
-    gap: clamp(18px, 2.5vw, 34px);
-}
-
-.header .menu > a {
-    position: relative;
-    color: var(--header-texto);
-    font-size: 13px;
-    font-weight: 600;
-    transition: color 0.2s ease;
-}
-
-.header .menu > a::after {
-    content: "";
-    position: absolute;
-    right: 0;
-    bottom: -7px;
-    left: 0;
-    height: 2px;
-    border-radius: 2px;
-    background: var(--destaque);
-    transform: scaleX(0);
-    transform-origin: right;
-    transition: transform 0.2s ease;
-}
-
-.header .menu > a:hover::after,
-.header .menu > a:focus-visible::after {
-    transform: scaleX(1);
-    transform-origin: left;
-}
-
-.header .login .btn,
-.header .login .btn-sair {
-    min-height: 43px;
-    padding: 0 22px;
-    border-radius: 8px;
-    font-size: 13px;
-    font-weight: 600;
-}
-
-.header .btn-conta {
-    width: 43px;
-    height: 43px;
-    border: 1px solid var(--painel-borda);
-    border-radius: 50%;
-}
-
-.header .btn-conta:hover {
-    background: var(--destaque-claro);
-}
-
-
-/* =========================================
-   CABEÇALHO NO CELULAR
-========================================= */
-
-@media (max-width: 800px) {
-
-    .header {
-        min-height: 76px;
-        height: 76px;
-        padding: 10px 20px;
-    }
-
-    .header .logo img {
-        width: 105px;
-    }
-
-    .header .menu {
-        padding-top: 25px;
-    }
-
-    .header .menu > a {
-        font-size: 15px;
-    }
-
-    .header .menu > a::after {
-        display: none;
-    }
-
-    .header .menu-toggle {
-        width: 43px;
-        height: 43px;
-        border-radius: 9px;
-    }
-
-}
-
-
-/* =========================================
-   TEMA ESCURO
-========================================= */
-
-html[data-tema="escuro"] .header {
-    border-bottom-color: rgba(255, 255, 255, 0.08);
-    box-shadow: 0 4px 22px rgba(0, 0, 0, 0.15);
-}
-
-
-/* =========================================
-   ALTO CONTRASTE
-========================================= */
-
-html[data-contraste="alto"] .header {
-    border-bottom: 2px solid var(--titulo-cor);
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-}
-
-
-/* HEADER DESKTOP */
 @media (min-width: 801px) {
 
+    /* Reserva espaço para o botão à direita */
     .header {
         display: grid;
         grid-template-columns: 1fr auto 1fr;
-        align-items: center;
-        box-sizing: border-box;
-        padding-left: clamp(30px, 5vw, 100px);
-        padding-right: clamp(30px, 5vw, 100px);
-    }
-
-    /* Logo à esquerda */
-    .header .logo {
-        grid-column: 1;
-        justify-self: start;
     }
 
     /* Menu centralizado */
     .header .menu {
-        position: static;
         grid-column: 2;
         justify-self: center;
-        transform: none;
-        margin: 0;
-        display: flex;
-        align-items: center;
-        gap: clamp(18px, 2vw, 35px);
     }
 
-    /* Login à direita */
-    .header .menu .login {
+    .header .menu-navegacao {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: row;
+        gap: clamp(18px, 2.5vw, 34px);
+    }
+
+    /* Login azul à direita */
+    .header .menu-navegacao > a[href*="login"] {
         position: absolute;
         right: clamp(30px, 5vw, 100px);
         top: 50%;
         transform: translateY(-50%);
-        margin: 0;
+
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        min-height: 43px;
+        padding: 0 22px;
+
+        border: none;
+        border-radius: 8px;
+
+        background: var(--destaque);
+        color: var(--botao-texto);
+
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+
+        transition: background 0.3s;
     }
 
-}
+    .header .menu-navegacao > a[href*="login"]:hover {
+        background: var(--destaque-hover);
+        color: var(--botao-texto);
+    }
 
-
-/* =========================================
-   BOTÕES DOS TEMAS
-========================================= */
-
-.config-opcoes-tema {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 8px;
-    width: 100%;
-}
-
-.config-opcoes-tema .config-opcao {
-    min-width: 0;
-    padding: 12px 6px;
-    white-space: normal;
-    text-align: center;
-    line-height: 1.3;
-}
-
-@media (max-width: 360px) {
-    .config-opcoes-tema {
-        grid-template-columns: 1fr;
+    .header .menu-navegacao > a[href*="login"]::after {
+        display: none;
     }
 }
 
-/* =========================================
-   DESTAQUE DE MEU PERFIL E RESULTADOS
-========================================= */
+/* Login normal dentro da sidebar no celular */
+@media (max-width: 800px) {
+    .header .menu-navegacao > a[href*="login"] {
+        position: static;
+        transform: none;
 
-/* MODO CLARO */
-.conta-links > a {
-    background: #e8e8f5;
-    color: #191970;
-    font-weight: bold;
-    border-radius: 8px;
-    margin-bottom: 6px;
-}
+        display: block;
+        width: auto;
 
-/* MODO ESCURO */
-html[data-tema="escuro"] .conta-links > a {
-    background: #34345c;
-    color: #eeeeff;
-}
+        padding: 13px 8px;
 
-/* HOVER NO MODO CLARO E ESCURO */
-.conta-links > a:hover {
-    filter: brightness(0.96);
-}
+        background: transparent;
+        color: var(--painel-texto);
 
-/* BOTÕES DAS OUTRAS OPÇÕES */
-.conta-links .conta-link-botao {
-    border-radius: 8px;
-    margin-bottom: 4px;
-}
-
-/* =========================================
-   ALTO CONTRASTE
-========================================= */
-
-/* Meu perfil e resultados: AMARELO COM TEXTO PRETO */
-html[data-contraste="alto"] .conta-links > a {
-    background: #ffd600;
-    color: #000000;
-    font-weight: bold;
-    border: 2px solid #ffd600;
-}
-
-/* Configurações e privacidade: PRETO COM TEXTO AMARELO */
-html[data-contraste="alto"] .conta-links .conta-link-botao {
-    background: #000000;
-    color: #ffd600;
-    border: 1px solid #ffd600;
-    border-radius: 8px;
-    margin-bottom: 6px;
-}
-
-/* HOVER NO ALTO CONTRASTE */
-html[data-contraste="alto"] .conta-links > a:hover {
-    background: #fff176;
-}
-
-html[data-contraste="alto"] .conta-links .conta-link-botao:hover {
-    background: #222222;
-    color: #ffffff;
-}
-
-/* CORREÇÃO DOS BOTÕES NO ALTO CONTRASTE */
-html[data-contraste="alto"] .conta-links button.conta-link-botao {
-    background: #000000 !important;
-    background-color: #000000 !important;
-    color: #ffd600 !important;
-    border: 1px solid #ffd600 !important;
-}
-
-/* Mantém o destaque amarelo apenas no perfil */
-html[data-contraste="alto"] .conta-links > a {
-    background: #ffd600 !important;
-    color: #000000 !important;
-}
-
-/* =========================================
-   HEADER TRANSLÚCIDO SOBRE A PÁGINA INICIAL
-========================================= */
-
-body:has(.hero) .header {
-    background: rgba(217, 217, 217, 0.72);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.18);
-    box-shadow: 0 4px 22px rgba(20, 20, 70, 0.08);
-}
-
-/* Tema escuro */
-html[data-tema="escuro"] body:has(.hero) .header {
-    background: rgba(20, 20, 36, 0.78);
-}
-
-/* Alto contraste sempre prevalece */
-html[data-contraste="alto"] body:has(.hero) .header {
-    background: #000000;
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-    border-bottom: 2px solid #ffd600;
-}
-
-
-/* =========================================
-   CABEÇALHO SEM MENU DE NAVEGAÇÃO
-   (quem está logado, fora da página inicial)
-   Os elementos continuam no HTML para o header.js
-   não quebrar; aqui eles só ficam escondidos.
-========================================= */
-
-.header.header-sem-menu .menu,
-.header.header-sem-menu .menu-toggle,
-.header.header-sem-menu .menu-overlay {
-    display: none !important;
+        border-radius: 0;
+    }
 }

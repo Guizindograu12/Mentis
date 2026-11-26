@@ -1,514 +1,547 @@
-
 (function () {
-
     "use strict";
 
     // =========================================
-    // CONFIGURAÇÕES
+    // CONFIGURAÇÕES PADRÃO
     // =========================================
-
 
     const CONFIG = {
         fonte: {
             padrao: "normal",
             valores: ["normal", "grande", "muito-grande"]
         },
-
         tema: {
             padrao: "claro",
             valores: ["claro", "escuro", "alto-contraste"]
         },
-
         animacoes: {
             padrao: "normal",
             valores: ["normal", "reduzidas"]
         },
-
         dislexia: {
             padrao: "normal",
             valores: ["normal", "ligada"]
         }
     };
 
-
     window.MENTIS_CONFIG = CONFIG;
 
     const html = document.documentElement;
+    const LARGURA_MOBILE = 800;
 
-    // Carrega as configurações salvas.
+    // =========================================
+    // CARREGAR CONFIGURAÇÕES SALVAS
+    // =========================================
+
     Object.keys(CONFIG).forEach(function (chave) {
-
         let valor = CONFIG[chave].padrao;
 
         try {
-
             const salvo = localStorage.getItem("mentis-" + chave);
 
-            if (
-                salvo &&
-                CONFIG[chave].valores.includes(salvo)
-            ) {
+            if (salvo && CONFIG[chave].valores.includes(salvo)) {
                 valor = salvo;
             }
-
-        } catch (erro) {}
+        } catch (erro) {
+            // Continua com a configuração padrão.
+        }
 
         html.setAttribute("data-" + chave, valor);
-
     });
-    
-    // O alto contraste é um tema próprio,
-    // não uma configuração independente.
-    html.setAttribute(
-        "data-contraste",
-        html.getAttribute("data-tema") === "alto-contraste"
-            ? "alto"
-            : "normal"
-    );
+
+    atualizarContraste();
+
+    function atualizarContraste() {
+        html.setAttribute(
+            "data-contraste",
+            html.getAttribute("data-tema") === "alto-contraste"
+                ? "alto"
+                : "normal"
+        );
+    }
 
     // =========================================
     // INICIALIZAÇÃO
     // =========================================
 
     document.addEventListener("DOMContentLoaded", function () {
-
+        prepararPaineisMobile();
         inicializarMenu();
         inicializarPainelConta();
         inicializarPaineisSecundarios();
         inicializarConfiguracoes();
         inicializarPrivacidade();
-
     });
 
+    // =========================================
+    // ELEMENTOS DO MENU
+    // =========================================
+
+    function obterElementosMenu() {
+        return {
+            botao: document.getElementById("menu-toggle"),
+            fechar: document.getElementById("menu-close"),
+            menu: document.getElementById("menu-principal"),
+            overlay: document.getElementById("menu-overlay")
+        };
+    }
 
     // =========================================
-    // MENU MOBILE
+    // ABRIR E FECHAR MENU
     // =========================================
+
+    function abrirMenu() {
+        const elementos = obterElementosMenu();
+
+        if (!elementos.menu || !elementos.overlay) return;
+
+        fecharPainelConta();
+
+        elementos.menu.classList.add("menu-aberto");
+        elementos.overlay.classList.add("overlay-visivel");
+
+        if (elementos.botao) {
+            elementos.botao.setAttribute("aria-expanded", "true");
+            elementos.botao.setAttribute("aria-label", "Fechar menu");
+        }
+
+        document.body.classList.add("menu-bloqueado");
+    }
+
+    function fecharMenu() {
+        const elementos = obterElementosMenu();
+
+        if (elementos.menu) {
+            elementos.menu.classList.remove("menu-aberto");
+        }
+
+        if (elementos.overlay) {
+            elementos.overlay.classList.remove("overlay-visivel");
+        }
+
+        if (elementos.botao) {
+            elementos.botao.setAttribute("aria-expanded", "false");
+            elementos.botao.setAttribute("aria-label", "Abrir menu");
+        }
+
+        document.body.classList.remove("menu-bloqueado");
+    }
 
     function inicializarMenu() {
+        const elementos = obterElementosMenu();
 
-        const botaoAbrir = document.getElementById("menu-toggle");
-        const botaoFechar = document.getElementById("menu-close");
-        const menu = document.getElementById("menu-principal");
-        const overlay = document.getElementById("menu-overlay");
+        if (!elementos.menu) return;
 
-        if (!botaoAbrir || !botaoFechar || !menu || !overlay) {
-            return;
+        if (elementos.botao) {
+            elementos.botao.addEventListener("click", function () {
+                if (elementos.menu.classList.contains("menu-aberto")) {
+                    fecharMenu();
+                } else {
+                    abrirMenu();
+                }
+            });
         }
 
-        function abrirMenu() {
-
-            menu.classList.add("menu-aberto");
-            overlay.classList.add("overlay-visivel");
-
-            botaoAbrir.setAttribute("aria-expanded", "true");
-            botaoAbrir.setAttribute("aria-label", "Fechar menu");
-
-            document.body.classList.add("menu-bloqueado");
-
+        if (elementos.fechar) {
+            elementos.fechar.addEventListener("click", fecharMenu);
         }
 
-        function fecharMenu() {
-
-            menu.classList.remove("menu-aberto");
-            overlay.classList.remove("overlay-visivel");
-
-            botaoAbrir.setAttribute("aria-expanded", "false");
-            botaoAbrir.setAttribute("aria-label", "Abrir menu");
-
-            document.body.classList.remove("menu-bloqueado");
-
+        if (elementos.overlay) {
+            elementos.overlay.addEventListener("click", fecharMenu);
         }
 
-        botaoAbrir.addEventListener("click", abrirMenu);
+        elementos.menu.addEventListener("click", function (evento) {
+            const link = evento.target.closest("a");
 
-        botaoFechar.addEventListener("click", fecharMenu);
-
-        overlay.addEventListener("click", fecharMenu);
-
-        menu.querySelectorAll("a").forEach(function (link) {
-
-            link.addEventListener("click", fecharMenu);
-
-        });
-
-        document.addEventListener("keydown", function (event) {
-
-            if (event.key === "Escape") {
+            if (link) {
                 fecharMenu();
             }
+        });
 
+        document.addEventListener("keydown", function (evento) {
+            if (evento.key === "Escape") {
+                fecharMenu();
+                fecharPainelConta();
+                fecharPaineisSecundarios();
+            }
         });
 
         window.addEventListener("resize", function () {
+            prepararPaineisMobile();
 
-            if (window.innerWidth > 800) {
+            if (window.innerWidth > LARGURA_MOBILE) {
                 fecharMenu();
             }
-
         });
-
     }
 
+    // =========================================
+    // MOVER PAINÉIS PARA A SIDEBAR NO MOBILE
+    // =========================================
+
+    const locaisOriginais = new Map();
+
+    function prepararPaineisMobile() {
+        const menu = document.getElementById("menu-principal");
+
+        if (!menu) return;
+
+        const paineis = [
+            document.getElementById("painel-config"),
+            document.getElementById("painel-privacidade")
+        ].filter(Boolean);
+
+        // Guarda a posição original de cada painel.
+        paineis.forEach(function (painel) {
+            if (!locaisOriginais.has(painel)) {
+                locaisOriginais.set(painel, {
+                    pai: painel.parentNode,
+                    proximo: painel.nextSibling
+                });
+            }
+        });
+
+        if (window.innerWidth <= LARGURA_MOBILE) {
+            paineis.forEach(function (painel) {
+                if (painel.parentNode !== menu) {
+                    menu.appendChild(painel);
+                }
+            });
+
+            return;
+        }
+
+        // No desktop, restaura de trás para frente
+        // para preservar a ordem original dos elementos.
+        paineis.slice().reverse().forEach(function (painel) {
+            const local = locaisOriginais.get(painel);
+
+            if (!local || !local.pai) return;
+
+            if (painel.parentNode !== local.pai) {
+                if (
+                    local.proximo &&
+                    local.proximo.parentNode === local.pai
+                ) {
+                    local.pai.insertBefore(painel, local.proximo);
+                } else {
+                    local.pai.appendChild(painel);
+                }
+            }
+
+            painel.classList.remove("conta-aberta");
+            painel.setAttribute("aria-hidden", "true");
+        });
+
+        menu.classList.remove("menu-painel-secundario");
+    }
 
     // =========================================
-    // PAINEL DA CONTA
+    // PAINEL DA CONTA — DESKTOP
     // =========================================
 
     function inicializarPainelConta() {
-
         const botao = document.getElementById("btn-conta");
         const painel = document.getElementById("painel-conta");
         const overlay = document.getElementById("conta-overlay");
         const botaoFechar = document.getElementById("conta-fechar");
 
-        if (!botao || !painel || !overlay || !botaoFechar) {
-            return;
+        if (!painel || !overlay) return;
+
+        if (botao) {
+            botao.addEventListener("click", function () {
+                if (painel.classList.contains("conta-aberta")) {
+                    fecharPainelConta();
+                } else {
+                    abrirPainelConta();
+                }
+            });
         }
 
-        function abrirPainel() {
-
-            painel.classList.add("conta-aberta");
-            overlay.classList.add("conta-overlay-visivel");
-
-            painel.setAttribute("aria-hidden", "false");
-            botao.setAttribute("aria-expanded", "true");
-
-            document.body.classList.add("conta-bloqueado");
-
-            botaoFechar.focus();
-
+        if (botaoFechar) {
+            botaoFechar.addEventListener("click", fecharPainelConta);
         }
 
-        function fecharPainel() {
-
-            if (!painel.classList.contains("conta-aberta")) {
-                return;
-            }
-
-            painel.classList.remove("conta-aberta");
-            overlay.classList.remove("conta-overlay-visivel");
-
-            painel.setAttribute("aria-hidden", "true");
-            botao.setAttribute("aria-expanded", "false");
-
-            document.body.classList.remove("conta-bloqueado");
-
-            botao.focus();
-
-        }
-
-        botao.addEventListener("click", abrirPainel);
-
-        botaoFechar.addEventListener("click", fecharPainel);
-
-        overlay.addEventListener("click", fecharPainel);
-
-        document.addEventListener("keydown", function (event) {
-
-            if (event.key === "Escape") {
-                fecharPainel();
-            }
-
-        });
-
+        overlay.addEventListener("click", fecharPainelConta);
     }
 
+    function abrirPainelConta() {
+        const painel = document.getElementById("painel-conta");
+        const overlay = document.getElementById("conta-overlay");
+        const botao = document.getElementById("btn-conta");
+
+        if (!painel || !overlay) return;
+
+        fecharMenu();
+        fecharPaineisSecundarios();
+
+        painel.classList.add("conta-aberta");
+        painel.setAttribute("aria-hidden", "false");
+
+        overlay.classList.add("conta-overlay-visivel");
+
+        if (botao) {
+            botao.setAttribute("aria-expanded", "true");
+        }
+
+        document.body.classList.add("conta-bloqueado");
+    }
+
+    function fecharPainelConta() {
+        const painel = document.getElementById("painel-conta");
+        const overlay = document.getElementById("conta-overlay");
+        const botao = document.getElementById("btn-conta");
+
+        if (painel) {
+            painel.classList.remove("conta-aberta");
+            painel.setAttribute("aria-hidden", "true");
+        }
+
+        if (overlay) {
+            overlay.classList.remove("conta-overlay-visivel");
+        }
+
+        if (botao) {
+            botao.setAttribute("aria-expanded", "false");
+        }
+
+        document.body.classList.remove("conta-bloqueado");
+    }
 
     // =========================================
-    // PAINÉIS SECUNDÁRIOS
+    // PAINÉIS DE CONFIGURAÇÕES E PRIVACIDADE
     // =========================================
+
+    function obterPaineisSecundarios() {
+        return [
+            {
+                seletores: ".abrir-config",
+                painel: document.getElementById("painel-config"),
+                voltar: document.getElementById("config-voltar"),
+                fechar: document.getElementById("config-fechar")
+            },
+            {
+                seletores: ".abrir-privacidade",
+                painel: document.getElementById("painel-privacidade"),
+                voltar: document.getElementById("privacidade-voltar"),
+                fechar: document.getElementById("privacidade-fechar")
+            }
+        ].map(function (item) {
+            item.aberturas = Array.from(
+                document.querySelectorAll(item.seletores)
+            );
+
+            return item;
+        }).filter(function (item) {
+            return item.aberturas.length > 0 && item.painel;
+        });
+    }
 
     function inicializarPaineisSecundarios() {
+        obterPaineisSecundarios().forEach(function (item) {
 
-        const overlay = document.getElementById("conta-overlay");
-        const fecharConta = document.getElementById("conta-fechar");
+            item.aberturas.forEach(function (botao) {
+                botao.addEventListener("click", function () {
+                    const mobile = window.innerWidth <= LARGURA_MOBILE;
+                    const menu = document.getElementById("menu-principal");
 
-        if (!overlay || !fecharConta) {
-            return;
-        }
+                    fecharPaineisSecundarios();
 
-        const paineis = [
+                    if (!mobile) {
+                        fecharMenu();
+                    }
 
-            {
-                abrir: "abrir-config",
-                painel: "painel-config",
-                voltar: "config-voltar",
-                fechar: "config-fechar"
-            },
+                    item.painel.classList.add("conta-aberta");
+                    item.painel.setAttribute("aria-hidden", "false");
 
-            {
-                abrir: "abrir-privacidade",
-                painel: "painel-privacidade",
-                voltar: "privacidade-voltar",
-                fechar: "privacidade-fechar"
-            }
+                    if (mobile && menu) {
+                        menu.classList.add("menu-painel-secundario");
+                        menu.classList.add("menu-aberto");
 
-        ].map(function (ids) {
+                        const overlay = document.getElementById("menu-overlay");
 
-            return {
-                botaoAbrir: document.getElementById(ids.abrir),
-                painel: document.getElementById(ids.painel),
-                botaoVoltar: document.getElementById(ids.voltar),
-                botaoFechar: document.getElementById(ids.fechar)
-            };
+                        if (overlay) {
+                            overlay.classList.add("overlay-visivel");
+                        }
 
-        }).filter(function (item) {
+                        document.body.classList.add("menu-bloqueado");
+                    }
 
-            return (
-                item.botaoAbrir &&
-                item.painel &&
-                item.botaoVoltar &&
-                item.botaoFechar
-            );
+                    item.aberturas.forEach(function (abertura) {
+                        abertura.setAttribute("aria-expanded", "true");
+                    });
 
-        });
-
-
-        function abrir(item) {
-
-            item.painel.classList.add("conta-aberta");
-
-            item.painel.setAttribute("aria-hidden", "false");
-
-            item.botaoAbrir.setAttribute("aria-expanded", "true");
-
-            item.botaoVoltar.focus();
-
-        }
-
-
-        function fechar(item) {
-
-            if (!item.painel.classList.contains("conta-aberta")) {
-                return;
-            }
-
-            item.painel.classList.remove("conta-aberta");
-
-            item.painel.setAttribute("aria-hidden", "true");
-
-            item.botaoAbrir.setAttribute("aria-expanded", "false");
-
-            item.painel.dispatchEvent(
-                new CustomEvent("painel-fechado")
-            );
-
-        }
-
-
-        paineis.forEach(function (item) {
-
-            item.botaoAbrir.addEventListener("click", function () {
-
-                abrir(item);
-
+                    if (item.voltar) {
+                        item.voltar.focus();
+                    }
+                });
             });
 
+            if (item.voltar) {
+                item.voltar.addEventListener("click", function () {
+                    fecharPainelSecundario(item);
 
-            // Voltar para Minha conta.
-            item.botaoVoltar.addEventListener("click", function () {
+                    if (window.innerWidth <= LARGURA_MOBILE) {
+                        const menu = document.getElementById("menu-principal");
 
-                fechar(item);
+                        if (menu) {
+                            menu.classList.remove("menu-painel-secundario");
+                        }
 
-                item.botaoAbrir.focus();
-
-            });
-
-
-            // Fechar o painel secundário e o principal.
-            item.botaoFechar.addEventListener("click", function () {
-
-                fechar(item);
-
-                fecharConta.click();
-
-            });
-
-        });
-
-
-        // Fechar pelo fundo escuro.
-        overlay.addEventListener("click", function () {
-
-            paineis.forEach(fechar);
-
-        });
-
-
-        // Fechar com Escape.
-        document.addEventListener("keydown", function (event) {
-
-            if (event.key === "Escape") {
-
-                paineis.forEach(fechar);
-
+                        // Retorna à navegação da mesma sidebar.
+                        abrirMenu();
+                    } else {
+                        abrirPainelConta();
+                    }
+                });
             }
 
-        });
+            if (item.fechar) {
+                item.fechar.addEventListener("click", function () {
+                    fecharPainelSecundario(item);
 
+                    if (window.innerWidth <= LARGURA_MOBILE) {
+                        fecharMenu();
+                    } else {
+                        fecharPainelConta();
+                    }
+                });
+            }
+        });
     }
 
+    function fecharPainelSecundario(item) {
+        if (!item || !item.painel) return;
+
+        item.painel.classList.remove("conta-aberta");
+        item.painel.setAttribute("aria-hidden", "true");
+
+        item.aberturas.forEach(function (botao) {
+            botao.setAttribute("aria-expanded", "false");
+        });
+
+        item.painel.dispatchEvent(new CustomEvent("painel-fechado"));
+    }
+
+    function fecharPaineisSecundarios() {
+        obterPaineisSecundarios().forEach(function (item) {
+            if (item.painel.classList.contains("conta-aberta")) {
+                fecharPainelSecundario(item);
+            }
+        });
+
+        const menu = document.getElementById("menu-principal");
+
+        if (menu) {
+            menu.classList.remove("menu-painel-secundario");
+        }
+    }
 
     // =========================================
-    // CONFIGURAÇÕES DE ACESSIBILIDADE
+    // ACESSIBILIDADE
     // =========================================
 
     function inicializarConfiguracoes() {
 
         function valorAtual(chave) {
-
-            return (
-                html.getAttribute("data-" + chave) ||
-                CONFIG[chave].padrao
-            );
-
+            return html.getAttribute("data-" + chave) ||
+                CONFIG[chave].padrao;
         }
 
-
-        // Atualiza o estado visual dos controles.
         function atualizarPainel() {
-
             document.querySelectorAll("[data-config][data-valor]")
                 .forEach(function (botao) {
 
                     botao.setAttribute(
                         "aria-pressed",
-
                         valorAtual(botao.dataset.config) === botao.dataset.valor
                             ? "true"
                             : "false"
                     );
-
                 });
-
 
             document.querySelectorAll(".config-switch")
                 .forEach(function (botao) {
 
                     botao.setAttribute(
                         "aria-checked",
-
                         valorAtual(botao.dataset.config) === botao.dataset.ligado
                             ? "true"
                             : "false"
                     );
-
                 });
-
         }
 
-
-        // Altera e salva uma configuração.
         function definir(chave, valor) {
-
-            if (!CONFIG[chave]) {
-                return;
-            }
-
-            if (!CONFIG[chave].valores.includes(valor)) {
+            if (
+                !CONFIG[chave] ||
+                !CONFIG[chave].valores.includes(valor)
+            ) {
                 return;
             }
 
             html.setAttribute("data-" + chave, valor);
 
-            // Sincroniza o contraste com o tema escolhido.
             if (chave === "tema") {
-
-            html.setAttribute(
-            "data-contraste",
-            valor === "alto-contraste" ? "alto" : "normal"
-            );
-
+                atualizarContraste();
             }
 
             try {
-
-                localStorage.setItem(
-                    "mentis-" + chave,
-                    valor
-                );
-
-            } catch (erro) {}
+                localStorage.setItem("mentis-" + chave, valor);
+            } catch (erro) {
+                // A configuração continua aplicada nesta sessão.
+            }
 
             atualizarPainel();
-
         }
 
-
-        // Botões de escolha: fonte e tema.
         document.querySelectorAll("[data-config][data-valor]")
             .forEach(function (botao) {
 
                 botao.addEventListener("click", function () {
-
                     definir(
                         botao.dataset.config,
                         botao.dataset.valor
                     );
-
                 });
-
             });
 
-
-        // Interruptores: contraste, animações e dislexia.
         document.querySelectorAll(".config-switch")
             .forEach(function (botao) {
 
                 botao.addEventListener("click", function () {
-
                     const ligado =
                         valorAtual(botao.dataset.config) === botao.dataset.ligado;
 
                     definir(
                         botao.dataset.config,
-
                         ligado
                             ? botao.dataset.desligado
                             : botao.dataset.ligado
                     );
-
                 });
-
             });
 
-
-        // Restaurar configurações padrão.
         const restaurar = document.getElementById("config-restaurar");
 
         if (restaurar) {
-
             restaurar.addEventListener("click", function () {
-
                 Object.keys(CONFIG).forEach(function (chave) {
-
-                    definir(
-                        chave,
-                        CONFIG[chave].padrao
-                    );
-
+                    definir(chave, CONFIG[chave].padrao);
                 });
-
             });
-
         }
 
         atualizarPainel();
-
     }
-
 
     // =========================================
     // PRIVACIDADE E SEGURANÇA
     // =========================================
 
     function inicializarPrivacidade() {
-
         const painel = document.getElementById("painel-privacidade");
-
         const formSenha = document.getElementById("form-senha");
-
         const formExclusao = document.getElementById("form-exclusao");
 
         const botaoAbrirExclusao =
@@ -516,7 +549,6 @@
 
         const botaoCancelarExclusao =
             document.getElementById("cancelar-exclusao");
-
 
         if (
             !painel ||
@@ -528,92 +560,61 @@
             return;
         }
 
-
         const msgSenha = document.getElementById("msg-senha");
-
         const msgExclusao = document.getElementById("msg-exclusao");
 
-
-        // Mostra mensagens.
         function mostrarMensagem(elemento, texto, tipo) {
+            if (!elemento) return;
 
             elemento.textContent = texto;
-
             elemento.className = "priv-mensagem priv-" + tipo;
-
         }
 
-
-        // Limpa mensagens.
         function limparMensagem(elemento) {
+            if (!elemento) return;
 
             elemento.textContent = "";
-
             elemento.className = "priv-mensagem";
-
         }
 
-
-        // Envia informações para o Flask.
         async function enviar(url, dados) {
-
             try {
-
                 const resposta = await fetch(url, {
-
                     method: "POST",
-
                     headers: {
                         "Content-Type": "application/json"
                     },
-
                     body: JSON.stringify(dados)
-
                 });
-
 
                 let corpo = {};
 
                 try {
-
                     corpo = await resposta.json();
-
-                } catch (erro) {}
-
+                } catch (erro) {
+                    // Resposta sem JSON.
+                }
 
                 return {
-
                     ok: resposta.ok && corpo.status === "sucesso",
-
                     dados: corpo
-
                 };
 
             } catch (erro) {
-
                 return {
-
                     ok: false,
-
                     dados: {
-                        mensagem: "Não foi possível conectar ao servidor. Tente novamente."
+                        mensagem:
+                            "Não foi possível conectar ao servidor. Tente novamente."
                     }
-
                 };
-
             }
-
         }
 
-
-        // =====================================
         // ALTERAR SENHA
-        // =====================================
 
         formSenha.addEventListener("submit", async function (evento) {
-
             evento.preventDefault();
-
 
             const senhaAtual =
                 document.getElementById("senha-atual").value;
@@ -624,96 +625,71 @@
             const senhaConfirmar =
                 document.getElementById("senha-confirmar").value;
 
-
             if (!senhaAtual || !senhaNova || !senhaConfirmar) {
-
                 mostrarMensagem(
                     msgSenha,
                     "Preencha todos os campos.",
                     "erro"
                 );
-
                 return;
-
             }
 
-
             if (senhaNova.length < 8) {
-
                 mostrarMensagem(
                     msgSenha,
                     "A nova senha precisa ter pelo menos 8 caracteres.",
                     "erro"
                 );
-
                 return;
-
             }
 
-
             if (senhaNova !== senhaConfirmar) {
-
                 mostrarMensagem(
                     msgSenha,
                     "As senhas novas não são iguais.",
                     "erro"
                 );
-
                 return;
-
             }
 
+            const botao = formSenha.querySelector("button[type='submit']");
 
-            const botao = formSenha.querySelector(
-                "button[type='submit']"
-            );
+            if (botao) {
+                botao.disabled = true;
+            }
 
-            botao.disabled = true;
+            const resultado = await enviar(formSenha.dataset.url, {
+                senha_atual: senhaAtual,
+                nova_senha: senhaNova,
+                confirmar_senha: senhaConfirmar
+            });
 
-
-            const resultado = await enviar(
-                formSenha.dataset.url,
-
-                {
-                    senha_atual: senhaAtual,
-                    nova_senha: senhaNova,
-                    confirmar_senha: senhaConfirmar
-                }
-            );
-
-
-            botao.disabled = false;
-
+            if (botao) {
+                botao.disabled = false;
+            }
 
             if (resultado.ok) {
-
                 formSenha.reset();
 
                 mostrarMensagem(
                     msgSenha,
-                    resultado.dados.mensagem || "Senha alterada com sucesso.",
+                    resultado.dados.mensagem ||
+                        "Senha alterada com sucesso.",
                     "sucesso"
                 );
-
             } else {
-
                 mostrarMensagem(
                     msgSenha,
-                    resultado.dados.mensagem || "Não foi possível alterar a senha.",
+                    resultado.dados.mensagem ||
+                        "Não foi possível alterar a senha.",
                     "erro"
                 );
-
             }
-
         });
 
-
-        // =====================================
-        // EXCLUIR CONTA
-        // =====================================
+        // ABRIR FORMULÁRIO DE EXCLUSÃO
 
         botaoAbrirExclusao.addEventListener("click", function () {
-
             formExclusao.hidden = false;
 
             botaoAbrirExclusao.setAttribute(
@@ -722,15 +698,12 @@
             );
 
             document.getElementById("senha-exclusao").focus();
-
         });
 
+        // CANCELAR EXCLUSÃO
 
-        // Cancelar exclusão.
         function cancelarExclusao() {
-
             formExclusao.reset();
-
             formExclusao.hidden = true;
 
             botaoAbrirExclusao.setAttribute(
@@ -739,87 +712,66 @@
             );
 
             limparMensagem(msgExclusao);
-
         }
-
 
         botaoCancelarExclusao.addEventListener(
             "click",
             cancelarExclusao
         );
 
+        // CONFIRMAR EXCLUSÃO
 
-        // Confirmar exclusão.
         formExclusao.addEventListener("submit", async function (evento) {
-
             evento.preventDefault();
-
 
             const senha =
                 document.getElementById("senha-exclusao").value;
 
-
             if (!senha) {
-
                 mostrarMensagem(
                     msgExclusao,
                     "Digite sua senha para confirmar.",
                     "erro"
                 );
-
                 return;
-
             }
 
+            const botao =
+                formExclusao.querySelector("button[type='submit']");
 
-            const botao = formExclusao.querySelector(
-                "button[type='submit']"
-            );
-
-            botao.disabled = true;
-
+            if (botao) {
+                botao.disabled = true;
+            }
 
             const resultado = await enviar(
                 painel.dataset.urlExclusao,
-
-                {
-                    senha: senha
-                }
+                { senha: senha }
             );
 
-
-            botao.disabled = false;
-
-
-            if (resultado.ok) {
-
-                window.location.href =
-                    resultado.dados.redirecionar || "/";
-
-            } else {
-
-                mostrarMensagem(
-                    msgExclusao,
-                    resultado.dados.mensagem || "Não foi possível excluir a conta.",
-                    "erro"
-                );
-
+            if (botao) {
+                botao.disabled = false;
             }
 
+            if (resultado.ok) {
+                window.location.href =
+                    resultado.dados.redirecionar || "/";
+            } else {
+                mostrarMensagem(
+                    msgExclusao,
+                    resultado.dados.mensagem ||
+                        "Não foi possível excluir a conta.",
+                    "erro"
+                );
+            }
         });
 
+        // LIMPAR OS CAMPOS QUANDO O PAINEL FECHAR
 
-        // Limpar os campos ao fechar o painel.
         painel.addEventListener("painel-fechado", function () {
-
             formSenha.reset();
-
             limparMensagem(msgSenha);
-
             cancelarExclusao();
-
         });
-
     }
 
 })();

@@ -1,9 +1,4 @@
-{# Os links de navegação (Home, Sobre nós, Demo...) só aparecem para quem
-   NÃO está logado. Quem está logado só os vê na página inicial, onde eles
-   levam às seções da própria página. #}
-{% set mostrar_menu = (not usuario) or request.endpoint == 'home' %}
-
-<header class="header{% if not mostrar_menu %} header-sem-menu{% endif %}">
+<header class="header">
 
     <!-- LOGO -->
     <div class="logo">
@@ -14,7 +9,7 @@
         </a>
     </div>
 
-    <!-- BOTÃO HAMBÚRGUER: MOBILE -->
+    <!-- BOTÃO HAMBÚRGUER -->
     <button
         type="button"
         class="menu-toggle"
@@ -29,20 +24,13 @@
 
     </button>
 
-    <!-- FUNDO ESCURO DA SIDEBAR -->
-    <div
-        class="menu-overlay"
-        id="menu-overlay">
-    </div>
+    <!-- FUNDO DA SIDEBAR -->
+    <div class="menu-overlay" id="menu-overlay"></div>
 
     <!-- MENU PRINCIPAL -->
-    <nav
-        class="menu"
-        id="menu-principal"
-        aria-label="Menu principal">
+    <nav class="menu" id="menu-principal" aria-label="Menu principal">
 
         <div class="sidebar-top">
-
             <span>Menu</span>
 
             <button
@@ -50,636 +38,574 @@
                 class="menu-close"
                 id="menu-close"
                 aria-label="Fechar menu">
-
                 &times;
-
             </button>
+        </div>
+
+        <!-- NAVEGAÇÃO -->
+        <div class="menu-navegacao">
+
+            <span class="menu-subtitulo">NAVEGAÇÃO</span>
+
+            <a href="{{ url_for('home') }}#hero">Home</a>
+            <a href="{{ url_for('home') }}#sobre">Sobre nós</a>
+            <a href="{{ url_for('home') }}#demo">Demo</a>
+            <a href="{{ url_for('home') }}#faq">FAQ</a>
+            <a href="{{ url_for('home') }}#time">Nosso time</a>
+
+            {% if not usuario %}
+                <a href="{{ url_for('login') }}">Login</a>
+            {% endif %}
 
         </div>
 
-        <!-- LINKS DE NAVEGAÇÃO -->
-        <a href="{{ url_for('home') }}#hero">
-            Home
-        </a>
+        <!-- CONTA MOBILE -->
+        {% if usuario %}
 
-        <a href="{{ url_for('home') }}#sobre">
-            Sobre nós
-        </a>
+        <div class="menu-conta-mobile">
 
-        <a href="{{ url_for('home') }}#demo">
-            Demo
-        </a>
+            <div class="menu-conta-divisor"></div>
 
-        <a href="{{ url_for('home') }}#faq">
-            FAQ
-        </a>
+            <div class="menu-conta-titulo">
+                Minha conta
+            </div>
 
-        <a href="{{ url_for('home') }}#time">
-            Nosso time
-        </a>
+            <p class="menu-conta-email">
+                {{ usuario }}
+            </p>
 
-        <!-- LOGIN: APENAS PARA QUEM NÃO ESTÁ LOGADO -->
-        {% if not usuario %}
+            <div class="menu-conta-links">
 
-            <div class="login">
+                {% if tipo_conta == 'empresa_rh' %}
 
-                <a
-                    href="{{ url_for('login') }}"
-                    class="btn">
+                    <a href="{{ url_for('rh_painel') }}">
+                        <span class="menu-conta-icone">♙</span>
+                        Área da empresa
+                    </a>
 
-                    Login
+                {% else %}
 
-                </a>
+                    <a href="{{ url_for('perfil') }}">
+                        <span class="menu-conta-icone">♙</span>
+                        Meu perfil e resultados
+                    </a>
+
+                {% endif %}
+
+                <button
+                    type="button"
+                    class="menu-conta-acao abrir-config"
+                    aria-controls="painel-config"
+                    aria-expanded="false">
+
+                    <span class="menu-conta-icone">⚙</span>
+                    Configurações
+
+                </button>
+
+                <button
+                    type="button"
+                    class="menu-conta-acao abrir-privacidade"
+                    aria-controls="painel-privacidade"
+                    aria-expanded="false">
+
+                    <span class="menu-conta-icone">♢</span>
+                    Privacidade e segurança
+
+                </button>
 
             </div>
+
+            <a href="{{ url_for('logout') }}" class="menu-conta-sair">
+                <span class="menu-conta-icone">⇥</span>
+                Sair
+            </a>
+
+        </div>
 
         {% endif %}
 
     </nav>
 
-    <!-- ÍCONE DA CONTA: APENAS PARA QUEM ESTÁ LOGADO -->
+    <!-- ÍCONE DA CONTA DESKTOP -->
     {% if usuario %}
 
-        <button
-            type="button"
-            class="btn-conta"
-            id="btn-conta"
-            aria-label="Abrir painel da conta"
-            aria-controls="painel-conta"
-            aria-expanded="false">
+    <button
+        type="button"
+        class="btn-conta"
+        id="btn-conta"
+        aria-label="Abrir painel da conta"
+        aria-controls="painel-conta"
+        aria-expanded="false">
 
-            <svg
-                viewBox="0 0 24 24"
-                width="28"
-                height="28"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.8"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                aria-hidden="true">
+        <svg
+            viewBox="0 0 24 24"
+            width="28"
+            height="28"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true">
 
-                <circle cx="12" cy="8" r="4"></circle>
-                <path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"></path>
+            <circle cx="12" cy="8" r="4"></circle>
+            <path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"></path>
 
-            </svg>
+        </svg>
 
-        </button>
+    </button>
 
     {% endif %}
 
 </header>
 
 
-<!-- =====================================
-     PAINEL LATERAL DA CONTA
-====================================== -->
-
 {% if usuario %}
 
-    <!-- FUNDO ESCURO -->
-    <div
-        class="conta-overlay"
-        id="conta-overlay">
-    </div>
+<!-- =====================================
+     PAINEL DA CONTA DESKTOP
+====================================== -->
 
-    <!-- PAINEL PRINCIPAL -->
-    <aside
-        class="conta-painel"
-        id="painel-conta"
-        aria-label="Painel da conta"
-        aria-hidden="true">
+<div class="conta-overlay" id="conta-overlay"></div>
 
-        <div class="conta-painel-topo">
+<aside
+    class="conta-painel"
+    id="painel-conta"
+    aria-label="Painel da conta"
+    aria-hidden="true">
 
-            <span>Minha conta</span>
+    <div class="conta-painel-topo">
 
-            <button
-                type="button"
-                class="conta-fechar"
-                id="conta-fechar"
-                aria-label="Fechar painel">
+        <span>Minha conta</span>
 
-                &times;
-
-            </button>
-
-        </div>
-
-        <p class="conta-email">{{ usuario }}</p>
-
-        <nav
-            class="conta-links"
-            aria-label="Opções da conta">
-
-            {% if tipo_conta == 'empresa_rh' %}
-
-                <!-- CONTA EMPRESA / RH -->
-                <a href="{{ url_for('rh_painel') }}">
-                    Área da empresa
-                </a>
-
-            {% else %}
-
-                <!-- CONTA FUNCIONÁRIO -->
-                <a href="{{ url_for('perfil') }}">
-                    Meu perfil e resultados
-                </a>
-
-            {% endif %}
-
-            <button
-                type="button"
-                class="conta-link-botao"
-                id="abrir-config"
-                aria-controls="painel-config"
-                aria-expanded="false">
-
-                Configurações
-
-            </button>
-
-            <button
-                type="button"
-                class="conta-link-botao"
-                id="abrir-privacidade"
-                aria-controls="painel-privacidade"
-                aria-expanded="false">
-
-                Privacidade e segurança
-
-            </button>
-
-        </nav>
-
-        <a
-            href="{{ url_for('logout') }}"
-            class="conta-sair">
-
-            Sair
-
-        </a>
-
-    </aside>
-
-
-    <!-- =====================================
-         PAINEL DE CONFIGURAÇÕES
-    ====================================== -->
-
-    <aside
-        class="conta-painel config-painel"
-        id="painel-config"
-        aria-label="Configurações"
-        aria-hidden="true">
-
-        <div class="conta-painel-topo">
-
-            <button
-                type="button"
-                class="conta-fechar"
-                id="config-voltar"
-                aria-label="Voltar para Minha conta">
-
-                &larr;
-
-            </button>
-
-            <span>Configurações</span>
-
-            <button
-                type="button"
-                class="conta-fechar"
-                id="config-fechar"
-                aria-label="Fechar painel">
-
-                &times;
-
-            </button>
-
-        </div>
-
-
-        <!-- ACESSIBILIDADE -->
-        <section class="config-grupo">
-
-            <h3>Acessibilidade</h3>
-
-            <!-- TAMANHO DA FONTE -->
-            <div
-                class="config-item config-item-coluna"
-                id="config-fonte">
-
-                <div class="config-item-texto">
-                    <strong>Tamanho da fonte</strong>
-                    <span>Aumenta ou diminui os textos</span>
-                </div>
-
-                <div
-                    class="config-opcoes"
-                    role="group"
-                    aria-label="Tamanho da fonte">
-
-                    <button
-                        type="button"
-                        class="config-opcao"
-                        data-config="fonte"
-                        data-valor="normal"
-                        aria-pressed="true">
-
-                        Normal
-
-                    </button>
-
-                    <button
-                        type="button"
-                        class="config-opcao"
-                        data-config="fonte"
-                        data-valor="grande"
-                        aria-pressed="false">
-
-                        Grande
-
-                    </button>
-
-                    <button
-                        type="button"
-                        class="config-opcao"
-                        data-config="fonte"
-                        data-valor="muito-grande"
-                        aria-pressed="false">
-
-                        Muito grande
-
-                    </button>
-
-                </div>
-
-            </div>
-
-            <!-- REDUZIR ANIMAÇÕES -->
-            <div
-                class="config-item"
-                id="config-animacoes">
-
-                <div class="config-item-texto">
-
-                    <strong id="rotulo-animacoes">
-                        Reduzir animações
-                    </strong>
-
-                    <span>
-                        Diminui os movimentos na tela
-                    </span>
-
-                </div>
-
-                <button
-                    type="button"
-                    class="config-switch"
-                    role="switch"
-                    aria-checked="false"
-                    aria-labelledby="rotulo-animacoes"
-                    data-config="animacoes"
-                    data-ligado="reduzidas"
-                    data-desligado="normal">
-                </button>
-
-            </div>
-
-
-            <!-- FONTE PARA DISLEXIA -->
-            <div
-                class="config-item"
-                id="config-dislexia">
-
-                <div class="config-item-texto">
-
-                    <strong id="rotulo-dislexia">
-                        Fonte para dislexia
-                    </strong>
-
-                    <span>
-                        Letras mais fáceis de distinguir
-                    </span>
-
-                </div>
-
-                <button
-                    type="button"
-                    class="config-switch"
-                    role="switch"
-                    aria-checked="false"
-                    aria-labelledby="rotulo-dislexia"
-                    data-config="dislexia"
-                    data-ligado="ligada"
-                    data-desligado="normal">
-                </button>
-
-            </div>
-
-        </section>
-
-
-        
-        <!-- APARÊNCIA -->
-        <section class="config-grupo">
-
-          <h3>Aparência</h3>
-
-            <div class="config-item config-item-coluna" id="config-tema">
-                <div class="config-item-texto">
-                    <strong>Tema</strong>
-                    <span>Escolha a aparência do Mentis</span>
-
-                </div>
-
-            <div
-            class="config-opcoes config-opcoes-tema"
-            role="group"
-            aria-label="Tema">
-
-            <button
-                type="button"
-                class="config-opcao"
-                data-config="tema"
-                data-valor="claro"
-                aria-pressed="true">
-
-                Claro
-
-            </button>
-
-            <button
-                type="button"
-                class="config-opcao"
-                data-config="tema"
-                data-valor="escuro"
-                aria-pressed="false">
-
-                Escuro
-
-            </button>
-
-            <button
-                type="button"
-                class="config-opcao"
-                data-config="tema"
-                data-valor="alto-contraste"
-                aria-pressed="false">
-
-                Alto contraste
-
-            </button>
-
-        </div>
-
-    </div>
-
-</section>
-
-
-
-        <!-- RESTAURAR PADRÃO -->
         <button
             type="button"
-            class="config-restaurar"
-            id="config-restaurar">
+            class="conta-fechar"
+            id="conta-fechar"
+            aria-label="Fechar painel">
+            &times;
+        </button>
 
-            Restaurar padrão
+    </div>
+
+    <p class="conta-email">{{ usuario }}</p>
+
+    <nav class="conta-links" aria-label="Opções da conta">
+
+        {% if tipo_conta == 'empresa_rh' %}
+
+            <a href="{{ url_for('rh_painel') }}">
+                Área da empresa
+            </a>
+
+        {% else %}
+
+            <a href="{{ url_for('perfil') }}">
+                Meu perfil e resultados
+            </a>
+
+        {% endif %}
+
+        <button
+            type="button"
+            class="conta-link-botao abrir-config"
+            id="abrir-config"
+            aria-controls="painel-config"
+            aria-expanded="false">
+
+            Configurações
 
         </button>
 
-    </aside>
+        <button
+            type="button"
+            class="conta-link-botao abrir-privacidade"
+            id="abrir-privacidade"
+            aria-controls="painel-privacidade"
+            aria-expanded="false">
+
+            Privacidade e segurança
+
+        </button>
+
+    </nav>
+
+    <a href="{{ url_for('logout') }}" class="conta-sair">
+        Sair
+    </a>
+
+</aside>
 
 
-    <!-- =====================================
-         PAINEL DE PRIVACIDADE E SEGURANÇA
-    ====================================== -->
+<!-- =====================================
+     PAINEL DE CONFIGURAÇÕES
+====================================== -->
 
-    <aside
-        class="conta-painel config-painel"
-        id="painel-privacidade"
-        data-url-exclusao="{{ url_for('conta_excluir') }}"
-        aria-label="Privacidade e segurança"
-        aria-hidden="true">
+<aside
+    class="conta-painel config-painel"
+    id="painel-config"
+    aria-label="Configurações"
+    aria-hidden="true">
 
-        <div class="conta-painel-topo">
+    <div class="conta-painel-topo">
+
+        <button
+            type="button"
+            class="conta-fechar"
+            id="config-voltar"
+            aria-label="Voltar">
+            &larr;
+        </button>
+
+        <span>Configurações</span>
+
+        <button
+            type="button"
+            class="conta-fechar"
+            id="config-fechar"
+            aria-label="Fechar painel">
+            &times;
+        </button>
+
+    </div>
+
+    <section class="config-grupo">
+
+        <h3>Acessibilidade</h3>
+
+        <div class="config-item config-item-coluna" id="config-fonte">
+
+            <div class="config-item-texto">
+                <strong>Tamanho da fonte</strong>
+                <span>Aumenta ou diminui os textos</span>
+            </div>
+
+            <div
+                class="config-opcoes"
+                role="group"
+                aria-label="Tamanho da fonte">
+
+                <button
+                    type="button"
+                    class="config-opcao"
+                    data-config="fonte"
+                    data-valor="normal"
+                    aria-pressed="true">
+                    Normal
+                </button>
+
+                <button
+                    type="button"
+                    class="config-opcao"
+                    data-config="fonte"
+                    data-valor="grande"
+                    aria-pressed="false">
+                    Grande
+                </button>
+
+                <button
+                    type="button"
+                    class="config-opcao"
+                    data-config="fonte"
+                    data-valor="muito-grande"
+                    aria-pressed="false">
+                    Muito grande
+                </button>
+
+            </div>
+
+        </div>
+
+        <div class="config-item" id="config-animacoes">
+
+            <div class="config-item-texto">
+                <strong id="rotulo-animacoes">Reduzir animações</strong>
+                <span>Diminui os movimentos na tela</span>
+            </div>
 
             <button
                 type="button"
-                class="conta-fechar"
-                id="privacidade-voltar"
-                aria-label="Voltar para Minha conta">
-
-                &larr;
-
-            </button>
-
-            <span>Privacidade e segurança</span>
-
-            <button
-                type="button"
-                class="conta-fechar"
-                id="privacidade-fechar"
-                aria-label="Fechar painel">
-
-                &times;
-
+                class="config-switch"
+                role="switch"
+                aria-checked="false"
+                aria-labelledby="rotulo-animacoes"
+                data-config="animacoes"
+                data-ligado="reduzidas"
+                data-desligado="normal">
             </button>
 
         </div>
 
+        <div class="config-item" id="config-dislexia">
 
-        <!-- SEGURANÇA: ALTERAR SENHA -->
-        <section class="config-grupo">
-
-            <h3>Segurança</h3>
-
-            <form
-                class="priv-form"
-                id="form-senha"
-                data-url="{{ url_for('conta_alterar_senha') }}"
-                novalidate>
-
-                <div class="priv-campo">
-
-                    <label for="senha-atual">
-                        Senha atual
-                    </label>
-
-                    <input
-                        type="password"
-                        id="senha-atual"
-                        autocomplete="current-password"
-                        required>
-
-                </div>
-
-                <div class="priv-campo">
-
-                    <label for="senha-nova">
-                        Nova senha (mínimo 8 caracteres)
-                    </label>
-
-                    <input
-                        type="password"
-                        id="senha-nova"
-                        autocomplete="new-password"
-                        minlength="8"
-                        required>
-
-                </div>
-
-                <div class="priv-campo">
-
-                    <label for="senha-confirmar">
-                        Confirmar nova senha
-                    </label>
-
-                    <input
-                        type="password"
-                        id="senha-confirmar"
-                        autocomplete="new-password"
-                        minlength="8"
-                        required>
-
-                </div>
-
-                <p
-                    class="priv-mensagem"
-                    id="msg-senha"
-                    role="status"
-                    aria-live="polite">
-                </p>
-
-                <button
-                    type="submit"
-                    class="priv-botao">
-
-                    Alterar senha
-
-                </button>
-
-            </form>
-
-        </section>
-
-
-        <!-- PRIVACIDADE -->
-        <section class="config-grupo">
-
-            <h3>Privacidade</h3>
-
-            <p class="priv-texto">
-
-                A Mentis guarda seu e-mail, suas respostas, seus resultados
-                e seus check-ins de humor para montar o seu histórico, que
-                só é exibido na sua conta. A senha é guardada de forma
-                protegida (hash), nunca em texto. Os resultados são
-                indicadores de bem-estar e não substituem um diagnóstico
-                médico.
-
-            </p>
-
-            <div class="priv-acoes">
-
-                <a
-                    class="priv-botao priv-botao-contorno"
-                    href="{{ url_for('baixar_dados') }}"
-                    download>
-
-                    Baixar meus dados
-
-                </a>
-
+            <div class="config-item-texto">
+                <strong id="rotulo-dislexia">Fonte para dislexia</strong>
+                <span>Letras mais fáceis de distinguir</span>
             </div>
 
-        </section>
+            <button
+                type="button"
+                class="config-switch"
+                role="switch"
+                aria-checked="false"
+                aria-labelledby="rotulo-dislexia"
+                data-config="dislexia"
+                data-ligado="ligada"
+                data-desligado="normal">
+            </button>
 
+        </div>
 
-        <!-- EXCLUIR CONTA -->
-        <section class="config-grupo">
+    </section>
 
-            <h3>Excluir conta</h3>
+    <section class="config-grupo">
 
-            <p class="priv-texto">
+        <h3>Aparência</h3>
 
-                Apaga sua conta e todos os seus testes, resultados e
-                check-ins. Essa ação não pode ser desfeita.
+        <div class="config-item config-item-coluna" id="config-tema">
 
-            </p>
+            <div class="config-item-texto">
+                <strong>Tema</strong>
+                <span>Escolha a aparência do Mentis</span>
+            </div>
 
-            <div class="priv-acoes">
+            <div
+                class="config-opcoes config-opcoes-tema"
+                role="group"
+                aria-label="Tema">
 
                 <button
                     type="button"
-                    class="priv-botao priv-botao-perigo"
-                    id="abrir-exclusao"
-                    aria-expanded="false"
-                    aria-controls="form-exclusao">
-
-                    Excluir minha conta
-
-                </button>
-
-            </div>
-
-            <form
-                class="priv-form"
-                id="form-exclusao"
-                hidden
-                novalidate>
-
-                <div class="priv-campo">
-
-                    <label for="senha-exclusao">
-                        Digite sua senha para confirmar
-                    </label>
-
-                    <input
-                        type="password"
-                        id="senha-exclusao"
-                        autocomplete="current-password"
-                        required>
-
-                </div>
-
-                <p
-                    class="priv-mensagem"
-                    id="msg-exclusao"
-                    role="status"
-                    aria-live="polite">
-                </p>
-
-                <button
-                    type="submit"
-                    class="priv-botao priv-botao-perigo-cheio">
-
-                    Excluir definitivamente
-
+                    class="config-opcao"
+                    data-config="tema"
+                    data-valor="claro"
+                    aria-pressed="true">
+                    Claro
                 </button>
 
                 <button
                     type="button"
-                    class="priv-botao priv-botao-contorno"
-                    id="cancelar-exclusao">
-
-                    Cancelar
-
+                    class="config-opcao"
+                    data-config="tema"
+                    data-valor="escuro"
+                    aria-pressed="false">
+                    Escuro
                 </button>
 
-            </form>
+                <button
+                    type="button"
+                    class="config-opcao"
+                    data-config="tema"
+                    data-valor="alto-contraste"
+                    aria-pressed="false">
+                    Alto contraste
+                </button>
 
-        </section>
+            </div>
 
-    </aside>
+        </div>
 
-{% endif %}
+    </section>
+
+    <button
+        type="button"
+        class="config-restaurar"
+        id="config-restaurar">
+        Restaurar padrão
+    </button>
+
+</aside>
 
 
 <!-- =====================================
-     JAVASCRIPT EXTERNO DO CABEÇALHO
+     PAINEL DE PRIVACIDADE
 ====================================== -->
+
+<aside
+    class="conta-painel config-painel"
+    id="painel-privacidade"
+    data-url-exclusao="{{ url_for('conta_excluir') }}"
+    aria-label="Privacidade e segurança"
+    aria-hidden="true">
+
+    <div class="conta-painel-topo">
+
+        <button
+            type="button"
+            class="conta-fechar"
+            id="privacidade-voltar"
+            aria-label="Voltar">
+            &larr;
+        </button>
+
+        <span>Privacidade e segurança</span>
+
+        <button
+            type="button"
+            class="conta-fechar"
+            id="privacidade-fechar"
+            aria-label="Fechar painel">
+            &times;
+        </button>
+
+    </div>
+
+    <section class="config-grupo">
+
+        <h3>Segurança</h3>
+
+        <form
+            class="priv-form"
+            id="form-senha"
+            data-url="{{ url_for('conta_alterar_senha') }}"
+            novalidate>
+
+            <div class="priv-campo">
+                <label for="senha-atual">Senha atual</label>
+
+                <input
+                    type="password"
+                    id="senha-atual"
+                    autocomplete="current-password"
+                    required>
+            </div>
+
+            <div class="priv-campo">
+                <label for="senha-nova">
+                    Nova senha (mínimo 8 caracteres)
+                </label>
+
+                <input
+                    type="password"
+                    id="senha-nova"
+                    autocomplete="new-password"
+                    minlength="8"
+                    required>
+            </div>
+
+            <div class="priv-campo">
+                <label for="senha-confirmar">
+                    Confirmar nova senha
+                </label>
+
+                <input
+                    type="password"
+                    id="senha-confirmar"
+                    autocomplete="new-password"
+                    minlength="8"
+                    required>
+            </div>
+
+            <p
+                class="priv-mensagem"
+                id="msg-senha"
+                role="status"
+                aria-live="polite">
+            </p>
+
+            <button type="submit" class="priv-botao">
+                Alterar senha
+            </button>
+
+        </form>
+
+    </section>
+
+    <section class="config-grupo">
+
+        <h3>Privacidade</h3>
+
+        <p class="priv-texto">
+            A Mentis guarda seu e-mail, suas respostas, seus resultados
+            e seus check-ins de humor para montar o seu histórico, que
+            só é exibido na sua conta. A senha é guardada de forma
+            protegida (hash), nunca em texto. Os resultados são
+            indicadores de bem-estar e não substituem um diagnóstico
+            médico.
+        </p>
+
+        <div class="priv-acoes">
+
+            <a
+                class="priv-botao priv-botao-contorno"
+                href="{{ url_for('baixar_dados') }}"
+                download>
+                Baixar meus dados
+            </a>
+
+        </div>
+
+    </section>
+
+    <section class="config-grupo">
+
+        <h3>Excluir conta</h3>
+
+        <p class="priv-texto">
+            Apaga sua conta e todos os seus testes, resultados e
+            check-ins. Essa ação não pode ser desfeita.
+        </p>
+
+        <div class="priv-acoes">
+
+            <button
+                type="button"
+                class="priv-botao priv-botao-perigo"
+                id="abrir-exclusao"
+                aria-expanded="false"
+                aria-controls="form-exclusao">
+                Excluir minha conta
+            </button>
+
+        </div>
+
+        <form
+            class="priv-form"
+            id="form-exclusao"
+            hidden
+            novalidate>
+
+            <div class="priv-campo">
+
+                <label for="senha-exclusao">
+                    Digite sua senha para confirmar
+                </label>
+
+                <input
+                    type="password"
+                    id="senha-exclusao"
+                    autocomplete="current-password"
+                    required>
+
+            </div>
+
+            <p
+                class="priv-mensagem"
+                id="msg-exclusao"
+                role="status"
+                aria-live="polite">
+            </p>
+
+            <button
+                type="submit"
+                class="priv-botao priv-botao-perigo-cheio">
+                Excluir definitivamente
+            </button>
+
+            <button
+                type="button"
+                class="priv-botao priv-botao-contorno"
+                id="cancelar-exclusao">
+                Cancelar
+            </button>
+
+        </form>
+
+    </section>
+
+</aside>
+
+{% endif %}
 
 <script src="{{ url_for('static', filename='js/header.js') }}"></script>
